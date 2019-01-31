@@ -18,5 +18,13 @@ namespace ChatLib
 	{
 		eOk = 0x01,
 		eError = 0x02,
+		eNotSet = 0x03,
+	};
+	enum MessageType
+	{
+		eNameRequest = 0x01,
+		eMessageRequest = 0x02,
+		eResponseOk = 0x03,
+		eResponceError = 0x04,
 	};
 }

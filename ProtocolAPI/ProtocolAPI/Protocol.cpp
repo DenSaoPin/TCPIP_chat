@@ -31,14 +31,14 @@ namespace ChatLib
 			//TODO UNIX check error
 		}
 		else if (result == 0)
-		{
+		{ 
 			//TODO win check error and timeout
 		}
 		else
 		{
 			if (FD_ISSET(socket, &rfds))
 			{
-				Message message = RecieveMessage(socket);
+				Message message = RecieveMessageFromServer(socket);
 
 				SendResponse(eOk, socket);
 
@@ -47,9 +47,10 @@ namespace ChatLib
 		}
 	}
 
-	Message Protocol::RecieveMessage(int socket)
+	Message Protocol::RecieveMessageFromServer(int socket)
 	{
-		//TODO check revieved num
+
+		//TODO check recieved num
 		char buff[MAX_PACKAGE_LENGTH];
 		int recived = recv(socket, buff, sizeof buff, NULL);
 		if (recived == 0)
@@ -66,29 +67,23 @@ namespace ChatLib
 
 			//TODO refactor It must be inside message
 			//TODO maybe lost data after recieve
-			if (*(int*)buff == HEADER_START)
-			{
-				switch (buff[4])
-				{
-				case eRequest:
-					str.append(buff, HEADER_SIZE + buff[6]);
-					break;
-				case eResponce:
-					str.append(buff, HEADER_SIZE);
-					break;
-				default:
-					throw new std::exception(" Not filled package type or package is trash \n");
-				}
 
-				switch (buff[5])
-				{
-				case eSendName:
-					break;
-				case eSendMessage:
-					break;
-				default:
-					throw new std::exception(" Not filled sixth header element or package is trash \n");
-				}
+			MessageType type = GetMessageType(buff);
+
+			switch (type)
+			{
+			case eNameRequest:
+				str.append(buff, HEADER_SIZE + buff[MESSAGE_LENGTH_INDEX]);
+				break;
+			case eMessageRequest:
+				str.append(buff, HEADER_SIZE + buff[MESSAGE_LENGTH_INDEX]);
+				break;
+			case eResponseOk:
+				str.append(buff, HEADER_SIZE);
+				break;
+			case eResponceError:
+				str.append(buff, HEADER_SIZE);
+				break;
 			}
 			//TODO THIS______________________________________________________________________
 			Message message(str);
@@ -119,15 +114,14 @@ namespace ChatLib
 			//TODO check with length = 1
 			//TODO check & + [] + string
 			sended = send(socket, &(package.c_str()[package.length() - length]), length,
-			              NULL);
+				NULL);
 			length -= sended;
 			if (sended == -1)
 			{
 				break;
 				//TODO check error WIN \ UNIX
 			}
-		}
-		while (length > 0);
+		} while (length > 0);
 	}
 
 	Response Protocol::RecieveAnswer(int socket)
@@ -135,7 +129,7 @@ namespace ChatLib
 		char recvBuffer[RESPONSE_OK_LENGTH];
 
 		int recieved = 0;
-		Response response;
+		Response response = eNotSet;
 		do
 		{
 			recieved = recv(socket, recvBuffer, RESPONSE_OK_LENGTH, NULL);
@@ -149,31 +143,12 @@ namespace ChatLib
 			}
 			else
 			{
-				if (*(int*)recvBuffer == HEADER_START)
-				{
-					//TODO check
-					if ((int)recvBuffer[4] == eResponce)
-					{
-						if ((int)recvBuffer[5] == eOk)
-							return eOk;
-						else if ((int)recvBuffer[5] == eError)
-							return eError;
-						else
-						{
-							//TODO
-							//throw new std::exception(" Wrong Response \n");
-							//std::cout << " Wrong Response \n";
-						}
-					}
-				}
-				else
-				{
-					//TODO exception
-				}
+				return response = CheckResponseStatus(recvBuffer);
 			}
 			//TODO maybe while responce != oK
 		}
 		//while (recieved < RESPONSE_OK_LENGTH);
+		//TODO check 
 		while (true);
 	}
 
@@ -186,5 +161,64 @@ namespace ChatLib
 	bool Protocol::IsLegalPackage(char* buff)
 	{
 		return false;
+	}
+
+	Response Protocol::CheckResponseStatus(char* buff)
+	{
+		if (*(int *)buff == HEADER_START)
+		{
+			//TODO check
+			if ((int)buff[4] == eResponce)
+			{
+				if ((int)buff[5] == eOk)
+					return eOk;
+				else if ((int)buff[5] == eError)
+					return eError;
+				else
+				{
+					//TODO
+					//throw new std::exception(" Wrong Response \n");
+					//std::cout << " Wrong Response \n";
+				}
+			}
+		}
+		else
+		{
+			//TODO exception
+		}
+	}
+
+	MessageType Protocol::GetMessageType(char* buff)
+	{
+		if (*(int*)buff == HEADER_START)
+		{
+			switch (buff[MESSAGE_TYPE_INDEX])
+			{
+			case eRequest:
+
+				if (buff[CONTENT_TYPE_INDEX] == eSendName)
+				{
+					return eNameRequest;
+				}
+				else if (buff[CONTENT_TYPE_INDEX] == eSendMessage)
+				{
+					return eMessageRequest;
+				}
+				break;
+			case eResponce:
+				if (buff[CONTENT_TYPE_INDEX] == eResponseOk)
+				{
+					return eResponseOk;
+				}
+				else if (buff[CONTENT_TYPE_INDEX] == eResponceError)
+				{
+					return eResponceError;
+				}
+				break;
+			default:
+				throw new std::exception(" Not filled package type or package is trash \n");
+			}
+		}
+		//MesageType Protocol::CheckPackageType()
 	}
 }
