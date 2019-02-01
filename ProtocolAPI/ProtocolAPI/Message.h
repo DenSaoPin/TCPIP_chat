@@ -34,13 +34,41 @@ namespace ChatLib
 			Header.push_back((char)eResponce);
 			Header.push_back((char)responseVal);
 		}
+		void FillHeader(MessageType messageType)
+		{
+			switch (messageType)
+			{
+			case eNameRequest:
+				break;
+			case eMessageRequest:
+				break;
+			case eResponseOk:
+				break;
+			case eResponceError:
+				break;
+			}
+			Header.append(_mStartHeaderPoint, 4);
+		}
 		void FillHeader()
 		{
 			Header.append(_mStartHeaderPoint, 4);
 		}
 
+
 	public:
 		//std::string MessageID;
+
+		Message(MessageType messageType, std::string *pstrMessage = nullptr)
+		{
+			FillHeader(messageType);
+			if (pstrMessage != nullptr)
+			{
+				MessageText = *pstrMessage;
+				Header.push_back(MessageText.length());
+				//_package = Header + MessageText;
+			}
+		}
+
 
 		Message(Response responseVal, std::string *pstrMessage = nullptr)
 		{

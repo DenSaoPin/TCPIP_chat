@@ -4,6 +4,7 @@
 #include "Message.h"
 #include <WinSock2.h>
 #include <WS2tcpip.h>
+#include <vector>
 
 #define MAX_PACKAGE_LENGTH 255
 #define HEADER_SIZE 7
@@ -21,7 +22,7 @@ namespace ChatLib
 
 		Message TryRecieveMessage(int socket);
 
-		Message RecieveMessageFromServer(int socket);
+		Message RecieveMessage(int socket);
 
 		void SendMessagee(Message message, int socket);
 
@@ -34,6 +35,10 @@ namespace ChatLib
 		Response CheckResponseStatus(char* buff);
 
 		MessageType GetMessageType(char* buff);
+
+		int IncomingMessageNum(std::vector<int> &sockVec);
+
+		//int IncomingMessageNum(int &socket);
 
 		void f1();
 	};

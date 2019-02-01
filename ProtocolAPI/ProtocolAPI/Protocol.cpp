@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Protocol.h"
 #include <iostream>
+#include <vector>
 
 namespace ChatLib
 {
@@ -25,6 +26,8 @@ namespace ChatLib
 		timeout.tv_sec = 0;
 		timeout.tv_usec = 500;
 
+		Message message;
+
 		int result = select(maxNumFD, &rfds, NULL, NULL, &timeout);
 		if (result < 0)
 		{
@@ -38,16 +41,15 @@ namespace ChatLib
 		{
 			if (FD_ISSET(socket, &rfds))
 			{
-				Message message = RecieveMessageFromServer(socket);
+				message = RecieveMessage(socket);
 
 				SendResponse(eOk, socket);
-
-				return message;
 			}
 		}
+		return message;
 	}
 
-	Message Protocol::RecieveMessageFromServer(int socket)
+	Message Protocol::RecieveMessage(int socket)
 	{
 
 		//TODO check recieved num
@@ -63,7 +65,7 @@ namespace ChatLib
 		}
 		else
 		{
-			std::string str;
+			std::string str = "";
 
 			//TODO refactor It must be inside message
 			//TODO maybe lost data after recieve
@@ -74,6 +76,7 @@ namespace ChatLib
 			{
 			case eNameRequest:
 				str.append(buff, HEADER_SIZE + buff[MESSAGE_LENGTH_INDEX]);
+				Message message(eNameRequest, str);
 				break;
 			case eMessageRequest:
 				str.append(buff, HEADER_SIZE + buff[MESSAGE_LENGTH_INDEX]);
@@ -221,4 +224,46 @@ namespace ChatLib
 		}
 		//MesageType Protocol::CheckPackageType()
 	}
+
+	int IncomingMessageNum(std::vector<int> &socketVec)
+	{
+		fd_set rfds;
+		FD_ZERO(&rfds);
+
+		std::vector<int>::iterator it;
+
+		int maxNumFD = 0;
+		for (it = socketVec.begin(); it != socketVec.end(); it++)
+		{
+			FD_SET(*it, &rfds);
+			maxNumFD = max(maxNumFD, *it);
+		}
+		maxNumFD++;
+
+		timeval timeout;
+		timeout.tv_sec = 0;
+		timeout.tv_usec = 500;
+
+		Message message;
+
+		int result = select(maxNumFD, &rfds, NULL, NULL, &timeout);
+		return result;
+	}
+	//int IncomingMessageNum(int &sockfd)
+	//{
+	//	fd_set rfds;
+	//	FD_ZERO(&rfds);
+	//	FD_SET(sockfd, &rfds);
+	//	int maxNumFD = sockfd + 1;
+
+	//	timeval timeout;
+	//	timeout.tv_sec = 0;
+	//	timeout.tv_usec = 500;
+
+	//	Message message;
+
+	//	int result = select(maxNumFD, &rfds, NULL, NULL, &timeout);
+	//	return result;
+	//}
+
 }
