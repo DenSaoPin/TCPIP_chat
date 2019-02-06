@@ -1,6 +1,9 @@
 #pragma once
 #include <string>
 #include "Enums.h"
+#include "Protocol.h"
+
+
 
 namespace ChatLib
 {
@@ -11,43 +14,27 @@ namespace ChatLib
 		std::string MessageText;
 		std::string Header;
 
-		//std::string CombineFullPackage()
-		//{
-		//	_package = Header + MessageText;
-		//	return _package;
-		//}
-
 		char _mStartHeaderPoint[4] = { (char)0xFF, (char)0xFF, (char)0xFF, (char)0xFF };
-		PackageType _mPackageType;
-		Response _mResponse;
-		Request _mRequest;
+		//PackageType _mPackageType;
+		//Response _mResponse;
+		//Request _mRequest;
 
-		void FillHeader(PackageType type, Request requestVal)
-		{
-			Header.append(_mStartHeaderPoint, 4);
-			Header.push_back((char)eResponce);
-			Header.push_back((char)requestVal);
-		}
-		void FillHeader(PackageType type, Response responseVal)
-		{
-			Header.append(_mStartHeaderPoint, 4);
-			Header.push_back((char)eResponce);
-			Header.push_back((char)responseVal);
-		}
+		//void FillHeader(PackageType type, Request requestVal)
+		//{
+		//	Header.append(_mStartHeaderPoint, 4);
+		//	Header.push_back((char)eResponce);
+		//	Header.push_back((char)requestVal);
+		//}
+		//void FillHeader(PackageType type, Response responseVal)
+		//{
+		//	Header.append(_mStartHeaderPoint, 4);
+		//	Header.push_back((char)eResponce);
+		//	Header.push_back((char)responseVal);
+		//}
 		void FillHeader(MessageType messageType)
 		{
-			switch (messageType)
-			{
-			case eNameRequest:
-				break;
-			case eMessageRequest:
-				break;
-			case eResponseOk:
-				break;
-			case eResponceError:
-				break;
-			}
 			Header.append(_mStartHeaderPoint, 4);
+			Header.push_back((char)messageType);
 		}
 		void FillHeader()
 		{
@@ -70,24 +57,24 @@ namespace ChatLib
 		}
 
 
-		Message(Response responseVal, std::string *pstrMessage = nullptr)
-		{
-			FillHeader(eResponce, responseVal);
-			if (pstrMessage != nullptr)
-			{
-				MessageText = *pstrMessage;
-				Header.push_back(MessageText.length());
-				//_package = Header + MessageText;
-			}
-		}
+		//Message(Response responseVal, std::string *pstrMessage = nullptr)
+		//{
+		//	FillHeader(eResponce, responseVal);
+		//	if (pstrMessage != nullptr)
+		//	{
+		//		MessageText = *pstrMessage;
+		//		Header.push_back(MessageText.length());
+		//		//_package = Header + MessageText;
+		//	}
+		//}
 
-		Message(Request requestVal, std::string message)
-		{
-			FillHeader(eRequest, requestVal);
+		//Message(Request requestVal, std::string message)
+		//{
+		//	FillHeader(eRequest, requestVal);
 
-			MessageText = message;
-			Header.push_back(message.length());
-		}
+		//	MessageText = message;
+		//	Header.push_back(message.length());
+		//}
 
 		Message(std::string str)
 		{
@@ -132,6 +119,11 @@ namespace ChatLib
 			MessageText = text;
 		}
 
+		MessageType GetType()
+		{
+			return  (MessageType)Header[MESSAGE_TYPE_INDEX];
+		}
+
 		//std::string GetFullPackage()
 		//{
 		//	CombineFullPackage();
@@ -139,4 +131,6 @@ namespace ChatLib
 		//	return _package;
 		//}
 	};
+	typedef Message & MessageR;
+	typedef Message * MessageP;
 }

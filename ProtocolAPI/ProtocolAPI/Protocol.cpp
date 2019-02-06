@@ -1,18 +1,19 @@
 #include "stdafx.h"
 #include "Protocol.h"
+#include "Message.h"
 #include <iostream>
 #include <vector>
 
 namespace ChatLib
 {
-	Response Protocol::TrySendMessage(Message message, int socket)
+	MessageType Protocol::TrySendMessage(Message message, int socket)
 	{
 		//TODO need to know sent message or not
 		SendMessagee(message, socket);
 
-		Response response = RecieveAnswer(socket);
+		MessageType messageType = RecieveAnswer(socket);
 
-		return response;
+		return messageType;
 	}
 
 	Message Protocol::TryRecieveMessage(int socket)
@@ -43,7 +44,7 @@ namespace ChatLib
 			{
 				message = RecieveMessage(socket);
 
-				SendResponse(eOk, socket);
+				SendResponse(eResponseOk, socket);
 			}
 		}
 		return message;
@@ -76,7 +77,6 @@ namespace ChatLib
 			{
 			case eNameRequest:
 				str.append(buff, HEADER_SIZE + buff[MESSAGE_LENGTH_INDEX]);
-				Message message(eNameRequest, str);
 				break;
 			case eMessageRequest:
 				str.append(buff, HEADER_SIZE + buff[MESSAGE_LENGTH_INDEX]);
@@ -127,12 +127,12 @@ namespace ChatLib
 		} while (length > 0);
 	}
 
-	Response Protocol::RecieveAnswer(int socket)
+	MessageType Protocol::RecieveAnswer(int socket)
 	{
 		char recvBuffer[RESPONSE_OK_LENGTH];
 
 		int recieved = 0;
-		Response response = eNotSet;
+		MessageType response = eNotSet;
 		do
 		{
 			recieved = recv(socket, recvBuffer, RESPONSE_OK_LENGTH, NULL);
@@ -146,7 +146,7 @@ namespace ChatLib
 			}
 			else
 			{
-				return response = CheckResponseStatus(recvBuffer);
+				return response = GetMessageType(recvBuffer);
 			}
 			//TODO maybe while responce != oK
 		}
@@ -155,9 +155,9 @@ namespace ChatLib
 		while (true);
 	}
 
-	void Protocol::SendResponse(Response responceVal, int socket, std::string* pstrMessage)
+	void Protocol::SendResponse(MessageType messageType, int socket, std::string* pstrMessage)
 	{
-		Message message(responceVal, pstrMessage);
+		Message message(messageType, pstrMessage);
 		SendMessagee(message, socket);
 	}
 
@@ -166,60 +166,68 @@ namespace ChatLib
 		return false;
 	}
 
-	Response Protocol::CheckResponseStatus(char* buff)
-	{
-		if (*(int *)buff == HEADER_START)
-		{
-			//TODO check
-			if ((int)buff[4] == eResponce)
-			{
-				if ((int)buff[5] == eOk)
-					return eOk;
-				else if ((int)buff[5] == eError)
-					return eError;
-				else
-				{
-					//TODO
-					//throw new std::exception(" Wrong Response \n");
-					//std::cout << " Wrong Response \n";
-				}
-			}
-		}
-		else
-		{
-			//TODO exception
-		}
-	}
+	//MessageType Protocol::CheckResponseStatus(char* buff)
+	//{
+	//	if (*(int *)buff == HEADER_START)
+	//	{
+	//		//TODO check
+	//		if ((int)buff[4] == eResponce)
+	//		{
+	//			if ((int)buff[5] == eOk)
+	//				return eOk;
+	//			else if ((int)buff[5] == eError)
+	//				return eError;
+	//			else
+	//			{
+	//				//TODO
+	//				//throw new std::exception(" Wrong Response \n");
+	//				//std::cout << " Wrong Response \n";
+	//			}
+	//		}
+	//	}
+	//	else
+	//	{
+	//		//TODO exception
+	//	}
+	//}
 
 	MessageType Protocol::GetMessageType(char* buff)
 	{
 		if (*(int*)buff == HEADER_START)
 		{
+			//MessageType messageType = buff[MESSAGE_TYPE_INDEX];
+			
 			switch (buff[MESSAGE_TYPE_INDEX])
 			{
-			case eRequest:
+				case eNameRequest:
+				case eMessageRequest:
+				case eResponseOk:
+				case eResponceError:
+					return (MessageType)buff[MESSAGE_TYPE_INDEX];
+				default:
+					throw new std::exception(" Not filled package type or package is trash \n");
+			//case eRequest:
 
-				if (buff[CONTENT_TYPE_INDEX] == eSendName)
-				{
-					return eNameRequest;
-				}
-				else if (buff[CONTENT_TYPE_INDEX] == eSendMessage)
-				{
-					return eMessageRequest;
-				}
-				break;
-			case eResponce:
-				if (buff[CONTENT_TYPE_INDEX] == eResponseOk)
-				{
-					return eResponseOk;
-				}
-				else if (buff[CONTENT_TYPE_INDEX] == eResponceError)
-				{
-					return eResponceError;
-				}
-				break;
-			default:
-				throw new std::exception(" Not filled package type or package is trash \n");
+			//	if (buff[CONTENT_TYPE_INDEX] == eSendName)
+			//	{
+			//		return eNameRequest;
+			//	}
+			//	else if (buff[CONTENT_TYPE_INDEX] == eSendMessage)
+			//	{
+			//		return eMessageRequest;
+			//	}
+			//	break;
+			//case eResponce:
+			//	if (buff[CONTENT_TYPE_INDEX] == eResponseOk)
+			//	{
+			//		return eResponseOk;
+			//	}
+			//	else if (buff[CONTENT_TYPE_INDEX] == eResponceError)
+			//	{
+			//		return eResponceError;
+			//	}
+			//	break;
+
 			}
 		}
 		//MesageType Protocol::CheckPackageType()
