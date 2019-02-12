@@ -52,7 +52,6 @@ namespace ChatLib
 
 	Message Protocol::RecieveMessage(int socket)
 	{
-
 		//TODO check recieved num
 		char buff[MAX_PACKAGE_LENGTH];
 		int recived = recv(socket, buff, sizeof buff, NULL);
@@ -73,23 +72,8 @@ namespace ChatLib
 
 			MessageType type = GetMessageType(buff);
 
-			switch (type)
-			{
-			case eNameRequest:
-				str.append(buff, HEADER_SIZE + buff[MESSAGE_LENGTH_INDEX]);
-				break;
-			case eMessageRequest:
-				str.append(buff, HEADER_SIZE + buff[MESSAGE_LENGTH_INDEX]);
-				break;
-			case eResponseOk:
-				str.append(buff, HEADER_SIZE);
-				break;
-			case eResponceError:
-				str.append(buff, HEADER_SIZE);
-				break;
-			}
-			//TODO THIS______________________________________________________________________
-			Message message(str);
+			Message message(type, buff);
+		
 			return message;
 			//if (IsLegalPackage(buff))
 			//{
@@ -230,6 +214,7 @@ namespace ChatLib
 
 			}
 		}
+		throw new std::exception(" It isn`t message \n");
 		//MesageType Protocol::CheckPackageType()
 	}
 

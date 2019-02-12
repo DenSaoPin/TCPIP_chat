@@ -51,7 +51,7 @@ namespace ChatLib
 			if (pstrMessage != nullptr)
 			{
 				MessageText = *pstrMessage;
-				Header.push_back(MessageText.length());
+				Header.push_back((char)MessageText.length());
 				//_package = Header + MessageText;
 			}
 		}
@@ -78,8 +78,24 @@ namespace ChatLib
 
 		Message(std::string str)
 		{
+			FillHeader();
 			//TODO check copy or ref
 			MessageText = str;
+			Header.push_back((char)MessageText.length());
+		}
+
+		Message(MessageType messageType, char* buff)
+		{
+			FillHeader(messageType);
+			//TODO check 
+			//MessageText.append(buff, (int)buff[5]);
+
+			if(messageType == eMessageRequest || messageType == eNameRequest)
+			{
+				MessageText.append(buff, MESSAGE_START_TEXT_INDEX, (int)buff[MESSAGE_LENGTH_INDEX]);
+			}
+
+			Header.push_back((char)MessageText.length());
 		}
 
 		//Message(std::string str)
@@ -90,6 +106,8 @@ namespace ChatLib
 		Message()
 		{
 			FillHeader();
+
+			Header.push_back((char)0);
 		}
 
 		//int GetPackageLength()
@@ -122,6 +140,10 @@ namespace ChatLib
 		MessageType GetType()
 		{
 			return  (MessageType)Header[MESSAGE_TYPE_INDEX];
+		}
+		int GetTextLength()
+		{
+			 return MessageText.length();
 		}
 
 		//std::string GetFullPackage()
