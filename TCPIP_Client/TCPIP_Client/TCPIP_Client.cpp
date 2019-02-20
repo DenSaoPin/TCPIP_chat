@@ -2,13 +2,11 @@
 //
 #pragma comment (lib, "Ws2_32.lib")
 
-
 #include <iostream>
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 #include <stdio.h>
 #include <string>
-#include <random>
 #include <thread>
 #include "../../ProtocolAPI/ProtocolAPI/Message.h"
 #include <future>
@@ -68,11 +66,12 @@ public:
 		}
 		return  ret;
 	}
-	void PrintMessage(std::string str)
+	void PrintMessage(const std::string& str)
 	{
 		std::cout << str;
 	}
-	void PrintMessage(ChatLib::Message msg)
+	//TODO why can`t I set const & string if i invoce method?
+	void PrintMessage(ChatLib::Message& msg)
 	{
 		std::cout << msg.GetText();
 	}
@@ -96,7 +95,7 @@ public:
 		//TODO don`t copy?
 		//Response TrySendMessage(const std::string& cs);
 		
-		TCPIP_Client(std::string name, std::string serverIP, std::string serverPort)
+		TCPIP_Client(const std::string& name, const std::string& serverIP, const std::string& serverPort)
 		{
 			Name = name;
 			ServerIP = serverIP;
@@ -137,13 +136,11 @@ public:
 			hints.ai_protocol = IPPROTO_TCP;
 			//hints.ai_flags = AI_PASSIVE;
 
-
 			//TODO check errors
 			if (int status = getaddrinfo(ServerIP.c_str(), ServerPort.c_str(), &hints, &servinfo) != 0)
 			{
 				std::cout << "getaddrinfo error: \n" << gai_strerror(status) << std::endl;
 			}
-
 
 			Socket = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
 
@@ -154,7 +151,6 @@ public:
 			{
 				std::cout << "connect error: " << gai_strerror(status) << std::endl;
 			}
-
 		}
 
 		int GetSocket()
@@ -162,32 +158,10 @@ public:
 			return Socket;
 		}
 	};
-	 void UserInput(std::string &message)
-	{
-		std::cin >> message;
-	}
-	 std::string GetUserInput()
-	 {
-		 std::string s;
-		 std::cin >> s;
-		 return s;
-	 }
-	 typedef std::shared_ptr<std::future<std::basic_string<char>>> StdFuturePtr;
-	 StdFuturePtr CreateCinReadingThread()
-	 {
-		 return StdFuturePtr(&(std::async(std::launch::async, []
-		 {
-			 std::string s = "";
-			 std::cin >> s;
-		 	 return s;
-		 })));
-	 }
 
 //TODO check
 	 int main()
 	 {
-		 //setlocale(LC_ALL, "Russian");
-
 		 UIInterface ui;
 		 std::string confClientName = ui.GetName();
 		 std::string confServerIP = ui.GetIP();
@@ -213,12 +187,7 @@ public:
 			 if (message.GetText().length() != 0)
 				 ui.PrintMessage(message);
 
-			 //std::chrono::milliseconds time(100);
-
-			 //std::future<std::string> future = std::async(GetUserInput);
-
-			 //while(future.wait_for(time) == std::future_status::timeout)
-
+			 //TODO what we have in getline if we received a message at the moment when we write a message
 			 if (!asyncThread.valid())
 			 {
 				 asyncThread = std::async(std::launch::async, []
@@ -227,7 +196,6 @@ public:
 					 if (std::getline(std::cin, s)) return s;
 				 });
 			 }
-
 
 			 std::string str;
 			 if(asyncThread.wait_for(std::chrono::seconds(1)) == std::future_status::ready)

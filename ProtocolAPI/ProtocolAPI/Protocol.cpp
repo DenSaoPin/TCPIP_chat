@@ -1,12 +1,11 @@
 #include "stdafx.h"
 #include "Protocol.h"
 #include "Message.h"
-#include <iostream>
 #include <vector>
 
 namespace ChatLib
 {
-	MessageType Protocol::TrySendMessage(Message message, CROSS_SOCKET socket)
+	const MessageType Protocol::TrySendMessage(const Message& message,const CROSS_SOCKET& socket)
 	{
 		//TODO need to know sent message or not
 		SendMessagee(message, socket);
@@ -16,7 +15,7 @@ namespace ChatLib
 		return response.GetType();
 	}
 
-	Message Protocol::TryRecieveMessage(CROSS_SOCKET socket)
+	const Message Protocol::TryRecieveMessage(const CROSS_SOCKET& socket)
 	{
 		fd_set rfds;
 		FD_ZERO(&rfds);
@@ -35,6 +34,7 @@ namespace ChatLib
 		}
 		else if (result == 0)
 		{ 
+
 			//TODO win check error and timeout
 		}
 		else
@@ -50,7 +50,7 @@ namespace ChatLib
 		return message;
 	}
 
-	 Message Protocol::RecieveMessage(CROSS_SOCKET socket)
+	 const Message Protocol::RecieveMessage(const CROSS_SOCKET& socket)
 	{
 		//TODO check recieved num
 		char buff[MAX_PACKAGE_LENGTH];
@@ -79,12 +79,12 @@ namespace ChatLib
 
 			MessageType type = GetMessageType(buff);
 
-			printf("Recieved message type equal %d ", type);
+			printf("Recieved message type equal %d \n", type);
     		//Message message(eInvalid);
 
 			Message message (type, buff);
 
-			printf("Recieved message equal %s ", message.GetText());
+			printf("Recieved message equal %s \n", message.GetText());
 
 			//if(*(int*)buff == HEADER_START)
 			//{
@@ -111,7 +111,7 @@ namespace ChatLib
 		return Message(eInvalid);
 	}
 
-	void Protocol::SendMessagee(Message message, CROSS_SOCKET socket)
+	void Protocol::SendMessagee(const Message& message, const CROSS_SOCKET& socket)
 	{
 		//TODO refactor this
 		//message.
@@ -175,13 +175,13 @@ namespace ChatLib
 	//	while (true);
 	//}
 
-	void Protocol::SendResponse(MessageType messageType, CROSS_SOCKET socket)    //, std::string strMessage)
+	void Protocol::SendResponse(const MessageType& messageType, const CROSS_SOCKET& socket)    //, std::string strMessage)
 	{
 		Message message(messageType);                                   //, strMessage);
 		SendMessagee(message, socket);
 	}
 
-	bool Protocol::IsLegalPackage(char* buff)
+	const bool Protocol::IsLegalPackage(const char* buff)
 	{
 		return false;
 	}
@@ -211,55 +211,21 @@ namespace ChatLib
 	//	}
 	//}
 
-	MessageType Protocol::GetMessageType(char* buff)
+	const MessageType Protocol::GetMessageType(const char* buff)
 	{
 		if (*((int*)buff) == HEADER_START)
 		{
 			char messageType = buff[MESSAGE_TYPE_INDEX];
 
-			if(	messageType == eNameRequest ||
+			if (messageType == eNameRequest ||
 				messageType == eMessageRequest ||
 				messageType == eResponseOk ||
 				messageType == eResponceError)
 				return (MessageType)messageType;
-			
+
 			throw std::exception(" Not filled package type or package is trash \n");
-			
-			//switch (messageType)
-			//{
-			//	case eNameRequest:
-			//	case eMessageRequest:
-			//	case eResponseOk:
-			//	case eResponceError:
-			//		return messageType;
-			//	default:
-			//		throw std::exception(" Not filled package type or package is trash \n");
-			////case eRequest:
-
-			////	if (buff[CONTENT_TYPE_INDEX] == eSendName)
-			////	{
-			////		return eNameRequest;
-			////	}
-			////	else if (buff[CONTENT_TYPE_INDEX] == eSendMessage)
-			////	{
-			////		return eMessageRequest;
-			////	}
-			////	break;
-			////case eResponce:
-			////	if (buff[CONTENT_TYPE_INDEX] == eResponseOk)
-			////	{
-			////		return eResponseOk;
-			////	}
-			////	else if (buff[CONTENT_TYPE_INDEX] == eResponceError)
-			////	{
-			////		return eResponceError;
-			////	}
-			////	break;
-
-			//}
 		}
 		throw std::exception(" It isn`t message \n");
-		//MesageType Protocol::CheckPackageType()
 	}
 
 	int IncomingMessageNum(SocketsVector &socketVec)
@@ -286,21 +252,21 @@ namespace ChatLib
 		int result = select(maxNumFD, &rfds, NULL, NULL, &timeout);
 		return result;
 	}
-	//int IncomingMessageNum(int &sockfd)
-	//{
-	//	fd_set rfds;
-	//	FD_ZERO(&rfds);
-	//	FD_SET(sockfd, &rfds);
-	//	int maxNumFD = sockfd + 1;
+	int IncomingMessageNum(int &sockfd)
+	{
+		fd_set rfds;
+		FD_ZERO(&rfds);
+		FD_SET(sockfd, &rfds);
+		int maxNumFD = sockfd + 1;
 
-	//	timeval timeout;
-	//	timeout.tv_sec = 0;
-	//	timeout.tv_usec = 500;
+		timeval timeout;
+		timeout.tv_sec = 0;
+		timeout.tv_usec = 500;
 
-	//	Message message;
+		int result = select(maxNumFD, &rfds, NULL, NULL, &timeout);
 
-	//	int result = select(maxNumFD, &rfds, NULL, NULL, &timeout);
-	//	return result;
-	//}
+		//TODO error check
+		return result;
+	}
 
 }

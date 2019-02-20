@@ -19,7 +19,7 @@ namespace ChatLib
 			char MessageType = 0;
 			char MessageLength = 0;
 
-			Header (ChatLib::MessageType messageType, int messageLength = 0)
+			Header (const ChatLib::MessageType& messageType, const int& messageLength = 0)
 			{
 				MessageType = messageType;
 				MessageLength = messageLength;
@@ -29,7 +29,7 @@ namespace ChatLib
 			{
 			}
 
-			int WriteBytes(char *pBuffer)
+			int WriteBytes(char *pBuffer) const
 			{
 				int b = 0;
 
@@ -84,13 +84,13 @@ namespace ChatLib
 
 		//TODO we will crush is string is nullptr or not?
 		//TODO we can create two constructors
-		Message(MessageType messageType, std::string strMessage) 
+		Message(const MessageType& messageType, const std::string& strMessage) 
 			: header(messageType)
 		{
 			SetText(strMessage);
 		}
 
-		Message(MessageType messageType) 
+		Message(const MessageType& messageType) 
 			: header(messageType)
 		{
 		}
@@ -125,7 +125,7 @@ namespace ChatLib
 		//}
 
 		//TODO check crush or not with string
-		Message(MessageType messageType, char* buff) 
+		Message(const MessageType& messageType, char* buff) 
 			: header(messageType, (int)buff[MESSAGE_LENGTH_INDEX])
 		{
 			if(header.MessageLength > 0)
@@ -153,10 +153,11 @@ namespace ChatLib
 			return  header;
 		}
 
-		int WriteBytes(char *pBuffer)
+		int WriteBytes(char *pBuffer) const
 		{
 			int bytes = header.WriteBytes(pBuffer);
 			pBuffer += bytes;
+			//TODO after .cstr we have changed strnig?
 			memcpy(pBuffer, messageText.c_str(), messageText.length());
 			bytes += (int)messageText.length();
 			return bytes;
@@ -182,9 +183,9 @@ namespace ChatLib
 		//	FillHeader();
 		//}
 
-		std::string GetText()
+		const std::string const GetText() const
 		{
-			return  messageText;
+			return messageText;
 		}
 		void SetText(const std::string & text)
 		{
@@ -194,12 +195,12 @@ namespace ChatLib
 		}
 
 		//TODO what will do if MessageType is not valid 
-		MessageType GetType()
+		const MessageType GetType() const
 		{
 			return  (MessageType)header.MessageType;
 		}
 
-		int GetTextLength()
+		const int GetTextLength() const
 		{
 			 return (int)messageText.length();
 		}

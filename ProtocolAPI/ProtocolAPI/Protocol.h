@@ -32,28 +32,24 @@ namespace ChatLib
 
 	namespace Protocol
 	{
-		MessageType TrySendMessage(Message message, CROSS_SOCKET socket);
+		const MessageType TrySendMessage(const Message& message, const CROSS_SOCKET& socket);
 
-		Message TryRecieveMessage(CROSS_SOCKET socket);
+		const Message TryRecieveMessage(const CROSS_SOCKET& socket);
 
-		Message RecieveMessage(CROSS_SOCKET socket);
+		const Message RecieveMessage(const CROSS_SOCKET& socket);
 
-		void SendMessagee(Message message, CROSS_SOCKET socket);
+		void SendMessagee(const Message& message, const CROSS_SOCKET& socket);
 
 		//MessageType RecieveAnswer(int socket);
 
-		void SendResponse(MessageType responceVal, CROSS_SOCKET socket);//, std::string strMessage);
+		void SendResponse(const MessageType& responceVal, const CROSS_SOCKET& socket); //, std::string strMessage);
 
-		bool IsLegalPackage(char* buff);
+		const bool IsLegalPackage(const char* buff);
 
 		//MessageType CheckResponseStatus(char* buff);
 
-		MessageType GetMessageType(char* buff);
+		const MessageType GetMessageType(const char* buff);
 
-		int IncomingMessageNum(SocketsVector &sockVec);
-
-		//int IncomingMessageNum(int &socket);
-
-		void f1();
+		const int IncomingMessageNum(const SocketsVector &sockVec);
 	};
 }
