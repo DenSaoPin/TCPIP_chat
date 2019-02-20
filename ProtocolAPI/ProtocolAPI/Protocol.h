@@ -2,9 +2,17 @@
 #include <string>
 #include "Enums.h"
 //#include "Message.h"
+#include <vector>
+
+#if defined _WIN32
 #include <WinSock2.h>
 #include <WS2tcpip.h>
-#include <vector>
+#define CROSS_SOCKET SOCKET
+#else
+#endif
+
+typedef std::vector<CROSS_SOCKET> SocketsVector;
+typedef SocketsVector::iterator SocketsVectorIterator;
 
 #define MAX_PACKAGE_LENGTH 255
 #define HEADER_SIZE 6
@@ -24,17 +32,17 @@ namespace ChatLib
 
 	namespace Protocol
 	{
-		MessageType TrySendMessage(Message message, int socket);
+		MessageType TrySendMessage(Message message, CROSS_SOCKET socket);
 
-		Message TryRecieveMessage(int socket);
+		Message TryRecieveMessage(CROSS_SOCKET socket);
 
-		Message RecieveMessage(int socket);
+		Message RecieveMessage(CROSS_SOCKET socket);
 
-		void SendMessagee(Message message, int socket);
+		void SendMessagee(Message message, CROSS_SOCKET socket);
 
-		MessageType RecieveAnswer(int socket);
+		//MessageType RecieveAnswer(int socket);
 
-		void SendResponse(MessageType responceVal, int socket, std::string* pstrMessage = nullptr);
+		void SendResponse(MessageType responceVal, CROSS_SOCKET socket);//, std::string strMessage);
 
 		bool IsLegalPackage(char* buff);
 
@@ -42,7 +50,7 @@ namespace ChatLib
 
 		MessageType GetMessageType(char* buff);
 
-		int IncomingMessageNum(std::vector<int> &sockVec);
+		int IncomingMessageNum(SocketsVector &sockVec);
 
 		//int IncomingMessageNum(int &socket);
 

@@ -6,28 +6,27 @@
 
 namespace ChatLib
 {
-	MessageType Protocol::TrySendMessage(Message message, int socket)
+	MessageType Protocol::TrySendMessage(Message message, CROSS_SOCKET socket)
 	{
 		//TODO need to know sent message or not
 		SendMessagee(message, socket);
 
-		MessageType messageType = RecieveAnswer(socket);
+		Message response = RecieveMessage(socket);
 
-		return messageType;
+		return response.GetType();
 	}
 
-	Message Protocol::TryRecieveMessage(int socket)
+	Message Protocol::TryRecieveMessage(CROSS_SOCKET socket)
 	{
 		fd_set rfds;
 		FD_ZERO(&rfds);
 		FD_SET(socket, &rfds);
-		int maxNumFD = socket;
+		int maxNumFD = (int)socket;
 
 		timeval timeout;
 		timeout.tv_sec = 0;
 		timeout.tv_usec = 500;
-
-		Message message;
+		Message message(eInvalid);
 
 		int result = select(maxNumFD, &rfds, NULL, NULL, &timeout);
 		if (result < 0)
@@ -44,17 +43,24 @@ namespace ChatLib
 			{
 				message = RecieveMessage(socket);
 
-				SendResponse(eResponseOk, socket);
+				if(message.GetType() != eInvalid)
+					SendResponse(eResponseOk, socket);
 			}
 		}
 		return message;
 	}
 
-	Message Protocol::RecieveMessage(int socket)
+	 Message Protocol::RecieveMessage(CROSS_SOCKET socket)
 	{
 		//TODO check recieved num
 		char buff[MAX_PACKAGE_LENGTH];
-		int recived = recv(socket, buff, sizeof buff, NULL);
+		int recived = recv(socket, buff, MAX_PACKAGE_LENGTH, NULL);
+		printf("RecieveMessage %d bytes: ", recived);
+		for (int i = 0; i < recived; i++)
+		{
+			printf("%02X ", buff[i]);
+		}
+		printf("\n");
 		if (recived == 0)
 		{
 			//TODO error check Win and Timeout
@@ -69,11 +75,26 @@ namespace ChatLib
 
 			//TODO refactor It must be inside message
 			//TODO maybe lost data after recieve
+			//buff[4] = 4;
 
 			MessageType type = GetMessageType(buff);
 
-			Message message(type, buff);
-		
+			printf("Recieved message type equal %d ", type);
+    		//Message message(eInvalid);
+
+			Message message (type, buff);
+
+			printf("Recieved message equal %s ", message.GetText());
+
+			//if(*(int*)buff == HEADER_START)
+			//{
+			//	return  Message (type, buff);
+			//}
+			//else
+			//{
+			//	throw new std::exception(" Not filled package type or package is trash \n");
+			//}
+				
 			return message;
 			//if (IsLegalPackage(buff))
 			//{
@@ -87,21 +108,30 @@ namespace ChatLib
 			//	throw new std::exception("It isn`t message");
 			//}
 		}
+		return Message(eInvalid);
 	}
 
-	void Protocol::SendMessagee(Message message, int socket)
+	void Protocol::SendMessagee(Message message, CROSS_SOCKET socket)
 	{
 		//TODO refactor this
 		//message.
-		std::string package = message.GetHeader() + message.GetText();
+
+		char pBuffer[255];
+
 		int sended = 0;
-		int length = package.length();
+		int length = message.WriteBytes(pBuffer);
+		printf("Sending %d bytes: ", length);
+		for(int i = 0; i < length; i++)
+		{
+			printf("%02X ", pBuffer[i]);
+		}
+		printf("...\n");
 		do
 		{
 			//TODO check with length = 1
 			//TODO check & + [] + string
-			sended = send(socket, &(package.c_str()[package.length() - length]), length,
-				NULL);
+			sended = send(socket, pBuffer, length, NULL);
+			printf("Sended %d\n", sended);
 			length -= sended;
 			if (sended == -1)
 			{
@@ -111,37 +141,43 @@ namespace ChatLib
 		} while (length > 0);
 	}
 
-	MessageType Protocol::RecieveAnswer(int socket)
-	{
-		char recvBuffer[RESPONSE_OK_LENGTH];
+	//MessageType Protocol::RecieveAnswer(int socket)
+	//{
+	//	char recvBuffer[RESPONSE_OK_LENGTH];
 
-		int recieved = 0;
-		MessageType response = eNotSet;
-		do
-		{
-			recieved = recv(socket, recvBuffer, RESPONSE_OK_LENGTH, NULL);
-			if (recieved == 0)
-			{
-				//TODO check error or close conn
-			}
-			else if (recieved == -1)
-			{
-				//TODO checkerror
-			}
-			else
-			{
-				return response = GetMessageType(recvBuffer);
-			}
-			//TODO maybe while responce != oK
-		}
-		//while (recieved < RESPONSE_OK_LENGTH);
-		//TODO check 
-		while (true);
-	}
+	//	int recieved = 0;
+	//	MessageType response = eInvalid;
+	//	do
+	//	{
+	//		recieved = recv(socket, recvBuffer, RESPONSE_OK_LENGTH, NULL);
+	//		printf("RecieveAnswer %d bytes: ", recieved);
+	//		for (int i = 0; i < recieved; i++)
+	//		{
+	//			printf("%02X ", recvBuffer[i]);
+	//		}
+	//		printf("\n");
+	//		if (recieved == 0)
+	//		{
+	//			//TODO check error or close conn
+	//		}
+	//		else if (recieved == -1)
+	//		{
+	//			//TODO checkerror
+	//		}
+	//		else
+	//		{
+	//			return response = GetMessageType(recvBuffer);
+	//		}
+	//		//TODO maybe while responce != oK
+	//	}
+	//	//while (recieved < RESPONSE_OK_LENGTH);
+	//	//TODO check 
+	//	while (true);
+	//}
 
-	void Protocol::SendResponse(MessageType messageType, int socket, std::string* pstrMessage)
+	void Protocol::SendResponse(MessageType messageType, CROSS_SOCKET socket)    //, std::string strMessage)
 	{
-		Message message(messageType, pstrMessage);
+		Message message(messageType);                                   //, strMessage);
 		SendMessagee(message, socket);
 	}
 
@@ -177,59 +213,67 @@ namespace ChatLib
 
 	MessageType Protocol::GetMessageType(char* buff)
 	{
-		if (*(int*)buff == HEADER_START)
+		if (*((int*)buff) == HEADER_START)
 		{
-			//MessageType messageType = buff[MESSAGE_TYPE_INDEX];
+			char messageType = buff[MESSAGE_TYPE_INDEX];
+
+			if(	messageType == eNameRequest ||
+				messageType == eMessageRequest ||
+				messageType == eResponseOk ||
+				messageType == eResponceError)
+				return (MessageType)messageType;
 			
-			switch (buff[MESSAGE_TYPE_INDEX])
-			{
-				case eNameRequest:
-				case eMessageRequest:
-				case eResponseOk:
-				case eResponceError:
-					return (MessageType)buff[MESSAGE_TYPE_INDEX];
-				default:
-					throw new std::exception(" Not filled package type or package is trash \n");
-			//case eRequest:
+			throw std::exception(" Not filled package type or package is trash \n");
+			
+			//switch (messageType)
+			//{
+			//	case eNameRequest:
+			//	case eMessageRequest:
+			//	case eResponseOk:
+			//	case eResponceError:
+			//		return messageType;
+			//	default:
+			//		throw std::exception(" Not filled package type or package is trash \n");
+			////case eRequest:
 
-			//	if (buff[CONTENT_TYPE_INDEX] == eSendName)
-			//	{
-			//		return eNameRequest;
-			//	}
-			//	else if (buff[CONTENT_TYPE_INDEX] == eSendMessage)
-			//	{
-			//		return eMessageRequest;
-			//	}
-			//	break;
-			//case eResponce:
-			//	if (buff[CONTENT_TYPE_INDEX] == eResponseOk)
-			//	{
-			//		return eResponseOk;
-			//	}
-			//	else if (buff[CONTENT_TYPE_INDEX] == eResponceError)
-			//	{
-			//		return eResponceError;
-			//	}
-			//	break;
+			////	if (buff[CONTENT_TYPE_INDEX] == eSendName)
+			////	{
+			////		return eNameRequest;
+			////	}
+			////	else if (buff[CONTENT_TYPE_INDEX] == eSendMessage)
+			////	{
+			////		return eMessageRequest;
+			////	}
+			////	break;
+			////case eResponce:
+			////	if (buff[CONTENT_TYPE_INDEX] == eResponseOk)
+			////	{
+			////		return eResponseOk;
+			////	}
+			////	else if (buff[CONTENT_TYPE_INDEX] == eResponceError)
+			////	{
+			////		return eResponceError;
+			////	}
+			////	break;
 
-			}
+			//}
 		}
-		throw new std::exception(" It isn`t message \n");
+		throw std::exception(" It isn`t message \n");
 		//MesageType Protocol::CheckPackageType()
 	}
 
-	int IncomingMessageNum(std::vector<int> &socketVec)
+	int IncomingMessageNum(SocketsVector &socketVec)
 	{
 		fd_set rfds;
 		FD_ZERO(&rfds);
 
-		std::vector<int>::iterator it;
+		SocketsVectorIterator it;
 
 		int maxNumFD = 0;
 		for (it = socketVec.begin(); it != socketVec.end(); it++)
 		{
 			FD_SET(*it, &rfds);
-			maxNumFD = max(maxNumFD, *it);
+			maxNumFD = max(maxNumFD, (int)*it);
 		}
 		maxNumFD++;
 
@@ -237,7 +281,7 @@ namespace ChatLib
 		timeout.tv_sec = 0;
 		timeout.tv_usec = 500;
 
-		Message message;
+		//Message message;
 
 		int result = select(maxNumFD, &rfds, NULL, NULL, &timeout);
 		return result;

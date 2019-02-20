@@ -2,7 +2,7 @@
 #include <string>
 #include "Enums.h"
 #include "Protocol.h"
-
+#include <xlocmon>
 
 
 namespace ChatLib
@@ -10,11 +10,49 @@ namespace ChatLib
 
 	class Message//:std::string
 	{
-	private:
-		std::string MessageText;
-		std::string Header;
+		
 
-		char _mStartHeaderPoint[4] = { (char)0xFF, (char)0xFF, (char)0xFF, (char)0xFF };
+	public:
+		class Header
+		{
+		public:
+			char MessageType = 0;
+			char MessageLength = 0;
+
+			Header (ChatLib::MessageType messageType, int messageLength = 0)
+			{
+				MessageType = messageType;
+				MessageLength = messageLength;
+			}
+
+			Header()
+			{
+			}
+
+			int WriteBytes(char *pBuffer)
+			{
+				int b = 0;
+
+				pBuffer[b++] = (char)0xFF;
+				pBuffer[b++] = (char)0xFF;
+				pBuffer[b++] = (char)0xFF;
+				pBuffer[b++] = (char)0xFF;
+				pBuffer[b++] = MessageType;
+				pBuffer[b++] = MessageLength;
+
+				return b;
+			}
+			//TODO where is good place?
+			//const std::string operator+(const Header& left, const std::string &str)
+			//{
+			//	return (left._fullHeaderText + str);
+			//}
+
+		};
+
+	private:
+		std::string messageText;
+		Header header;
 		//PackageType _mPackageType;
 		//Response _mResponse;
 		//Request _mRequest;
@@ -31,29 +69,30 @@ namespace ChatLib
 		//	Header.push_back((char)eResponce);
 		//	Header.push_back((char)responseVal);
 		//}
-		void FillHeader(MessageType messageType)
-		{
-			Header.append(_mStartHeaderPoint, 4);
-			Header.push_back((char)messageType);
-		}
-		void FillHeader()
-		{
-			Header.append(_mStartHeaderPoint, 4);
-		}
+
+		//void FillHeader(MessageType messageType)
+		//{
+		//	Header.MessageType = messageType;
+		//}
+		//void FillHeader()
+		//{
+		//}
 
 
 	public:
 		//std::string MessageID;
 
-		Message(MessageType messageType, std::string *pstrMessage = nullptr)
+		//TODO we will crush is string is nullptr or not?
+		//TODO we can create two constructors
+		Message(MessageType messageType, std::string strMessage) 
+			: header(messageType)
 		{
-			FillHeader(messageType);
-			if (pstrMessage != nullptr)
-			{
-				MessageText = *pstrMessage;
-				Header.push_back((char)MessageText.length());
-				//_package = Header + MessageText;
-			}
+			SetText(strMessage);
+		}
+
+		Message(MessageType messageType) 
+			: header(messageType)
+		{
 		}
 
 
@@ -76,26 +115,23 @@ namespace ChatLib
 		//	Header.push_back(message.length());
 		//}
 
-		Message(std::string str)
+		//TODO check where we use it 
+		//Message(std::string str) : Header()
+		//{
+		//	FillHeader();
+		//	//TODO check copy or ref
+		//	MessageText = str;
+		//	Header.push_back((char)MessageText.length());
+		//}
+
+		//TODO check crush or not with string
+		Message(MessageType messageType, char* buff) 
+			: header(messageType, (int)buff[MESSAGE_LENGTH_INDEX])
 		{
-			FillHeader();
-			//TODO check copy or ref
-			MessageText = str;
-			Header.push_back((char)MessageText.length());
-		}
+			if(header.MessageLength > 0)
+				messageText = std::string(buff + MESSAGE_START_TEXT_INDEX, buff[MESSAGE_LENGTH_INDEX]);
 
-		Message(MessageType messageType, char* buff)
-		{
-			FillHeader(messageType);
-			//TODO check 
-			//MessageText.append(buff, (int)buff[5]);
-
-			if(messageType == eMessageRequest || messageType == eNameRequest)
-			{
-				MessageText.append(buff, MESSAGE_START_TEXT_INDEX, (int)buff[MESSAGE_LENGTH_INDEX]);
-			}
-
-			Header.push_back((char)MessageText.length());
+			header.MessageLength = (char)messageText.length();
 		}
 
 		//Message(std::string str)
@@ -103,47 +139,69 @@ namespace ChatLib
 		//	//TODO check copy or ref
 		//	MessageText = str;
 		//}
-		Message()
-		{
-			FillHeader();
 
-			Header.push_back((char)0);
-		}
+
 
 		//int GetPackageLength()
 		//{
 		//	return _package.length();
 		//}
 		//TODO need references?
-		std::string GetHeader()
+
+		const Header & GetHeader() const
 		{
-			return  Header;
+			return  header;
 		}
-		void SetHeader(const std::string header)
+
+		int WriteBytes(char *pBuffer)
 		{
-			Header = header;
+			int bytes = header.WriteBytes(pBuffer);
+			pBuffer += bytes;
+			memcpy(pBuffer, messageText.c_str(), messageText.length());
+			bytes += (int)messageText.length();
+			return bytes;
 		}
-		void SetHeader()
+
+		/*
+		std::string GetHeaderLikeText()
 		{
-			FillHeader();
+			return  header.GetHeaderLikeText();
 		}
+		*/
+
+
+		//TODO check where we use
+		//void SetHeader(const std::string header)
+		//{
+		//	this->header = header;
+		//}
+
+		//TODO check where we use
+		//void SetHeader()
+		//{
+		//	FillHeader();
+		//}
 
 		std::string GetText()
 		{
-			return  MessageText;
+			return  messageText;
 		}
-		void SetText(const std::string text)
+		void SetText(const std::string & text)
 		{
-			MessageText = text;
+			messageText = text;
+			header.MessageLength = (char)text.length();
+			//TODO if we use thay we must set header.TextLength
 		}
 
+		//TODO what will do if MessageType is not valid 
 		MessageType GetType()
 		{
-			return  (MessageType)Header[MESSAGE_TYPE_INDEX];
+			return  (MessageType)header.MessageType;
 		}
+
 		int GetTextLength()
 		{
-			 return MessageText.length();
+			 return (int)messageText.length();
 		}
 
 		//std::string GetFullPackage()
