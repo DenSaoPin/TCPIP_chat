@@ -20,14 +20,14 @@ namespace ChatLib
 		fd_set rfds;
 		FD_ZERO(&rfds);
 		FD_SET(socket, &rfds);
-		int maxNumFD = (int)socket;
+		int maxFD = (int)socket + 1;
 
 		timeval timeout;
 		timeout.tv_sec = 0;
 		timeout.tv_usec = 500;
 		Message message(eInvalid);
 
-		int result = select(maxNumFD, &rfds, NULL, NULL, &timeout);
+		int result = select(maxFD, &rfds, NULL, NULL, &timeout);
 		if (result < 0)
 		{
 			//TODO UNIX check error
