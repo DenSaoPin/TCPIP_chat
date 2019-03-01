@@ -7,8 +7,10 @@
 #if defined _WIN32
 #include <WinSock2.h>
 #include <WS2tcpip.h>
+#define PrintErrors printWsaError()
 #define CROSS_SOCKET SOCKET
 #else
+#define PrintErrors printLinuxError()
 #endif
 
 typedef std::vector<CROSS_SOCKET> SocketsVector;
@@ -51,5 +53,9 @@ namespace ChatLib
 		const MessageType GetMessageType(const char* buff);
 
 		const int IncomingMessageNum(const SocketsVector &sockVec);
+
+		void printWsaError();
+
+		void printLinuxError();
 	};
 }

@@ -30,11 +30,12 @@ namespace ChatLib
 		int result = select(maxFD, &rfds, NULL, NULL, &timeout);
 		if (result < 0)
 		{
+			PrintErrors;
+			//win errors
 			//TODO UNIX check error
 		}
 		else if (result == 0)
 		{ 
-
 			//TODO win check error and timeout
 		}
 		else
@@ -63,59 +64,37 @@ namespace ChatLib
 		printf("\n");
 		if (recived == 0)
 		{
+			printf("Recieve message: connection softly closed");
+			closesocket(socket);
+			WSACleanup();
 			//TODO error check Win and Timeout
 		}
 		else if (recived == -1)
 		{
+			printWsaError();
+			closesocket(socket);
+			WSACleanup();
 			//TODO check Unix error
 		}
 		else
 		{
 			std::string str = "";
 
-			//TODO refactor It must be inside message
-			//TODO maybe lost data after recieve
-			//buff[4] = 4;
-
 			MessageType type = GetMessageType(buff);
 
 			printf("Recieved message type equal %d \n", type);
-    		//Message message(eInvalid);
 
 			Message message (type, buff);
 
 			printf("Recieved message equal %s \n", message.GetText());
-
-			//if(*(int*)buff == HEADER_START)
-			//{
-			//	return  Message (type, buff);
-			//}
-			//else
-			//{
-			//	throw new std::exception(" Not filled package type or package is trash \n");
-			//}
-				
+			
 			return message;
-			//if (IsLegalPackage(buff))
-			//{
-			//	std::string str;
-			//	str.append(buff, HEADER_SIZE + buff[6]);
-			//	Message message(str);
-			//	return message;
-			//}
-			//else
-			//{
-			//	throw new std::exception("It isn`t message");
-			//}
 		}
 		return Message(eInvalid);
 	}
 
 	void Protocol::SendMessagee(const Message& message, const CROSS_SOCKET& socket)
 	{
-		//TODO refactor this
-		//message.
-
 		char pBuffer[255];
 
 		int sended = 0;
@@ -135,8 +114,15 @@ namespace ChatLib
 			length -= sended;
 			if (sended == -1)
 			{
+				closesocket(socket);
+				printWsaError();
+				WSACleanup();
 				break;
 				//TODO check error WIN \ UNIX
+			}
+			else if(sended == 0)
+			{
+				break;
 			}
 		} while (length > 0);
 	}
@@ -228,45 +214,85 @@ namespace ChatLib
 		throw std::exception(" It isn`t message \n");
 	}
 
-	int IncomingMessageNum(SocketsVector &socketVec)
+	//int IncomingMessageNum(SocketsVector &socketVec)
+	//{
+	//	fd_set rfds;
+	//	FD_ZERO(&rfds);
+
+	//	SocketsVectorIterator it;
+
+	//	int maxNumFD = 0;
+	//	for (it = socketVec.begin(); it != socketVec.end(); it++)
+	//	{
+	//		FD_SET(*it, &rfds);
+	//		maxNumFD = max(maxNumFD, (int)*it);
+	//	}
+	//	maxNumFD++;
+
+	//	timeval timeout;
+	//	timeout.tv_sec = 0;
+	//	timeout.tv_usec = 500;
+
+	//	int result = select(maxNumFD, &rfds, NULL, NULL, &timeout);
+	//	return result;
+	//}
+	//int IncomingMessageNum(int &sockfd)
+	//{
+	//	fd_set rfds;
+	//	FD_ZERO(&rfds);
+	//	FD_SET(sockfd, &rfds);
+	//	int maxNumFD = sockfd + 1;
+
+	//	timeval timeout;
+	//	timeout.tv_sec = 0;
+	//	timeout.tv_usec = 500;
+
+	//	int result = select(maxNumFD, &rfds, NULL, NULL, &timeout);
+
+	//	//TODO error check
+	//	return result;
+	//}
+
+	void Protocol::printWsaError()
 	{
-		fd_set rfds;
-		FD_ZERO(&rfds);
-
-		SocketsVectorIterator it;
-
-		int maxNumFD = 0;
-		for (it = socketVec.begin(); it != socketVec.end(); it++)
+		switch (WSAGetLastError())
 		{
-			FD_SET(*it, &rfds);
-			maxNumFD = max(maxNumFD, (int)*it);
+		case WSANOTINITIALISED: printf("WSANOTINITIALISED: A successful WSAStartup call must occur before using this function.\n"); break;
+
+		case WSAENETDOWN: printf("WSAENETDOWN: The network subsystem has failed.\n"); break;
+
+		case WSAEFAULT: printf("WSAEFAULT: The buf parameter is not completely contained in a valid part of the user address space.\n"); break;
+
+		case WSAENOTCONN: printf("WSAENOTCONN: The socket is not connected.\n"); break;
+
+		case WSAEINTR: printf("WSAEINTR: The (blocking) call was canceled through WSACancelBlockingCall.\n"); break;
+
+		case WSAEINPROGRESS: printf("WSAEINPROGRESS: A blocking Windows Sockets 1.1 call is in progress, or the service provider is still processing a callback function.\n"); break;
+
+		case WSAENETRESET: printf("WSAENETRESET: For a connection-oriented socket, this error indicates that the connection has been broken due to keep-alive activity that detected a failure while the operation was in progress. For a datagram socket, this error indicates that the time to live has expired.\n"); break;
+
+		case WSAENOTSOCK: printf("WSAENOTSOCK: The descriptor is not a socket.\n"); break;
+
+		case WSAEOPNOTSUPP: printf("WSAEOPNOTSUPP: MSG_OOB was specified, but the socket is not stream-style such as type SOCK_STREAM, OOB data is not supported in the communication domain associated with this socket, or the socket is unidirectional and supports only send operations.\n"); break;
+
+		case WSAESHUTDOWN: printf("WSAESHUTDOWN: The socket has been shut down; it is not possible to receive on a socket after shutdown has been invoked with how set to SD_RECEIVE or SD_BOTH.\n"); break;
+
+		case WSAEWOULDBLOCK: printf("WSAEWOULDBLOCK: The socket is marked as nonblocking and the receive operation would block.\n"); break;
+
+		case WSAEMSGSIZE: printf("WSAEMSGSIZE: The message was too large to fit into the specified buffer and was truncated.\n"); break;
+
+		case WSAEINVAL: printf("WSAEINVAL: The socket has not been bound with bind, or an unknown flag was specified, or MSG_OOB was specified for a socket with SO_OOBINLINE enabled or (for byte stream sockets only) len was zero or negative.\n"); break;
+
+		case WSAECONNABORTED: printf("WSAECONNABORTED: The virtual circuit was terminated due to a time-out or other failure. The application should close the socket as it is no longer usable.\n"); break;
+
+		case WSAETIMEDOUT: printf("WSAETIMEDOUT: The connection has been dropped because of a network failure or because the peer system failed to respond.\n"); break;
+
+		case WSAECONNRESET: printf("WSAECONNRESET: The virtual circuit was reset by the remote side executing a hard or abortive close. The application should close the socket as it is no longer usable. On a UDP-datagram socket, this error would indicate that a previous send operation resulted in an ICMP \"Port Unreachable\" message.\n"); break;
 		}
-		maxNumFD++;
-
-		timeval timeout;
-		timeout.tv_sec = 0;
-		timeout.tv_usec = 500;
-
-		//Message message;
-
-		int result = select(maxNumFD, &rfds, NULL, NULL, &timeout);
-		return result;
 	}
-	int IncomingMessageNum(int &sockfd)
+
+	void Protocol::printLinuxError()
 	{
-		fd_set rfds;
-		FD_ZERO(&rfds);
-		FD_SET(sockfd, &rfds);
-		int maxNumFD = sockfd + 1;
-
-		timeval timeout;
-		timeout.tv_sec = 0;
-		timeout.tv_usec = 500;
-
-		int result = select(maxNumFD, &rfds, NULL, NULL, &timeout);
-
-		//TODO error check
-		return result;
+		//TODO not implemented
 	}
-
 }
