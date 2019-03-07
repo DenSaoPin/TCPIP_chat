@@ -151,12 +151,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ClientSet.cpp" />
+    <ClCompile Include="Server.cpp" />
+    <ClCompile Include="ServerClient.cpp" />
     <ClCompile Include="TCPIP_Server.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\ProtocolAPI\ProtocolAPI\ProtocolAPI.vcxproj">
       <Project>{a18949d6-7cce-47c6-bf64-f477cf508578}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ClientSet.h" />
+    <ClInclude Include="Server.h" />
+    <ClInclude Include="ServerClient.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

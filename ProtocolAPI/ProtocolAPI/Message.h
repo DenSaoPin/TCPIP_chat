@@ -2,7 +2,6 @@
 #include <string>
 #include "Enums.h"
 #include "Protocol.h"
-#include <xlocmon>
 
 
 namespace ChatLib

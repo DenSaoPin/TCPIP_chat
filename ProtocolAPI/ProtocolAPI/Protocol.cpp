@@ -5,6 +5,7 @@
 
 namespace ChatLib
 {
+
 	const MessageType Protocol::TrySendMessage(const Message& message,const CROSS_SOCKET& socket)
 	{
 		//TODO need to know sent message or not
@@ -65,14 +66,14 @@ namespace ChatLib
 		if (recived == 0)
 		{
 			printf("Recieve message: connection softly closed");
-			closesocket(socket);
-			WSACleanup();
+			throw ConnectionClosedException("connection softly closed");
 			//TODO error check Win and Timeout
 		}
 		else if (recived == -1)
 		{
 			printWsaError();
 			closesocket(socket);
+			throw ConnectionLostException("connection lost closed");
 			WSACleanup();
 			//TODO check Unix error
 		}

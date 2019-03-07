@@ -34,6 +34,14 @@ namespace ChatLib
 
 	namespace Protocol
 	{
+		class ConnectionLostException : public std::exception
+		{
+		public: ConnectionLostException(const char * text) : exception(text) {}
+		};
+		class ConnectionClosedException : public std::exception
+		{
+		public: ConnectionClosedException(const char * text) : exception(text) {}
+		};
 		const MessageType TrySendMessage(const Message& message, const CROSS_SOCKET& socket);
 
 		const Message TryRecieveMessage(const CROSS_SOCKET& socket);
