@@ -128,43 +128,9 @@ namespace ChatLib
 		} while (length > 0);
 	}
 
-	//MessageType Protocol::RecieveAnswer(int socket)
-	//{
-	//	char recvBuffer[RESPONSE_OK_LENGTH];
-
-	//	int recieved = 0;
-	//	MessageType response = eInvalid;
-	//	do
-	//	{
-	//		recieved = recv(socket, recvBuffer, RESPONSE_OK_LENGTH, NULL);
-	//		printf("RecieveAnswer %d bytes: ", recieved);
-	//		for (int i = 0; i < recieved; i++)
-	//		{
-	//			printf("%02X ", recvBuffer[i]);
-	//		}
-	//		printf("\n");
-	//		if (recieved == 0)
-	//		{
-	//			//TODO check error or close conn
-	//		}
-	//		else if (recieved == -1)
-	//		{
-	//			//TODO checkerror
-	//		}
-	//		else
-	//		{
-	//			return response = GetMessageType(recvBuffer);
-	//		}
-	//		//TODO maybe while responce != oK
-	//	}
-	//	//while (recieved < RESPONSE_OK_LENGTH);
-	//	//TODO check 
-	//	while (true);
-	//}
-
-	void Protocol::SendResponse(const MessageType& messageType, const CROSS_SOCKET& socket)    //, std::string strMessage)
+	void Protocol::SendResponse(const MessageType& messageType, const CROSS_SOCKET& socket)
 	{
-		Message message(messageType);                                   //, strMessage);
+		Message message(messageType);                               
 		SendMessagee(message, socket);
 	}
 
@@ -172,31 +138,6 @@ namespace ChatLib
 	{
 		return false;
 	}
-
-	//MessageType Protocol::CheckResponseStatus(char* buff)
-	//{
-	//	if (*(int *)buff == HEADER_START)
-	//	{
-	//		//TODO check
-	//		if ((int)buff[4] == eResponce)
-	//		{
-	//			if ((int)buff[5] == eOk)
-	//				return eOk;
-	//			else if ((int)buff[5] == eError)
-	//				return eError;
-	//			else
-	//			{
-	//				//TODO
-	//				//throw new std::exception(" Wrong Response \n");
-	//				//std::cout << " Wrong Response \n";
-	//			}
-	//		}
-	//	}
-	//	else
-	//	{
-	//		//TODO exception
-	//	}
-	//}
 
 	const MessageType Protocol::GetMessageType(const char* buff)
 	{
@@ -214,45 +155,6 @@ namespace ChatLib
 		}
 		throw std::exception(" It isn`t message \n");
 	}
-
-	//int IncomingMessageNum(SocketsVector &socketVec)
-	//{
-	//	fd_set rfds;
-	//	FD_ZERO(&rfds);
-
-	//	SocketsVectorIterator it;
-
-	//	int maxNumFD = 0;
-	//	for (it = socketVec.begin(); it != socketVec.end(); it++)
-	//	{
-	//		FD_SET(*it, &rfds);
-	//		maxNumFD = max(maxNumFD, (int)*it);
-	//	}
-	//	maxNumFD++;
-
-	//	timeval timeout;
-	//	timeout.tv_sec = 0;
-	//	timeout.tv_usec = 500;
-
-	//	int result = select(maxNumFD, &rfds, NULL, NULL, &timeout);
-	//	return result;
-	//}
-	//int IncomingMessageNum(int &sockfd)
-	//{
-	//	fd_set rfds;
-	//	FD_ZERO(&rfds);
-	//	FD_SET(sockfd, &rfds);
-	//	int maxNumFD = sockfd + 1;
-
-	//	timeval timeout;
-	//	timeout.tv_sec = 0;
-	//	timeout.tv_usec = 500;
-
-	//	int result = select(maxNumFD, &rfds, NULL, NULL, &timeout);
-
-	//	//TODO error check
-	//	return result;
-	//}
 
 	void Protocol::printWsaError()
 	{

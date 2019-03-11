@@ -1,12 +1,10 @@
 #pragma once
 #include <string>
 #include "Enums.h"
-//#include "Message.h"
 #include <vector>
 
 #if defined _WIN32
 #include <WinSock2.h>
-#include <WS2tcpip.h>
 #define PrintErrors printWsaError()
 #define CROSS_SOCKET SOCKET
 #else
@@ -22,7 +20,6 @@ typedef SocketsVector::iterator SocketsVectorIterator;
 #define RESPONSE_OK_LENGTH 5
 #define MESSAGE_LENGTH_INDEX 5
 #define MESSAGE_TYPE_INDEX 4
-//#define CONTENT_TYPE_INDEX 5
 
 #define MESSAGE_START_TEXT_INDEX 6
 
@@ -50,13 +47,9 @@ namespace ChatLib
 
 		void SendMessagee(const Message& message, const CROSS_SOCKET& socket);
 
-		//MessageType RecieveAnswer(int socket);
-
-		void SendResponse(const MessageType& responceVal, const CROSS_SOCKET& socket); //, std::string strMessage);
+		void SendResponse(const MessageType& responceVal, const CROSS_SOCKET& socket);
 
 		const bool IsLegalPackage(const char* buff);
-
-		//MessageType CheckResponseStatus(char* buff);
 
 		const MessageType GetMessageType(const char* buff);
 

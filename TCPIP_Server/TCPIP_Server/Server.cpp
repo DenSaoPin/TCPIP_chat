@@ -1,6 +1,7 @@
 #include "Server.h"
 #include "ServerClient.h"
 #include <iostream>
+#include <WS2tcpip.h>
 
 #define MAX_LENGTH 1024
 
@@ -19,7 +20,30 @@ Server::Server(std::string address, std::string port)
 
 bool Server::Assign(const std::string& name, ServerClient* pClient)
 {
-	return Clients.Find(name);
+	//TODO check
+	if (Clients.Check(name))
+	{
+		return false;
+	}
+
+	pClient->Name = name;
+	return true;
+	//pClient->Name = name;
+
+	//return Clients.Find(name);
+}
+
+bool Server::SetToSendForAllClients(ServerClient* server_client, ChatLib::Message& message)
+{
+	for (auto it = this->Clients.Begin(); it != this->Clients.End(); ++it)
+	{
+		if (*it == server_client)
+		{
+			continue;
+		}
+		(*it)->ForSend.push(message);
+	}
+	return true;
 }
 
 void Server::InitialWSARoutine()

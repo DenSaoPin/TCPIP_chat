@@ -1,7 +1,6 @@
 #include "ClientSet.h"
 #include "ServerClient.h"
 
-
 ClientSet::ClientSet()
 {
 }
@@ -34,7 +33,7 @@ ClientSet::Iterator ClientSet::End()
 
 bool ClientSet::Check(std::string inputName)
 {
-	int checkCounter;
+	int checkCounter = 0;
 	for (auto itClient = Begin(); itClient != End(); itClient++)
 	{
 		if ((*itClient)->Name == inputName)
@@ -42,9 +41,13 @@ bool ClientSet::Check(std::string inputName)
 			checkCounter++;
 		}
 	}
-	if (checkCounter <= 1)
+	if (checkCounter == 1)
 	{
 		return true;
+	}
+	else if(checkCounter == 0)
+	{
+		return false;
 	}
 	else
 	{

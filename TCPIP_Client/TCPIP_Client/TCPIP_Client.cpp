@@ -11,9 +11,6 @@
 #include "../../ProtocolAPI/ProtocolAPI/Message.h"
 #include <future>
 
-//#include <sys/types.h>
-//#include <sys/socket.h>
-
 #define MAX_PORT_DIGIT 5
 
 class UIInterface
@@ -85,15 +82,6 @@ public:
 		std::string ServerIP;
 		std::string ServerPort;
 		int Socket = NULL;
-		//Response TryRecieveMessage(char*);
-
-		//void CallInitializeDialog(char * nameBuff, char * serverIPbuff, char * serverPortBuff);
-
-		//int InitializeSocketRoutine();
-
-		//TODO why const and & 
-		//TODO don`t copy?
-		//Response TrySendMessage(const std::string& cs);
 		
 		TCPIP_Client(const std::string& name, const std::string& serverIP, const std::string& serverPort)
 		{
@@ -215,14 +203,10 @@ public:
 
 			 if (str.length())
 			 {
-				 ChatLib::Message messageForSend(ChatLib::eMessageRequest, str);
+				 ChatLib::Message messageForSend(ChatLib::eMessageRequest, client.Name + ": " + str);
 
 				 ChatLib::MessageType response = ChatLib::Protocol::TrySendMessage(messageForSend, sockfd);
 			 }
-			 //std::string message;
-			 //std::thread thread(UserInput, std::ref(message));
-			 //thread.detach();
-
 		 }
 
 		 closesocket(sockfd);
