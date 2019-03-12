@@ -10,5 +10,6 @@ namespace ChatLib
 		eMessageRequest = 0x02,
 		eResponseOk		= 0x03,
 		eResponceError	= 0x04,
+		eDirectMessage  = 0x05,
 	};
 }

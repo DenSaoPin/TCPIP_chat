@@ -88,6 +88,27 @@ bool ServerClient::ProcessSocket()
 				}
 				break;
 			}
+		case ChatLib::eDirectMessage:
+			{
+			if (message.GetText() != "")
+			{
+				if (Name != "")
+				{
+					std::cout << message.GetText() << std::endl;
+					//TODO send responce;
+
+					m_pServer->SetToSendForAllClients(this, message);
+
+					printf("Message Responce \n");
+					ChatLib::Protocol::SendResponse(ChatLib::eResponseOk, Socket);
+				}
+				else
+				{
+					std::cout << "Error socket don`t have Name" << std::endl;
+				}
+			}
+				break;
+			}
 		case ChatLib::eResponseOk:
 		case ChatLib::eResponceError:
 			std::cout << "Responce in Client" << std::endl;

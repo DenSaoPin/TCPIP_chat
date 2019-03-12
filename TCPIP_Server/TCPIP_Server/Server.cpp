@@ -9,8 +9,8 @@ const char * Server::DefaultAddress = "127.0.0.1";
 
 Server::Server(std::string address, std::string port)
 {
-	ConnectSock = 0;
-	ClientCount = 0;
+	_connectSock = 0;
+	_clientCount = 0;
 	ServerIP = address;
 	ServerPort = port;
 
@@ -25,7 +25,7 @@ bool Server::Assign(const std::string& name, ServerClient* pClient)
 	{
 		return false;
 	}
-
+	_iknowThisNames.insert(name);
 	pClient->Name = name;
 	return true;
 	//pClient->Name = name;
@@ -127,7 +127,7 @@ void Server::ListenSockInitialization(std::string& IPv4_Adress,std::string& port
 	}
 
 	printf("Start server\n");
-	char m_connect[] = "ConnectSock to server \n";
+	char m_connect[] = "_connectSock to server \n";
 
 	freeaddrinfo(pResults);
 }

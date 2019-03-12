@@ -2,6 +2,8 @@
 #include <xstring>
 #include "ClientSet.h"
 #include "../../ProtocolAPI/ProtocolAPI/Protocol.h"
+#include <unordered_map>
+#include <unordered_set>
 
 class ServerClient;
 
@@ -10,8 +12,9 @@ class Server
 public:
 	static const char *DefaultAddress;
 private:
-	int ConnectSock;
-	int ClientCount;
+	std::unordered_set<std::string> _iknowThisNames;
+	int _connectSock;
+	int _clientCount;
 public:
 	Server(std::string address, std::string port);
 	

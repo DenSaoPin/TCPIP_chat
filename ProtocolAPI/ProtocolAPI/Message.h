@@ -6,7 +6,6 @@
 
 namespace ChatLib
 {
-
 	class Message
 	{
 	public:
@@ -106,6 +105,16 @@ namespace ChatLib
 			 return (int)messageText.length();
 		}
 	};
+
+	//class DirectMessage : Message
+	//{
+	//public:
+	//	DirectMessage(std::string& forName, MessageType& type, std::string& text) : Message(type, text)
+	//	{
+	//		
+	//	}
+
+	//};
 	typedef Message & MessageR;
 	typedef Message * MessageP;
 }

@@ -148,7 +148,8 @@ namespace ChatLib
 			if (messageType == eNameRequest ||
 				messageType == eMessageRequest ||
 				messageType == eResponseOk ||
-				messageType == eResponceError)
+				messageType == eResponceError||
+				messageType == eDirectMessage)
 				return (MessageType)messageType;
 
 			throw std::exception(" Not filled package type or package is trash \n");

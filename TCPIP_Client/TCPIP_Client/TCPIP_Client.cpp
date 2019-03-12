@@ -201,9 +201,28 @@ public:
 				 //str = " Test message \n";
 			 }
 
+			 ChatLib::MessageType messageType = ChatLib::eInvalid;
+
 			 if (str.length())
 			 {
-				 ChatLib::Message messageForSend(ChatLib::eMessageRequest, client.Name + ": " + str);
+				 //TODO shall we improve?
+				 int startIndex = str.find("for @");
+
+				 if(startIndex != std::string::npos)
+				 {
+					 startIndex += 5;
+					 int finishIndex = str.find("@", startIndex);
+					 std::string forName = str.substr(startIndex, finishIndex - startIndex);
+					 messageType = ChatLib::eDirectMessage;
+				 }
+				 else
+				 {
+					 messageType = ChatLib::eMessageRequest;
+				 }
+
+				// ChatLib::DirectMessage message(messageType, client.Name);
+
+				 ChatLib::Message messageForSend(messageType, client.Name + ": " + str);
 
 				 ChatLib::MessageType response = ChatLib::Protocol::TrySendMessage(messageForSend, sockfd);
 			 }
