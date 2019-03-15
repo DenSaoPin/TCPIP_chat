@@ -4,6 +4,8 @@
 #include "../../ProtocolAPI/ProtocolAPI/Protocol.h"
 #include <unordered_map>
 #include <unordered_set>
+#include "../../ProtocolAPI/ProtocolAPI/DirectMessage.h"
+#include "../../ProtocolAPI/ProtocolAPI/BroadcastMessage.h"
 
 class ServerClient;
 
@@ -20,7 +22,8 @@ public:
 	
 	bool Assign(const std::string& name, ServerClient* pClient);
 
-	bool SetToSendForAllClients(ServerClient* server_client, ChatLib::Message& message);
+	bool SetToSendForAllClients(ServerClient* server_client, ChatLib::BroadcastMessage* message);
+	void SetToSendFor(ServerClient* server_client, ChatLib::DirectMessage* direct_message);
 
 	std::string ServerIP;
 	std::string ServerPort;

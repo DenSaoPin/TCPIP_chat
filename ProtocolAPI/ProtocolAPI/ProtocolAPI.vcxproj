@@ -147,15 +147,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BaseMessage.h" />
+    <ClInclude Include="BroadcastMessage.h" />
+    <ClInclude Include="Defines.h" />
+    <ClInclude Include="DirectMessage.h" />
     <ClInclude Include="Enums.h" />
-    <ClInclude Include="Message.h" />
+    <ClInclude Include="NameRequestMessage.h" />
     <ClInclude Include="Protocol.h" />
+    <ClInclude Include="Response.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Message.cpp" />
+    <ClCompile Include="BaseMessage.cpp" />
+    <ClCompile Include="BroadcastMessage.cpp" />
+    <ClCompile Include="DirectMessage.cpp" />
+    <ClCompile Include="NameRequestMessage.cpp" />
     <ClCompile Include="Protocol.cpp" />
+    <ClCompile Include="Response.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

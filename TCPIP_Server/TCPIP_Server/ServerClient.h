@@ -1,6 +1,5 @@
 #pragma once
 #include "../../ProtocolAPI/ProtocolAPI/Protocol.h"
-#include "../../ProtocolAPI/ProtocolAPI/Message.h"
 #include <queue>
 
 class Server;
@@ -15,7 +14,7 @@ public:
 	CROSS_SOCKET Socket = NULL;
 	bool IInvalid = false;
 
-	std::queue<ChatLib::Message> ForSend;
+	std::queue<ChatLib::BaseMessage*> ForSend;
 
 	bool ProcessSocket();
 };

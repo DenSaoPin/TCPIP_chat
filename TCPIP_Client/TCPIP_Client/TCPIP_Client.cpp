@@ -5,11 +5,13 @@
 #include <iostream>
 #include <WinSock2.h>
 #include <WS2tcpip.h>
-#include <stdio.h>
 #include <string>
 #include <thread>
-#include "../../ProtocolAPI/ProtocolAPI/Message.h"
 #include <future>
+#include "../../ProtocolAPI/ProtocolAPI/Protocol.h"
+#include "../../ProtocolAPI/ProtocolAPI/BroadcastMessage.h"
+#include "../../ProtocolAPI/ProtocolAPI/DirectMessage.h"
+#include "../../ProtocolAPI/ProtocolAPI/NameRequestMessage.h"
 
 #define MAX_PORT_DIGIT 5
 
@@ -68,10 +70,10 @@ public:
 		std::cout << str;
 	}
 	//TODO why can`t I set const & string if i invoce method?
-	void PrintMessage(ChatLib::Message& msg)
-	{
-		std::cout << msg.GetText();
-	}
+	//void PrintMessage(ChatLib::BaseMessage& msg)
+	//{
+	//	std::cout << msg.GetPrintable;
+	//}
 };
 
 	class TCPIP_Client
@@ -90,19 +92,18 @@ public:
 			ServerPort = serverPort;
 		}
 
-		ChatLib::MessageType IntroduceToServer()
+		ChatLib::Response IntroduceToServer()
 		{
 			if (Name.length() == 0)
 				throw new std::exception("You must fill client.Name before call IntroduceToServer() \n");
 
-			ChatLib::Message message(ChatLib::eNameRequest, Name);
-
-			ChatLib::MessageType msgType;
+			ChatLib::NameRequestMessage NameReqMessage(Name);
+			ChatLib::Response response(ChatLib::eResponseInvalid);
 			do
 			{
-				msgType = ChatLib::Protocol::TrySendMessage(message, Socket);
-			} while (msgType != ChatLib::eResponseOk);
-			return msgType;
+				response = ChatLib::Protocol::TrySendMessage(&NameReqMessage, Socket);
+			} while (response.GetStatus() != ChatLib::ResponseStatus::eOk);
+			return response;
 		}
 
 		void InitializeSocketRoutine()
@@ -170,11 +171,38 @@ public:
 		 while (true)
 		 {
 			 //TODO how to delete right
-			 ChatLib::Message message = ChatLib::Protocol::TryRecieveMessage(sockfd);
+			 ChatLib::RawBytes rawData = ChatLib::Protocol::RecieveMessageAndReply(sockfd);
 
-			 if (message.GetText().length() != 0)
-				 ui.PrintMessage(message);
+			 if (!rawData.empty())
+			 {
+				 const ChatLib::MessageType type = ChatLib::BaseMessage::GetType(rawData);
+				 byte *p = &rawData[0];
+				 std::string text;
+				 switch (type)
+				 {
+				 case ChatLib::eBroadcastMessage:
+				 {
+					 const ChatLib::BroadcastMessage BroadMessage(p);
+					 text = BroadMessage.Text;
+					 break;
+				 }
+				 case ChatLib::eDirectMessage:
+				 {
+					 const ChatLib::DirectMessage DirectMessage(p);
+					 text = DirectMessage.Text;
+					 break;
+				 }
+				 case ChatLib::eResponse:
+					 throw std::exception("Main receiving error: I received Response in main");
+				 case ChatLib::eNameRequest:
+					 throw std::exception("Main receiving error: I received NameRequest in main");
+				 default:
+					 throw std::exception("Main receiving error: I received unknown message type");
+				 }
 
+				 if (text.length() != 0)
+					 ui.PrintMessage(text);
+			 }
 			 //TODO what we have in getline if we received a message at the moment when we write a message
 			 if (!asyncThread.valid())
 			 {
@@ -208,23 +236,26 @@ public:
 				 //TODO shall we improve?
 				 int startIndex = str.find("for @");
 
+				 ////TODO how to delete?
+				 ChatLib::BaseMessage* message;
+
 				 if(startIndex != std::string::npos)
 				 {
 					 startIndex += 5;
 					 int finishIndex = str.find("@", startIndex);
 					 std::string forName = str.substr(startIndex, finishIndex - startIndex);
-					 messageType = ChatLib::eDirectMessage;
+					 std::string fullMessage = client.Name + ": " + str;
+					 message = new ChatLib::DirectMessage(forName, fullMessage);
 				 }
 				 else
 				 {
-					 messageType = ChatLib::eMessageRequest;
+					 message = new ChatLib::BroadcastMessage(str);
 				 }
 
-				// ChatLib::DirectMessage message(messageType, client.Name);
+				 ChatLib::Response response = ChatLib::Protocol::TrySendMessage(message, sockfd);
 
-				 ChatLib::Message messageForSend(messageType, client.Name + ": " + str);
-
-				 ChatLib::MessageType response = ChatLib::Protocol::TrySendMessage(messageForSend, sockfd);
+				 delete(message);
+				 //TODO response will be always Ok
 			 }
 		 }
 

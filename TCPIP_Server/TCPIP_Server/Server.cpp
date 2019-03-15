@@ -33,7 +33,7 @@ bool Server::Assign(const std::string& name, ServerClient* pClient)
 	//return Clients.Find(name);
 }
 
-bool Server::SetToSendForAllClients(ServerClient* server_client, ChatLib::Message& message)
+bool Server::SetToSendForAllClients(ServerClient* server_client, ChatLib::BroadcastMessage* message)
 {
 	for (auto it = this->Clients.Begin(); it != this->Clients.End(); ++it)
 	{
@@ -41,9 +41,20 @@ bool Server::SetToSendForAllClients(ServerClient* server_client, ChatLib::Messag
 		{
 			continue;
 		}
-		(*it)->ForSend.push(message);
+		(*it)->ForSend.push((ChatLib::BaseMessage*)message);
 	}
 	return true;
+}
+
+void Server::SetToSendFor(ServerClient * server_client, ChatLib::DirectMessage * direct_message)
+{
+	for(auto it = this->Clients.Begin(); it != this->Clients.End(); ++it)
+	{
+		if (*it == server_client)
+		{
+			(*it)->ForSend.push((ChatLib::BaseMessage*)direct_message);
+		}
+	}
 }
 
 void Server::InitialWSARoutine()

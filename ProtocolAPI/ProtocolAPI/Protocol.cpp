@@ -1,22 +1,13 @@
 #include "stdafx.h"
 #include "Protocol.h"
-#include "Message.h"
 #include <vector>
+#include "Defines.h"
+#include "Response.h"
+#include "Enums.h"
 
 namespace ChatLib
-{
-
-	const MessageType Protocol::TrySendMessage(const Message& message,const CROSS_SOCKET& socket)
-	{
-		//TODO need to know sent message or not
-		SendMessagee(message, socket);
-
-		Message response = RecieveMessage(socket);
-
-		return response.GetType();
-	}
-
-	const Message Protocol::TryRecieveMessage(const CROSS_SOCKET& socket)
+{	
+	RawBytes Protocol::RecieveMessageAndReply(const CROSS_SOCKET& socket)
 	{
 		fd_set rfds;
 		FD_ZERO(&rfds);
@@ -26,7 +17,8 @@ namespace ChatLib
 		timeval timeout;
 		timeout.tv_sec = 0;
 		timeout.tv_usec = 500;
-		Message message(eInvalid);
+		//Message message(eInvalid);
+		RawBytes rawData;
 
 		int result = select(maxFD, &rfds, NULL, NULL, &timeout);
 		if (result < 0)
@@ -43,21 +35,32 @@ namespace ChatLib
 		{
 			if (FD_ISSET(socket, &rfds))
 			{
-				message = RecieveMessage(socket);
+				rawData = RecieveMessage(socket);
 
-				if(message.GetType() != eInvalid)
-					SendResponse(eResponseOk, socket);
+				//TODO refactor this
+				switch (BaseMessage::GetType(rawData))
+				{
+				case eInvalid:
+				case eResponse:
+					break;
+				default:
+					SendResponse(ResponseStatus::eOk, socket);
+					break;
+				}
 			}
 		}
-		return message;
+		return rawData;
 	}
 
-	 const Message Protocol::RecieveMessage(const CROSS_SOCKET& socket)
+	RawBytes Protocol::RecieveMessage(const CROSS_SOCKET& socket)
 	{
 		//TODO check recieved num
 		char buff[MAX_PACKAGE_LENGTH];
 		int recived = recv(socket, buff, MAX_PACKAGE_LENGTH, NULL);
 		printf("RecieveMessage %d bytes: ", recived);
+
+		//TODO check raw data
+		RawBytes rawData(buff, buff + recived);
 		for (int i = 0; i < recived; i++)
 		{
 			printf("%02X ", buff[i]);
@@ -74,64 +77,55 @@ namespace ChatLib
 			printWsaError();
 			closesocket(socket);
 			throw ConnectionLostException("connection lost closed");
-			WSACleanup();
+			//WSACleanup();
 			//TODO check Unix error
 		}
-		else
-		{
-			std::string str = "";
 
-			MessageType type = GetMessageType(buff);
+			printf("Message was recieved \n");
 
-			printf("Recieved message type equal %d \n", type);
-
-			Message message (type, buff);
-
-			printf("Recieved message equal %s \n", message.GetText());
+			//MessageType type = BaseMessage::GetType(buff);
 			
-			return message;
-		}
-		return Message(eInvalid);
+			//printf("Recieved message type equal %d \n", type);
+
+			////Message message (type, buff);
+
+			//printf("Recieved message equal %s \n", message.GetText());
+			
+			return rawData;
 	}
 
-	void Protocol::SendMessagee(const Message& message, const CROSS_SOCKET& socket)
+	Response Protocol::TrySendMessage(BaseMessage* message, const CROSS_SOCKET& socket)
 	{
-		char pBuffer[255];
+		//TODO need to know sent message or not
+		SendMessagee(message, socket);
+
+		auto rawResponseData = RecieveMessage(socket);
+
+		MessageType type = BaseMessage::GetType(rawResponseData);
+
+		if (type != eResponse)
+			throw std::exception("I received not response after sending");
+
+		return Response(rawResponseData);
+	}
+	void Protocol::SendMessagee(BaseMessage* message, const CROSS_SOCKET& socket)
+	{
+		byte pBuffer[255];
+		int length = message->Construct(pBuffer);
 
 		int sended = 0;
-		int length = message.WriteBytes(pBuffer);
-		printf("Sending %d bytes: ", length);
-		for(int i = 0; i < length; i++)
-		{
-			printf("%02X ", pBuffer[i]);
-		}
-		printf("...\n");
 		do
 		{
-			//TODO check with length = 1
-			//TODO check & + [] + string
-			sended = send(socket, pBuffer, length, NULL);
-			printf("Sended %d\n", sended);
+			sended = send(socket, (char *)&pBuffer[sended], length, NULL);
 			length -= sended;
-			if (sended == -1)
-			{
-				closesocket(socket);
-				printWsaError();
-				WSACleanup();
-				break;
-				//TODO check error WIN \ UNIX
-			}
-			else if(sended == 0)
-			{
-				break;
-			}
 		} while (length > 0);
+
 	}
 
-	void Protocol::SendResponse(const MessageType& messageType, const CROSS_SOCKET& socket)
+	void Protocol::SendResponse(ResponseStatus status, const CROSS_SOCKET& socket)
 	{
-		Message message(messageType);                               
-		SendMessagee(message, socket);
+		Response response(status);
+		SendMessagee(&response, socket);
 	}
 
 	const bool Protocol::IsLegalPackage(const char* buff)
@@ -139,23 +133,19 @@ namespace ChatLib
 		return false;
 	}
 
-	const MessageType Protocol::GetMessageType(const char* buff)
-	{
-		if (*((int*)buff) == HEADER_START)
-		{
-			char messageType = buff[MESSAGE_TYPE_INDEX];
+	//const MessageType Protocol::GetMessageType(const char* buff)
+	//{
+	//	if (*((int*)buff) == HEADER_START)
+	//	{
+	//		char messageType = buff[MESSAGE_TYPE_INDEX];
 
-			if (messageType == eNameRequest ||
-				messageType == eMessageRequest ||
-				messageType == eResponseOk ||
-				messageType == eResponceError||
-				messageType == eDirectMessage)
-				return (MessageType)messageType;
+	//		if (messageType >= eInvalid && messageType <= eResponse)
+	//			return (MessageType)messageType;
 
-			throw std::exception(" Not filled package type or package is trash \n");
-		}
-		throw std::exception(" It isn`t message \n");
-	}
+	//		throw std::exception(" Not filled package type or package is trash \n");
+	//	}
+	//	throw std::exception(" It isn`t message \n");
+	//}
 
 	void Protocol::printWsaError()
 	{
