@@ -33,7 +33,7 @@ bool Server::Assign(const std::string& name, ServerClient* pClient)
 	//return Clients.Find(name);
 }
 
-bool Server::SetToSendForAllClients(ServerClient* server_client, ChatLib::BroadcastMessage* message)
+bool Server::SetToSendForAllClients(ServerClient* server_client, ChatLib::BroadcastMessagePtr& broadMessagePtr)
 {
 	for (auto it = this->Clients.Begin(); it != this->Clients.End(); ++it)
 	{
@@ -41,18 +41,20 @@ bool Server::SetToSendForAllClients(ServerClient* server_client, ChatLib::Broadc
 		{
 			continue;
 		}
-		(*it)->ForSend.push((ChatLib::BaseMessage*)message);
+
+		(*it)->ForSend.push(std::static_pointer_cast<ChatLib::BaseMessage>(broadMessagePtr));
 	}
 	return true;
 }
 
-void Server::SetToSendFor(ServerClient * server_client, ChatLib::DirectMessage * direct_message)
+void Server::SetToSendFor(ServerClient * server_client, ChatLib::DirectMessagePtr& directMessagePtr)
 {
+
 	for(auto it = this->Clients.Begin(); it != this->Clients.End(); ++it)
 	{
 		if (*it == server_client)
 		{
-			(*it)->ForSend.push((ChatLib::BaseMessage*)direct_message);
+			(*it)->ForSend.push(std::static_pointer_cast<ChatLib::BaseMessage>(directMessagePtr));
 		}
 	}
 }

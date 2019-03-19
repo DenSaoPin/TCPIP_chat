@@ -22,8 +22,8 @@ public:
 	
 	bool Assign(const std::string& name, ServerClient* pClient);
 
-	bool SetToSendForAllClients(ServerClient* server_client, ChatLib::BroadcastMessage* message);
-	void SetToSendFor(ServerClient* server_client, ChatLib::DirectMessage* direct_message);
+	bool SetToSendForAllClients(ServerClient* server_client, ChatLib::BroadcastMessagePtr& broadcast_message);
+	void SetToSendFor(ServerClient* server_client, ChatLib::DirectMessagePtr& direct_message);
 
 	std::string ServerIP;
 	std::string ServerPort;

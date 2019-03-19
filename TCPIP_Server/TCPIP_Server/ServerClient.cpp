@@ -65,15 +65,17 @@ bool ServerClient::ProcessSocket()
 		}
 		case ChatLib::eBroadcastMessage:
 		{
-			ChatLib::BroadcastMessage BroadMessage(p);
+			//ChatLib::BroadcastMessage BroadMessage(p);
 
-			if (!BroadMessage.Text.empty())
+			ChatLib::BroadcastMessagePtr broadMessagePtr(new ChatLib::BroadcastMessage(p));
+
+			if (!broadMessagePtr->Text.empty())
 			{
 				if (Name != "")
 				{
-					std::cout << BroadMessage.Text << std::endl;
+					std::cout << broadMessagePtr->Text << std::endl;
 					//TODO send responce;
-					m_pServer->SetToSendForAllClients(this, &BroadMessage);
+					m_pServer->SetToSendForAllClients(this, broadMessagePtr);
 
 					printf("Message Responce \n");
 					ChatLib::Protocol::SendResponse(ChatLib::ResponseStatus::eOk, Socket);
@@ -87,16 +89,18 @@ bool ServerClient::ProcessSocket()
 		}
 		case ChatLib::eDirectMessage:
 		{
-			ChatLib::DirectMessage DirMessage(p);
+			//ChatLib::DirectMessage DirMessage(p);
+			ChatLib::DirectMessagePtr directMessagePtr(new ChatLib::DirectMessage(p));
 
-			if (!DirMessage.Text.empty())
+			if (!directMessagePtr->Text.empty())
 			{
 				if (Name != "")
 				{
-					std::cout << DirMessage.Text << std::endl;
+					std::cout << directMessagePtr->Text << std::endl;
 					//TODO send responce;
 
-					m_pServer->SetToSendFor(this, &DirMessage);
+
+					m_pServer->SetToSendFor(this, directMessagePtr);
 
 					printf("Message Responce \n");
 					ChatLib::Protocol::SendResponse(ChatLib::ResponseStatus::eOk, Socket);
@@ -125,7 +129,7 @@ bool ServerClient::ProcessSocket()
 
 	if(FD_ISSET(Socket, &wfds))
 	{
-		ChatLib::Response response = ChatLib::Protocol::TrySendMessage(ForSend.front(), Socket);
+		ChatLib::Response response = ChatLib::Protocol::TrySendMessage(ForSend.front().get(), Socket);
 
 		if(response.GetStatus() == ChatLib::eOk)
 		{

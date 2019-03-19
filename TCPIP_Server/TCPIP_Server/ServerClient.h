@@ -14,7 +14,7 @@ public:
 	CROSS_SOCKET Socket = NULL;
 	bool IInvalid = false;
 
-	std::queue<ChatLib::BaseMessage*> ForSend;
+	std::queue<ChatLib::BaseMessagePtr> ForSend;
 
 	bool ProcessSocket();
 };

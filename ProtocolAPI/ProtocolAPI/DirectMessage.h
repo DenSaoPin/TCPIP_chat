@@ -15,6 +15,7 @@ namespace ChatLib
 
 		int Construct(ChatLib::byte* pBuff) override;
 	};
+	typedef std::shared_ptr<DirectMessage> DirectMessagePtr;
 }
 
 

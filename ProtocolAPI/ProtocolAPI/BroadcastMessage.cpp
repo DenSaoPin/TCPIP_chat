@@ -22,7 +22,7 @@ namespace  ChatLib
 	BroadcastMessage::BroadcastMessage(byteP& pBuff) : BaseMessage(pBuff)
 	{
 		//TODO check !!!!!!!!!!! change pointer or value
-		ChatLib::byte messageLength = *(pBuff++);
+		const byte messageLength = *(pBuff++);
 
 		if (messageLength > 0)
 			Text = std::string((char *)pBuff, messageLength);

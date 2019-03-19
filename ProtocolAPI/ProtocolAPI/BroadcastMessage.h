@@ -15,6 +15,8 @@ namespace ChatLib
 		BroadcastMessage(std::string& text);
 		//~BroadcastMessage();
 
-		int Construct(ChatLib::byte* pBuff) override;
+		int Construct(byte* pBuff) override;
 	};
+
+	typedef std::shared_ptr<BroadcastMessage> BroadcastMessagePtr;
 }

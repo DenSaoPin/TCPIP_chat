@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include <vector>
 #include "Enums.h"
+#include <memory>
 
 namespace ChatLib
 {
@@ -23,19 +24,22 @@ namespace ChatLib
 	protected:
 		unsigned int _magicNumber = HEADER_START;
 		byte _messageType = 0;
-	public:
-		BaseMessage(const ChatLib::RawBytes& rawData);
 
-		BaseMessage(const ChatLib::MessageType& messageType);
+	public:
+		BaseMessage(const RawBytes& rawData);
+
+		BaseMessage(const MessageType& messageType);
 
 		BaseMessage(byteP &pBuffer);
 	public:
-		static MessageType GetType(const ChatLib::byte *pBuff);
+		static MessageType GetType(const byte *pBuff);
 
-		static MessageType GetType(ChatLib::RawBytes& rawData);
+		static MessageType GetType(RawBytes& rawData);
 	public:
 		virtual int Construct(byte* pBuff);
 
 		virtual ~BaseMessage();
 	};
+
+	typedef std::shared_ptr<BaseMessage> BaseMessagePtr;
 }
