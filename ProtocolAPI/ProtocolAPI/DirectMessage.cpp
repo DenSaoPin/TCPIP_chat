@@ -45,3 +45,8 @@ int ChatLib::DirectMessage::Construct(byte* pBuff)
 
 	return count;
 }
+
+std::string ChatLib::DirectMessage::GetDebugString()
+{
+	return std::string("It is DirectMessage. TargetName = " + TargetName + " Text = " + Text + "\n");
+}

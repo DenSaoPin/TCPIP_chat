@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "BroadcastMessage.h"
+#include <ostream>
 
 namespace  ChatLib
 {
@@ -12,6 +13,11 @@ namespace  ChatLib
 		memcpy((char *)pBuff + len, this->Text.c_str(), Text.size());
 		len += Text.size();
 		return len;
+	}
+
+	std::string BroadcastMessage::GetDebugString()
+	{
+		return std::string("It is BroadcastMessage. Text = " + Text + "\n");
 	}
 
 	BroadcastMessage::BroadcastMessage(std::string& text): BaseMessage(ChatLib::eBroadcastMessage)

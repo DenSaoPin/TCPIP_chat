@@ -9,3 +9,8 @@ ChatLib::NameRequestMessage::NameRequestMessage(std::string& name): BroadcastMes
 {
 	_messageType = eNameRequest;
 }
+
+std::string ChatLib::NameRequestMessage::GetDebugString()
+{
+	return std::string("It is NameRequest");
+}

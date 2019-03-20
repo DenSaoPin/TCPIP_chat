@@ -30,4 +30,26 @@ namespace ChatLib
 	{
 		return _responseStatus;
 	}
+
+	std::string Response::GetDebugString()
+	{
+		std::string status;
+		switch (_responseStatus)
+		{
+		case eInvalid:
+			status = "eInvalid";
+			break;
+		case eOk:
+			status = "eOk";
+			break;
+		case eError:
+			status = "eError";
+			break;
+		case eNameConflict:
+			status = "eNameConflict";
+			break;
+		}
+
+		return std::string(" It is Response. Status = " + status + "\n");
+	}
 }

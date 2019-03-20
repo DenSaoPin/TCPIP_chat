@@ -8,6 +8,8 @@ namespace ChatLib
 		NameRequestMessage(byteP &ppBuff);
 
 		NameRequestMessage(std::string& name);
+
+		std::string GetDebugString() override;
 	};
 }
 

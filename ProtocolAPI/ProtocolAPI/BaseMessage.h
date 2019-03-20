@@ -38,7 +38,10 @@ namespace ChatLib
 	public:
 		virtual int Construct(byte* pBuff);
 
+		virtual std::string GetDebugString();
+
 		virtual ~BaseMessage();
+
 	};
 
 	typedef std::shared_ptr<BaseMessage> BaseMessagePtr;

@@ -33,6 +33,12 @@ namespace ChatLib
 		pBuff[count++] = this->_messageType;
 		return count;
 	}
+
+	std::string BaseMessage::GetDebugString()
+	{
+		return std::string ("It is BaseMessage");
+	}
+
 	BaseMessage::~BaseMessage()
 	{
 	}

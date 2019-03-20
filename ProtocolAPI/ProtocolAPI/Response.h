@@ -19,5 +19,7 @@ namespace ChatLib
 		int Construct(byte* pBuff) override;
 
 		ResponseStatus GetStatus() const;
+
+		std::string GetDebugString() override;
 	};
 }
