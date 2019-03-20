@@ -32,7 +32,7 @@ public:
 
 	ClientSet Clients;
 
-	void InitialWSARoutine();
+	static void InitialWSARoutine();
 
 	void ListenSockInitialization(std::string& IPv4_Adress, std::string& port);
 

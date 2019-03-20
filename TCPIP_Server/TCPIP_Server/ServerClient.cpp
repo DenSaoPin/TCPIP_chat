@@ -96,11 +96,10 @@ bool ServerClient::ProcessSocket()
 			{
 				if (Name != "")
 				{
-					std::cout << directMessagePtr->Text << std::endl;
+					//std::cout << directMessagePtr->Text << std::endl;
 					//TODO send responce;
 
-
-					m_pServer->SetToSendFor(this, directMessagePtr);
+					m_pServer->SetToSendFor(m_pServer->Clients.Find(directMessagePtr->TargetName), directMessagePtr);
 
 					printf("Message Responce \n");
 					ChatLib::Protocol::SendResponse(ChatLib::ResponseStatus::eOk, Socket);

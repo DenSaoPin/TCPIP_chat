@@ -25,8 +25,9 @@ bool Server::Assign(const std::string& name, ServerClient* pClient)
 	{
 		return false;
 	}
-	_iknowThisNames.insert(name);
+
 	pClient->Name = name;
+	_iknowThisNames.insert(name);
 	return true;
 	//pClient->Name = name;
 
@@ -58,6 +59,13 @@ void Server::SetToSendFor(ServerClient * server_client, ChatLib::DirectMessagePt
 		}
 	}
 }
+//
+//ServerClient* Server::GetClientByName(std::string& name)
+//{
+//	if(_iknowThisNames.find(name) != _iknowThisNames.end())
+//		 return _iknowThisNames[name];
+//	return nullptr;
+//}
 
 void Server::InitialWSARoutine()
 {

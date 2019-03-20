@@ -36,7 +36,6 @@ namespace ChatLib
 	BaseMessage::~BaseMessage()
 	{
 	}
-	;
 
 	BaseMessage::BaseMessage(const ChatLib::RawBytes& rawData)
 	{

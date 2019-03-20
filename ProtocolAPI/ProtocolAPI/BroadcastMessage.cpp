@@ -4,7 +4,7 @@
 namespace  ChatLib
 {
 
-	int BroadcastMessage::Construct(ChatLib::byte* pBuff) 
+	int BroadcastMessage::Construct(byte* pBuff) 
 	{
 		//TODO test!!!!!!!!!!!!!!!!!
 		int len = BaseMessage::Construct(pBuff);
