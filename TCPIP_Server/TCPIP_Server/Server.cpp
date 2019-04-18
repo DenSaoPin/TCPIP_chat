@@ -9,6 +9,8 @@ const char * Server::DefaultAddress = "127.0.0.1";
 
 Server::Server(std::string address, std::string port)
 {
+	m_log = LoggerManager::GetLogger("ServerLog");
+	m_log->error("test%d", 1);
 	_connectSock = 0;
 	_clientCount = 0;
 	ServerIP = address;
@@ -147,7 +149,8 @@ void Server::ListenSockInitialization(std::string& IPv4_Adress,std::string& port
 		exit(1);
 	}
 
-	printf("Start server\n");
+	m_log->info("start");
+	m_log->info("listen %s:%s", IPv4_Adress.c_str(), port.c_str());
 	char m_connect[] = "_connectSock to server \n";
 
 	freeaddrinfo(pResults);

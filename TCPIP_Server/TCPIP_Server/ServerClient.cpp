@@ -2,9 +2,12 @@
 #include "Server.h"
 #include <iostream>
 #include "../../ProtocolAPI/ProtocolAPI/NameRequestMessage.h"
+#include "loggerAPI/LoggerManager.h"
 
 ServerClient::ServerClient(Server* pServer, SOCKET socket)
 {
+	m_log = LoggerManager::GetLogger("ServerClient");
+	m_log->error("Test");
 	m_pServer = pServer;
 	Socket = socket;
 }
@@ -56,6 +59,7 @@ bool ServerClient::ProcessSocket()
 		{
 			const ChatLib::NameRequestMessage NameMessage(p);
 			ChatLib::ResponseStatus status = ChatLib::eOk;
+			m_log->info("Received message eNameRequest for %s", NameMessage.Text.c_str());
 
 			if (!m_pServer->Assign(NameMessage.Text, this))
 				status = ChatLib::eNameConflict;

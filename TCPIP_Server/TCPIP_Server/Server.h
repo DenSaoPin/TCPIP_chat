@@ -6,6 +6,7 @@
 #include <unordered_set>
 #include "../../ProtocolAPI/ProtocolAPI/DirectMessage.h"
 #include "../../ProtocolAPI/ProtocolAPI/BroadcastMessage.h"
+#include <loggerAPI/ILogger.h>
 
 class ServerClient;
 
@@ -15,6 +16,7 @@ public:
 	static const char *DefaultAddress;
 private:
 	std::unordered_set<std::string> _iknowThisNames;
+	ILogger* m_log;
 	int _connectSock;
 	int _clientCount;
 public:
