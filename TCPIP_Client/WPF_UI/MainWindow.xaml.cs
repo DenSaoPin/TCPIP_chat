@@ -24,5 +24,55 @@ namespace WPF_UI
         {
             InitializeComponent();
         }
+
+        private void button_SendMesage_OnClick(object sender, RoutedEventArgs e)
+        {
+            //TODO how to check which side used
+            OutputTextBox.TextAlignment = TextAlignment.Left;
+
+            OutputTextBox.Text = OutputTextBox.Text + "/n" + InputTextBox.Text;
+
+            //TODO send message to selected Client
+
+            InputTextBox.Clear();
+            InputTextBox.Text = "...enter your message";
+        }
+
+        public void OutputTextBox_PrintText(string text)
+        {          
+            //TODO how to check which side used
+            OutputTextBox.Text = OutputTextBox.Text + text;
+        }
+        public void ClientsListBox_Initialize(string text)
+        {
+            //TODO not implemented
+        }
+
+        public void ClientsListBox_Add(string text)
+        {
+            //TODO not implemented
+        }
+        public void ClientsListBox_Remove(string text)
+        {
+            //TODO not implemented
+        }
+
+        //private string prepareText(string text, ETextSide side)
+        //{
+        //    if (side == ETextSide.eLeft)
+        //    {
+        //        //TODO 
+        //        while (text.Length < OutputTextBox.ActualWidth)
+        //        {
+
+        //        }
+        //    }
+        //}
     }
+
+    //internal enum ETextSide
+    //{
+    //    eLeft,
+    //    eRight,
+    //}
 }

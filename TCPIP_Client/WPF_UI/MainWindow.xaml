@@ -5,8 +5,33 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WPF_UI"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="ChatClient" Height="450" Width="800">
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height ="*" />
+            <RowDefinition Height ="0.6*" />
+            <RowDefinition Height ="0.2*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="0.3*"/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Name="OutputTextBox" Grid.Row="0" Background="GreenYellow" Grid.ColumnSpan="1" TextWrapping="Wrap">
+        </TextBlock>
+        <TextBox Name="InputTextBox" Grid.Row="1" Background="Aqua" Grid.ColumnSpan="1" TextAlignment="Right" VerticalContentAlignment="Bottom" TextWrapping="Wrap" FontSize="20" SpellCheck.IsEnabled="True">
+            ...enter your message
+        </TextBox>
+        <ScrollViewer Grid.Column="1" Grid.RowSpan="2" VerticalScrollBarVisibility="Auto" CanContentScroll="True">
+            <ListBox Name="ClientsListBox" Background="BlueViolet">
+            </ListBox>
+        </ScrollViewer>
+
+
+        <GridSplitter Grid.Column="0" Grid.RowSpan="2" Width="3" VerticalAlignment="Stretch" ShowsPreview ="True"></GridSplitter>
+        <GridSplitter Grid.Row="1" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Top" ShowsPreview ="True"></GridSplitter>
+
+        <Button Grid.Row="2" Name="button_SendMesage" Click="button_SendMesage_OnClick" IsDefault="True">SEND MESSAGE</Button>
+        <Button Grid.Row="2" Grid.Column="1">BUTTON 2 </Button>
     </Grid>
 </Window>
