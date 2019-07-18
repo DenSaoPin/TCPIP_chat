@@ -9,3 +9,4 @@ add_subdirectory (../ProtocolAPI ProtocolAPI)
 add_subdirectory (TCPIP_CLIENT_DLL)          
 add_subdirectory (WPF_UI WPF_UI)
 add_subdirectory (Console Console)
+
