@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include "TCPIP_CLIENT_DLL.h"
 #include <string>
+#include <iostream>
 
 
 class UIInterface

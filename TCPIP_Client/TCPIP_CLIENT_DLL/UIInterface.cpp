@@ -1,7 +1,9 @@
 ﻿#include "stdafx.h"
+#include "TCPIP_CLIENT_DLL.h"
+#include <ws2ipdef.h>
 #include "UIInterface.h"
 
-	std::string UIInterface::GetName()
+std::string UIInterface::GetName()
 	{
 		std::string ret;
 		std::cout << "Enter your name: \n";

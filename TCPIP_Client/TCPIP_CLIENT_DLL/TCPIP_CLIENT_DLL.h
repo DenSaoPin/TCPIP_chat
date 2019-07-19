@@ -5,17 +5,11 @@
 #pragma comment (lib, "Ws2_32.lib")
 
 #include <iostream>
-#include <WinSock2.h>
-#include <WS2tcpip.h>
 #include <string>
 #include <thread>
 #include <future>
 #include <cstddef>
 #include "../../ProtocolAPI/ProtocolAPI/Protocol.h"
-#include "../../ProtocolAPI/ProtocolAPI/BroadcastMessage.h"
-#include "../../ProtocolAPI/ProtocolAPI/DirectMessage.h"
-#include "../../ProtocolAPI/ProtocolAPI/NameRequestMessage.h"
-#include "CallbacksHolder.h"
 
 #define MAX_PORT_DIGIT 5
 
@@ -35,7 +29,8 @@
 		std::string ServerPort;
 		int Socket = NULL;
 
-		const char* szHasIncomingMessage = nullptr;
+		char* szHasIncomingMessage = nullptr;
+		bool NeedTerminate = false;
 
 		static TCPIP_Client* Instance();
 

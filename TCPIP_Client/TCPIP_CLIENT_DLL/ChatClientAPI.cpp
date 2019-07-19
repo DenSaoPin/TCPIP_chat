@@ -1,18 +1,20 @@
-#include "stdafx.h"
+#include "TCPIP_CLIENT_DLL.h"
 #include "public/ChatClientAPI.h"
 #include "CallbacksHolder.h"
-#include "TCPIP_CLIENT_DLL.h"
 
 void setCallbackMessageReceived(callbackMessageReceivedFunc funcPtr)
 {
 	CallbacksHolder::clbMessageReceive = funcPtr;
 }
-
 void ClientMainLoop()
 {
 	TCPIP_Client::Instance()->ClientMainLoop();
 }
-void ClientSendMessage(const char* szStr)
+void ClientSendMessage(char* szStr)
 {
 	TCPIP_Client::Instance()->szHasIncomingMessage = szStr;
+}
+void ClientTerminate()
+{
+	TCPIP_Client::Instance()->NeedTerminate = true;
 }

@@ -1,9 +1,13 @@
-#include "stdafx.h"
-
-#pragma once
+#include <WinSock2.h>
+#include <WS2tcpip.h>
 #include "TCPIP_CLIENT_DLL.h"
+#include "../../ProtocolAPI/ProtocolAPI/BroadcastMessage.h"
+#include "../../ProtocolAPI/ProtocolAPI/DirectMessage.h"
+#include "../../ProtocolAPI/ProtocolAPI/NameRequestMessage.h"
+#include "CallbacksHolder.h"
 #include "UIInterface.h"
-#include "public/ChatClientAPI.h"
+
+
 
 		TCPIP_Client* TCPIP_Client::_instance = nullptr;
 
@@ -15,7 +19,6 @@
 				_instance = new TCPIP_Client();
 			}
 			return _instance;
-
 		}
 
 		void TCPIP_Client::Initialize(const std::string& name, const std::string& serverIP, const std::string& serverPort)
@@ -80,40 +83,6 @@
 			return Socket;
 		}
 
-		//const char* TCPIP_Client::ClientSendMessage(const char* szStr)
-		//{
-		//	return szStr;
-		//}
-
-		//ChatLib::BaseMessage* TCPIP_Client::ClientSendMessage(const char* szStr)
-		//{
-		//	std::string str(szStr);
-
-		//	if (str.length())
-		//	{
-		//		////TODO how to delete?
-		//		ChatLib::BaseMessage* message;
-
-		//		//TODO shall we improve?
-		//		int startIndex = str.find("for @");
-		//		if (startIndex != std::string::npos)
-		//		{
-		//			startIndex += 5;
-		//			int finishIndex = str.find("@", startIndex);
-		//			std::string forName = str.substr(startIndex, finishIndex - startIndex);
-		//			std::string fullMessage = Name + ": " + str;
-		//			message = new ChatLib::DirectMessage(forName, fullMessage);
-		//		}
-		//		else
-		//		{
-		//			message = new ChatLib::BroadcastMessage(str);
-		//		}
-
-		//		return message;
-		//	}
-		//}
-
-
 //TODO check
 	 void TCPIP_Client::ClientMainLoop()
 	 {
@@ -130,12 +99,7 @@
 
 		 pClient->IntroduceToServer();
 
-		 char buff[1024];
-		 bool Iasync = false;
-		 
-		 std::future<std::basic_string<char>> asyncThread;
-
-		 while (true)
+		 while (!NeedTerminate)
 		 {
 			 //TODO how to delete right
 			 ChatLib::RawBytes rawData = ChatLib::Protocol::RecieveMessageAndReply(sockfd);
@@ -200,9 +164,7 @@
 				 szHasIncomingMessage = nullptr;
 				 delete(message);
 			 }
-		 
 		 }
-
 		 closesocket(sockfd);
-		 std::cout << "Hello World!\n";
+		 WSACleanup();
 	 }
