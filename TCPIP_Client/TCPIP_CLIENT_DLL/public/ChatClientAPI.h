@@ -11,4 +11,6 @@ typedef void (*callbackMessageReceivedFunc) (const char *);
 extern "C"
 {
 	TCPIPCLIENTDLL_EXPORT void setCallbackMessageReceived(callbackMessageReceivedFunc);
+	TCPIPCLIENTDLL_EXPORT void ClientMainLoop();
+	TCPIPCLIENTDLL_EXPORT void ClientSendMessage(const char*);
 }

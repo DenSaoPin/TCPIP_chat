@@ -1,7 +1,8 @@
 
 set(PROJECT TCPIP_CLIENT_DLL)
                                 
-set(HEADER_FILES 
+set(HEADER_FILES
+	public/ChatClientAPI.h 
 	CallbacksHolder.h
  	TCPIP_CLIENT_DLL.h
  	UIInterface.h

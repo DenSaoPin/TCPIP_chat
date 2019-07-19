@@ -3,10 +3,7 @@
 #pragma once
 #include "TCPIP_CLIENT_DLL.h"
 #include "UIInterface.h"
-
-extern "C" TCPIPCLIENTDLL_EXPORT void OnRecieveMessage(char* message);
-extern "C" TCPIPCLIENTDLL_EXPORT void ClientMainLoop();
-extern "C" TCPIPCLIENTDLL_EXPORT void OnSendMessage();
+#include "public/ChatClientAPI.h"
 
 		TCPIP_Client* TCPIP_Client::_instance = nullptr;
 
@@ -83,16 +80,50 @@ extern "C" TCPIPCLIENTDLL_EXPORT void OnSendMessage();
 			return Socket;
 		}
 
+		//const char* TCPIP_Client::ClientSendMessage(const char* szStr)
+		//{
+		//	return szStr;
+		//}
+
+		//ChatLib::BaseMessage* TCPIP_Client::ClientSendMessage(const char* szStr)
+		//{
+		//	std::string str(szStr);
+
+		//	if (str.length())
+		//	{
+		//		////TODO how to delete?
+		//		ChatLib::BaseMessage* message;
+
+		//		//TODO shall we improve?
+		//		int startIndex = str.find("for @");
+		//		if (startIndex != std::string::npos)
+		//		{
+		//			startIndex += 5;
+		//			int finishIndex = str.find("@", startIndex);
+		//			std::string forName = str.substr(startIndex, finishIndex - startIndex);
+		//			std::string fullMessage = Name + ": " + str;
+		//			message = new ChatLib::DirectMessage(forName, fullMessage);
+		//		}
+		//		else
+		//		{
+		//			message = new ChatLib::BroadcastMessage(str);
+		//		}
+
+		//		return message;
+		//	}
+		//}
+
+
 //TODO check
 	 void TCPIP_Client::ClientMainLoop()
 	 {
-		 UIInterface ui;
+		 /*UIInterface ui;
 		 std::string confClientName = ui.GetName();
 		 std::string confServerIP = ui.GetIP();
-		 std::string confServerPort = ui.GetPort();
+		 std::string confServerPort = ui.GetPort();*/
 
 		 TCPIP_Client* pClient = Instance();
-		 pClient->Initialize(confClientName, confServerIP, confServerPort);
+		 pClient->Initialize("testuser", "127.0.0.1", "7700");
 
 		 pClient->InitializeSocketRoutine();
 		 int sockfd = pClient->GetSocket();
@@ -136,53 +167,26 @@ extern "C" TCPIPCLIENTDLL_EXPORT void OnSendMessage();
 					 throw std::exception("Main receiving error: I received unknown message type");
 				 }
 
-				 if (text.length() != 0)
-					 ui.PrintMessage(text);
+				 //if (text.length() != 0)
+				 //	 ui.PrintMessage(text);
 
 				 CallbacksHolder::clbMessageReceive(text.c_str());
 			 }
-			 //TODO what we have in getline if we received a message at the moment when we write a message
-			 if (!asyncThread.valid())
+
+			 if (szHasIncomingMessage != nullptr)
 			 {
-				 asyncThread = std::async(std::launch::async, []
-				 {
-					 std::string s = "";
-					 if (std::getline(std::cin, s)) return s;
-				 });
-			 }
-
-			 std::string str;
-			 if(asyncThread.wait_for(std::chrono::seconds(1)) == std::future_status::ready)
-			 {
-				 str = asyncThread.get();
-
-				 asyncThread = std::async(std::launch::async, []
-				 {
-					 std::string s = "";
-					 if (std::getline(std::cin, s)) return s;
-				 });
-			 }
-			 else
-			 {
-				 //str = " Test message \n";
-			 }
-
-			 ChatLib::MessageType messageType = ChatLib::eInvalid;
-
-			 if (str.length())
-			 {
-				 //TODO shall we improve?
-				 int startIndex = str.find("for @");
-
+				 std::string str(szHasIncomingMessage);
 				 ////TODO how to delete?
 				 ChatLib::BaseMessage* message;
 
-				 if(startIndex != std::string::npos)
+				 //TODO shall we improve?
+				 int startIndex = str.find("for @");
+				 if (startIndex != std::string::npos)
 				 {
 					 startIndex += 5;
 					 int finishIndex = str.find("@", startIndex);
 					 std::string forName = str.substr(startIndex, finishIndex - startIndex);
-					 std::string fullMessage = pClient->Name + ": " + str;
+					 std::string fullMessage = Name + ": " + str;
 					 message = new ChatLib::DirectMessage(forName, fullMessage);
 				 }
 				 else
@@ -192,26 +196,13 @@ extern "C" TCPIPCLIENTDLL_EXPORT void OnSendMessage();
 
 				 ChatLib::Response response = ChatLib::Protocol::TrySendMessage(message, sockfd);
 
+				 //TODO behavior may depend on the response
+				 szHasIncomingMessage = nullptr;
 				 delete(message);
-				 //TODO response will be always Ok
 			 }
+		 
 		 }
 
 		 closesocket(sockfd);
 		 std::cout << "Hello World!\n";
 	 }
-
-	 
-	// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-	// Debug program: F5 or Debug > Start Debugging menu
-
-	// Tips for Getting Started: 
-	//   1. Use the Solution Explorer window to add/manage files
-	//   2. Use the Team Explorer window to connect to source control
-	//   3. Use the Output window to see build output and other messages
-	//   4. Use the Error List window to view errors
-	//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-	//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
-
-
-

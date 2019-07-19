@@ -35,6 +35,8 @@
 		std::string ServerPort;
 		int Socket = NULL;
 
+		const char* szHasIncomingMessage = nullptr;
+
 		static TCPIP_Client* Instance();
 
 		void Initialize(const std::string& name, const std::string& serverIP, const std::string& serverPort);
@@ -46,4 +48,6 @@
 		int GetSocket();
 
 		void ClientMainLoop();
-	};
+
+		//const char* ClientSendMessage(const char *);
+};
