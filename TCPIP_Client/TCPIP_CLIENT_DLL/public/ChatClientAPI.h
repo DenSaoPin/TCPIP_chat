@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef TCPIPCLIENTDLL_EXPORTS
+#ifdef TCPIP_CLIENT_DLL_EXPORTS
 #define TCPIPCLIENTDLL_EXPORT __declspec(dllexport)
 #else
 #define TCPIPCLIENTDLL_EXPORT __declspec(dllimport)
@@ -12,6 +12,7 @@ extern "C"
 {
 	TCPIPCLIENTDLL_EXPORT void setCallbackMessageReceived(callbackMessageReceivedFunc);
 	TCPIPCLIENTDLL_EXPORT void ClientMainLoop();
-	TCPIPCLIENTDLL_EXPORT void ClientSendMessage(char*);
+	TCPIPCLIENTDLL_EXPORT void ClientSendMessage(const char *);
 	TCPIPCLIENTDLL_EXPORT void ClientTerminate();
+	TCPIPCLIENTDLL_EXPORT void SetConnectionParams(const char *, const char *, const char *);
 }

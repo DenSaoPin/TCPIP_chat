@@ -1,17 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace WPF_UI
 {
@@ -20,28 +9,52 @@ namespace WPF_UI
     /// </summary>
     public partial class MainWindow : Window
     {
+        public static class Native
+        {
+            public delegate void MessageRecievedCallbackDelegate(IntPtr ptr);
+
+            [DllImport("TCPIP_CLIENT_DLL.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+            public static extern void ClientMainLoop();
+
+            [DllImport("TCPIP_CLIENT_DLL.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+            public static extern void setCallbackMessageReceived([MarshalAs(UnmanagedType.FunctionPtr)] MessageRecievedCallbackDelegate ptr);
+
+            [DllImport("TCPIP_CLIENT_DLL.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+            public static extern void ClientSendMessage([MarshalAs(UnmanagedType.AnsiBStr)] string szStr);
+
+            [DllImport("TCPIP_CLIENT_DLL.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+            public static extern void ClientTerminate();
+        }
+
         public MainWindow()
         {
             InitializeComponent();
         }
-
+        
         private void button_SendMesage_OnClick(object sender, RoutedEventArgs e)
         {
-            //TODO how to check which side used
-            OutputTextBox.TextAlignment = TextAlignment.Left;
+            ////TODO how to check which side used
+            //OutputTextBox.TextAlignment = TextAlignment.Left;
 
-            OutputTextBox.Text = OutputTextBox.Text + "/n" + InputTextBox.Text;
+            OutputTextBox_PrintText(InputTextBox.Text);
 
             //TODO send message to selected Client
+            Native.ClientSendMessage(InputTextBox.Text);
 
             InputTextBox.Clear();
             InputTextBox.Text = "...enter your message";
         }
 
+        public void MessageRecievedCallback(IntPtr ptr)
+        {
+            string text = Marshal.PtrToStringAnsi(ptr);
+            OutputTextBox_PrintText(text);
+        }
+
         public void OutputTextBox_PrintText(string text)
         {          
             //TODO how to check which side used
-            OutputTextBox.Text = OutputTextBox.Text + text;
+            OutputTextBox.Text = OutputTextBox.Text + "\n" + text;
         }
         public void ClientsListBox_Initialize(string text)
         {
@@ -68,11 +81,15 @@ namespace WPF_UI
         //        }
         //    }
         //}
-    }
+        private void InputTextBox_IsKeyboardFocusWithinChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            InputTextBox.Clear();
+        }
 
-    //internal enum ETextSide
-    //{
-    //    eLeft,
-    //    eRight,
-    //}
+        private void Button_Exit_OnClick(object sender, RoutedEventArgs e)
+        {
+            Native.ClientTerminate();
+            Application.Current.Shutdown();
+        }
+    }
 }

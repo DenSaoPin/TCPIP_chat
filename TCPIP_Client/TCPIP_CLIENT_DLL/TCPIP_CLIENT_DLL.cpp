@@ -1,9 +1,10 @@
+#pragma comment (lib, "Ws2_32.lib")
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 #include "TCPIP_CLIENT_DLL.h"
-#include "../../ProtocolAPI/ProtocolAPI/BroadcastMessage.h"
-#include "../../ProtocolAPI/ProtocolAPI/DirectMessage.h"
-#include "../../ProtocolAPI/ProtocolAPI/NameRequestMessage.h"
+#include <ProtocolAPI/BroadcastMessage.h>
+#include <ProtocolAPI/DirectMessage.h>
+#include <ProtocolAPI/NameRequestMessage.h>
 #include "CallbacksHolder.h"
 #include "UIInterface.h"
 
@@ -86,20 +87,13 @@
 //TODO check
 	 void TCPIP_Client::ClientMainLoop()
 	 {
-		 /*UIInterface ui;
-		 std::string confClientName = ui.GetName();
-		 std::string confServerIP = ui.GetIP();
-		 std::string confServerPort = ui.GetPort();*/
+		 InitializeSocketRoutine();
 
-		 TCPIP_Client* pClient = Instance();
-		 pClient->Initialize("testuser", "127.0.0.1", "7700");
+		 int sockfd = GetSocket();
 
-		 pClient->InitializeSocketRoutine();
-		 int sockfd = pClient->GetSocket();
+		 IntroduceToServer();
 
-		 pClient->IntroduceToServer();
-
-		 while (!NeedTerminate)
+		 while (!m_NeedTerminate)
 		 {
 			 //TODO how to delete right
 			 ChatLib::RawBytes rawData = ChatLib::Protocol::RecieveMessageAndReply(sockfd);
@@ -137,34 +131,52 @@
 				 CallbacksHolder::clbMessageReceive(text.c_str());
 			 }
 
-			 if (szHasIncomingMessage != nullptr)
-			 {
-				 std::string str(szHasIncomingMessage);
-				 ////TODO how to delete?
-				 ChatLib::BaseMessage* message;
 
-				 //TODO shall we improve?
-				 int startIndex = str.find("for @");
-				 if (startIndex != std::string::npos)
+			 if(!m_outgoingMessages.empty())
+			 { 
+				 std::string &textMessage = m_outgoingMessages.front();
+				
+
+				 if (textMessage.length() > 0)
 				 {
-					 startIndex += 5;
-					 int finishIndex = str.find("@", startIndex);
-					 std::string forName = str.substr(startIndex, finishIndex - startIndex);
-					 std::string fullMessage = Name + ": " + str;
-					 message = new ChatLib::DirectMessage(forName, fullMessage);
-				 }
-				 else
-				 {
-					 message = new ChatLib::BroadcastMessage(str);
+
+					 ////TODO how to delete?
+					 ChatLib::BaseMessage* message;
+
+					 //TODO shall we improve?
+					 int startIndex = textMessage.find("for @");
+					 if (startIndex != std::string::npos)
+					 {
+						 startIndex += 5;
+						 int finishIndex = textMessage.find("@", startIndex);
+						 std::string forName = textMessage.substr(startIndex, finishIndex - startIndex);
+						 std::string fullMessage = Name + ": " + textMessage;
+						 message = new ChatLib::DirectMessage(forName, fullMessage);
+					 }
+					 else
+					 {
+						 message = new ChatLib::BroadcastMessage(textMessage);
+					 }
+
+					 ChatLib::Response response = ChatLib::Protocol::TrySendMessage(message, sockfd);
+
+					 //TODO behavior may depend on the response
+					 delete(message);
 				 }
 
-				 ChatLib::Response response = ChatLib::Protocol::TrySendMessage(message, sockfd);
-
-				 //TODO behavior may depend on the response
-				 szHasIncomingMessage = nullptr;
-				 delete(message);
+				 m_outgoingMessages.pop();
 			 }
 		 }
 		 closesocket(sockfd);
 		 WSACleanup();
 	 }
+
+void TCPIP_Client::SendTextMessage(const char* sz_str)
+{
+	m_outgoingMessages.push(sz_str);
+}
+
+void TCPIP_Client::Shutdown()
+{
+	m_NeedTerminate = true;
+}

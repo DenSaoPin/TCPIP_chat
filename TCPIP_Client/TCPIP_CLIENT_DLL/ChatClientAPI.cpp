@@ -2,19 +2,26 @@
 #include "public/ChatClientAPI.h"
 #include "CallbacksHolder.h"
 
-void setCallbackMessageReceived(callbackMessageReceivedFunc funcPtr)
+extern "C"
 {
-	CallbacksHolder::clbMessageReceive = funcPtr;
-}
-void ClientMainLoop()
-{
-	TCPIP_Client::Instance()->ClientMainLoop();
-}
-void ClientSendMessage(char* szStr)
-{
-	TCPIP_Client::Instance()->szHasIncomingMessage = szStr;
-}
-void ClientTerminate()
-{
-	TCPIP_Client::Instance()->NeedTerminate = true;
+	void setCallbackMessageReceived(callbackMessageReceivedFunc funcPtr)
+	{
+		CallbacksHolder::clbMessageReceive = funcPtr;
+	}
+	void ClientMainLoop()
+	{
+		TCPIP_Client::Instance()->ClientMainLoop();
+	}
+	void ClientSendMessage(const char* szStr)
+	{
+		TCPIP_Client::Instance()->SendTextMessage(szStr);
+	}
+	void ClientTerminate()
+	{
+		TCPIP_Client::Instance()->Shutdown();
+	}
+	void SetConnectionParams(const char *name, const char *ip, const char *port)
+	{
+		TCPIP_Client::Instance()->Initialize(name, ip, port);
+	}
 }

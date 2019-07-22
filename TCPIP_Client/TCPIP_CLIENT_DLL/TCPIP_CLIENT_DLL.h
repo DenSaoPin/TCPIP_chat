@@ -1,15 +1,8 @@
 #pragma once
 
-#include "stdafx.h"
-
-#pragma comment (lib, "Ws2_32.lib")
-
-#include <iostream>
+#include <ProtocolAPI/Protocol.h>
 #include <string>
-#include <thread>
-#include <future>
-#include <cstddef>
-#include "../../ProtocolAPI/ProtocolAPI/Protocol.h"
+#include <queue>
 
 #define MAX_PORT_DIGIT 5
 
@@ -22,6 +15,8 @@
 		TCPIP_Client& operator=(const TCPIP_Client&);
 
 		static TCPIP_Client* _instance;
+		std::queue<std::string> m_outgoingMessages;
+		bool m_NeedTerminate = false;
 
 	public:
 		std::string Name;
@@ -29,8 +24,6 @@
 		std::string ServerPort;
 		int Socket = NULL;
 
-		char* szHasIncomingMessage = nullptr;
-		bool NeedTerminate = false;
 
 		static TCPIP_Client* Instance();
 
@@ -43,6 +36,8 @@
 		int GetSocket();
 
 		void ClientMainLoop();
+		void SendTextMessage(const char* sz_str);
+		void Shutdown();
 
 		//const char* ClientSendMessage(const char *);
 };
