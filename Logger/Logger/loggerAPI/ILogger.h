@@ -1,6 +1,6 @@
 #pragma once
 
-#if LOGGER_EXPORTS
+#if Logger_EXPORTS
 #define DLLEXPORT __declspec(dllexport)
 #else
 #define DLLEXPORT __declspec(dllimport)

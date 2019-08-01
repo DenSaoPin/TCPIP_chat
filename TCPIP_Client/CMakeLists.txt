@@ -10,3 +10,5 @@ add_subdirectory (TCPIP_CLIENT_DLL)
 add_subdirectory (WPF_UI WPF_UI)
 add_subdirectory (Console Console)
 
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT WPF_UI)
+

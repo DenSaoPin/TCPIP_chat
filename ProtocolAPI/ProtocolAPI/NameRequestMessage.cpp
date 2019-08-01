@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "NameRequestMessage.h"
 
 ChatLib::NameRequestMessage::NameRequestMessage(byteP &ppBuff): BroadcastMessage(ppBuff)

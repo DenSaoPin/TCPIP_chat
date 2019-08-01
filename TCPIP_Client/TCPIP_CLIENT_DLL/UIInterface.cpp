@@ -1,5 +1,4 @@
-﻿#include "stdafx.h"
-#include "TCPIP_CLIENT_DLL.h"
+﻿#include "TCPIP_CLIENT_DLL.h"
 #include <ws2ipdef.h>
 #include "UIInterface.h"
 

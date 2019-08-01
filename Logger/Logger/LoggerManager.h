@@ -1,5 +1,5 @@
 #pragma once
-#include "ILogger.h"
+#include "loggerAPI/ILogger.h"
 
 class DLLEXPORT LoggerManager
 {

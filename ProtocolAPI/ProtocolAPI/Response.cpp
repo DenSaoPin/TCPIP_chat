@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "Response.h"
 
 namespace ChatLib

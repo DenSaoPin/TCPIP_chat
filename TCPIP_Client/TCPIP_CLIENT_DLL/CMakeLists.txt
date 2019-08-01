@@ -6,8 +6,6 @@ set(HEADER_FILES
 	CallbacksHolder.h
  	TCPIP_CLIENT_DLL.h
  	UIInterface.h
- 	targetver.h
- 	stdafx.h
 )
 
 set(CPP_FILES
@@ -15,7 +13,6 @@ set(CPP_FILES
  	UIInterface.cpp
  	dllmain.cpp
  	TCPIP_CLIENT_DLL.cpp
- 	stdafx.cpp
  	CallbacksHolder.cpp
 )
                                                                 

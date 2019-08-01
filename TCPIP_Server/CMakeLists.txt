@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.10.00)
+cmake_minimum_required (VERSION 3.8.2)
 project(TCP_Server)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -7,3 +7,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 add_subdirectory (TCPIP_Server)
 add_subdirectory (../ProtocolAPI ProtocolAPI)
+add_subdirectory (../Logger/Logger Logger)
+
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT TCPIP_Server)
+

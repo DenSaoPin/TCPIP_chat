@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "Protocol.h"
 #include <vector>
 #include "Defines.h"
