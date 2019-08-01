@@ -10,28 +10,32 @@
         <Grid.RowDefinitions>
             <RowDefinition Height ="*" />
             <RowDefinition Height ="0.6*" />
+            <RowDefinition Height ="0.1*" />
             <RowDefinition Height ="0.2*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="0.3*"/>
+            <ColumnDefinition Width="0.05*"/> 
         </Grid.ColumnDefinitions>
 
         <TextBlock Name="OutputTextBox" Grid.Row="0" Background="GreenYellow" Grid.ColumnSpan="1" TextWrapping="Wrap" IsHyphenationEnabled="True"  >
         </TextBlock>
-        <TextBox Name="InputTextBox" Grid.Row="1" Background="Aqua" Grid.ColumnSpan="1" TextAlignment="Right" VerticalContentAlignment="Bottom" TextWrapping="Wrap" FontSize="20" SpellCheck.IsEnabled="True" IsKeyboardFocusWithinChanged="InputTextBox_IsKeyboardFocusWithinChanged">
+        <TextBox Name="InputTextBox" Grid.Row="1" Grid.RowSpan="2" Background="Aqua" Grid.ColumnSpan="1" TextAlignment="Right" VerticalContentAlignment="Bottom" TextWrapping="Wrap" FontSize="20" SpellCheck.IsEnabled="True" GotKeyboardFocus="InputTextBox_OnGotKeyboardFocus" LostKeyboardFocus="InputTextBox_OnLostKeyboardFocus">
             ...enter your message
         </TextBox>
-        <ScrollViewer Grid.Column="1" Grid.RowSpan="2" VerticalScrollBarVisibility="Auto" CanContentScroll="True">
+        <ScrollViewer Grid.Column="1" Grid.RowSpan="2" Grid.ColumnSpan="2" VerticalScrollBarVisibility="Auto" CanContentScroll="True">
             <ListBox Name="ClientsListBox" Background="BlueViolet">
             </ListBox>
         </ScrollViewer>
 
+        <TextBox Name="inputNameBox" Grid.Column="1" Grid.Row="2" Background="Coral" Text="...enter your name" GotKeyboardFocus="InputNameBox_OnGotKeyboardFocus"></TextBox>
+        <Button Grid.Row="2" Grid.Column="3" Name="nameOk" Click="NameOk_OnClick">Ok</Button>
 
         <GridSplitter Grid.Column="0" Grid.RowSpan="2" Width="3" VerticalAlignment="Stretch" ShowsPreview ="True"></GridSplitter>
         <GridSplitter Grid.Row="1" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Top" ShowsPreview ="True"></GridSplitter>
 
-        <Button Grid.Row="2" Name="button_SendMesage" Click="button_SendMesage_OnClick" IsDefault="True">SEND MESSAGE</Button>
-        <Button Grid.Row="2" Name="button_Exit" Grid.Column="1" Click="Button_Exit_OnClick" >EXIT </Button>
+        <Button Grid.Row="3" Name="button_SendMesage" Click="button_SendMesage_OnClick" IsDefault="True">SEND MESSAGE</Button>
+        <Button Grid.Row="3" Grid.ColumnSpan="2" Name="button_Exit" Grid.Column="1" Click="Button_Exit_OnClick" >EXIT </Button>
     </Grid>
 </Window>

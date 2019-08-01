@@ -179,4 +179,5 @@ void TCPIP_Client::SendTextMessage(const char* sz_str)
 void TCPIP_Client::Shutdown()
 {
 	m_NeedTerminate = true;
+	while (!m_IsTerminate);
 }

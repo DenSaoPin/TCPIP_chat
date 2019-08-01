@@ -17,6 +17,7 @@
 		static TCPIP_Client* _instance;
 		std::queue<std::string> m_outgoingMessages;
 		bool m_NeedTerminate = false;
+		bool m_IsTerminate = false;
 
 	public:
 		std::string Name;
