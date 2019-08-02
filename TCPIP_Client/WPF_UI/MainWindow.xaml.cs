@@ -12,6 +12,7 @@ namespace WPF_UI
     public partial class MainWindow : Window
     {
         private Thread _threadDllMain;
+        //private UserInfoWindow _userInfoWindow;
 
         public static class Native
         {
@@ -32,16 +33,18 @@ namespace WPF_UI
             [DllImport("TCPIP_CLIENT_DLL.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
             public static extern void SetConnectionParams([MarshalAs(UnmanagedType.AnsiBStr)] string name, [MarshalAs(UnmanagedType.AnsiBStr)] string ip, [MarshalAs(UnmanagedType.AnsiBStr)] string port);
         }
-
+        public static class ClientInfo
+        {
+            public static string Name;
+            public static string Adress;
+            public static string Port;
+        }
         public MainWindow()
         {
             InitializeComponent();
 
             Native.setCallbackMessageReceived(MessageRecievedCallback);
-
             
-            Native.SetConnectionParams("WPF_UI", "127.0.0.1", "7700");
-
             _threadDllMain = new Thread(Native.ClientMainLoop);
             _threadDllMain.Start();
         }
@@ -84,18 +87,6 @@ namespace WPF_UI
         {
             //TODO not implemented
         }
-
-        //private string prepareText(string text, ETextSide side)
-        //{
-        //    if (side == ETextSide.eLeft)
-        //    {
-        //        //TODO 
-        //        while (text.Length < OutputTextBox.ActualWidth)
-        //        {
-        //        }
-        //    }
-        //}
-
         private void Button_Exit_OnClick(object sender, RoutedEventArgs e)
         {
             Native.ClientTerminate();
@@ -106,10 +97,6 @@ namespace WPF_UI
             Application.Current.Shutdown();
         }
 
-        //private void InputTextBox_OnIsKeyboardFocusedChanged(object sender, DependencyPropertyChangedEventArgs e)
-        //{
-        //    InputTextBox.Clear();
-        //}
         private void InputTextBox_OnGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
                 InputTextBox.Clear();
@@ -122,11 +109,13 @@ namespace WPF_UI
 
         private void InputNameBox_OnGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
-            inputNameBox.Clear();
+            InputTextBox.Clear();
         }
 
-        private void NameOk_OnClick(object sender, RoutedEventArgs e)
+        private void userSettings_Click(object sender, RoutedEventArgs e)
         {
+            //_userInfoWindow.Show();
+            //this.Hide();
         }
     }
 }
