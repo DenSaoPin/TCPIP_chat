@@ -4,8 +4,16 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WPF_UI"
+        xmlns:attachedPropertyTest="clr-namespace:AttachedPropertyTest"
         mc:Ignorable="d"
         Title="ChatClient" Height="450" Width="800">
+    <Window.Resources>
+        <Style x:Key="MultiLineTB" TargetType="TextBox">
+            <Setter Property="IsReadOnly" Value="True"/>
+            <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="Text" Value="{Binding Text, ElementName=tbMaster}"/>
+        </Style>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height ="*" />
@@ -19,9 +27,9 @@
             <ColumnDefinition Width="0.05*"/> 
         </Grid.ColumnDefinitions>
 
-        <TextBlock Name="OutputTextBox" Grid.Row="0" Background="LightCyan" Grid.ColumnSpan="1" TextWrapping="Wrap" IsHyphenationEnabled="True"  >
-        </TextBlock>
-        <TextBox Name="InputTextBox" Grid.Row="1" Grid.RowSpan="2" Background="LightCyan" Grid.ColumnSpan="1" TextAlignment="Right" VerticalContentAlignment="Bottom" TextWrapping="Wrap" FontSize="20" SpellCheck.IsEnabled="True" GotKeyboardFocus="InputTextBox_OnGotKeyboardFocus" LostKeyboardFocus="InputTextBox_OnLostKeyboardFocus">
+        <TextBox Name="OutputTextBox" Grid.Row="0" Background="LightCyan" Grid.ColumnSpan="1" TextWrapping="Wrap" Style="{StaticResource MultiLineTB}" attachedPropertyTest:TextBoxUtilities.AlwaysScrollToEnd="True">
+        </TextBox>
+        <TextBox Name="InputTextBox" Grid.Row="1" Grid.RowSpan="2" Background="LightCyan" Grid.ColumnSpan="1" TextAlignment="Right" VerticalContentAlignment="Bottom" TextWrapping="Wrap" FontSize="20" SpellCheck.IsEnabled="True" MaxLength="255" GotKeyboardFocus="InputTextBox_OnGotKeyboardFocus">
             ...enter your message
         </TextBox>
         <ScrollViewer Grid.Column="1" Grid.RowSpan="2" Grid.ColumnSpan="2" VerticalScrollBarVisibility="Auto" CanContentScroll="True">

@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
+using AttachedPropertyTest;
 
 namespace WPF_UI
 {
@@ -50,6 +51,8 @@ namespace WPF_UI
 
             UserInfoWindow userInfoWindow = new UserInfoWindow();
             userInfoWindow.Show();
+
+            TextBoxUtilities.SetAlwaysScrollToEnd(OutputTextBox, true);
         }
 
         public void MainLoop()
@@ -57,13 +60,13 @@ namespace WPF_UI
             Native.SetConnectionParams(ClientInfo.Name, ClientInfo.Adress, ClientInfo.Port);
             Native.setCallbackMessageReceived(MessageRecievedCallback);
 
-            if (Native.ClientIsStarted())
-            {
+            //if (Native.ClientIsStarted())
+            //{
                 _threadDllMain = new Thread(ClientThreadFunc);
                 _threadDllMain.Start();
 
                 _clientExecuted = true;
-            }
+            //}
         }
 
         private static void  ClientThreadFunc()
@@ -129,12 +132,18 @@ namespace WPF_UI
 
         private void InputTextBox_OnGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
-                InputTextBox.Clear();
+            InputTextBox.Clear();
         }
 
-        private void InputTextBox_OnLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
-        {
-            InputTextBox.Text = "...enter your message";
-        }
+        //private void InputTextBox_OnLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        //{
+        //    InputTextBox.Text = "...enter your message";
+        //}
+
+        //private void InputTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        //{
+        //    if (IsLoaded && string.IsNullOrEmpty(InputTextBox.Text))
+        //        InputTextBox.Text = "...enter your message";
+        //}
     }
 }
