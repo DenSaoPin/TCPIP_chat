@@ -34,8 +34,8 @@
         <Button Name="OkButton" Grid.Row = "5" Grid.Column="4" Content="Ok" Grid.ColumnSpan="2 " Click="OkButton_Click"/>
         <Button Name="ExitButton" Grid.Row = "5" Grid.Column="1" Content="Exit" Click="ExitButton_Click"/>
 
-        <TextBox Name="NameTextBox" Grid.Row="1" Grid.Column="3" Grid.ColumnSpan="3" MaxLength="20" PreviewTextInput="NameTextBox_OnPreviewTextInput" DataObject.Pasting="NameTextBox_OnPasting" Text="Denis"></TextBox>
-        <TextBox Name="PortTextBox" Grid.Row="2" Grid.Column="3" Grid.ColumnSpan="3" MaxLength="5" PreviewTextInput="PortTextBox_OnPreviewTextInput" DataObject.Pasting="PortTextBox_OnPastingTextBoxPasting" Text="7700"></TextBox>
-        <TextBox Name="IP_TextBox" Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="3" Text="localhost" ></TextBox>
+        <TextBox Name="NameTextBox" Grid.Row="1" Grid.Column="3" Grid.ColumnSpan="3" MaxLength="20" PreviewTextInput="NameTextBox_OnPreviewTextInput" DataObject.Pasting="NameTextBox_OnPasting" GotKeyboardFocus="NameTextBox_OnGotKeyboardFocus" TextChanged="NameTextBox_OnTextChanged"  Text="Denis"></TextBox>
+        <TextBox Name="PortTextBox" Grid.Row="2" Grid.Column="3" Grid.ColumnSpan="3" MaxLength="5" PreviewTextInput="PortTextBox_OnPreviewTextInput" DataObject.Pasting="PortTextBox_OnPastingTextBoxPasting" GotKeyboardFocus="PortTextBox_OnGotKeyboardFocus" TextChanged="PortTextBox_OnTextChanged" Text="7700"></TextBox>
+        <TextBox Name="IP_TextBox" Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="3" MaxLength="255" PreviewTextInput="IP_TextBox_OnPreviewTextInput" DataObject.Pasting="IP_TextBox_OnPasting" GotKeyboardFocus="IP_TextBox_OnGotKeyboardFocus" Text="localhost" TextChanged="IP_TextBox_OnTextChanged"></TextBox>
     </Grid>
 </Window>

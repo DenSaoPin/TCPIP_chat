@@ -24,4 +24,8 @@ extern "C"
 	{
 		TCPIP_Client::Instance()->Initialize(name, ip, port);
 	}
+	bool ClientIsStarted()
+	{
+		return TCPIP_Client::Instance()->IsStarted;
+	}
 }

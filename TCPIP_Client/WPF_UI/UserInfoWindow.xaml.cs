@@ -1,28 +1,31 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace WPF_UI
 {
-    /// <summary>
-    /// Interaction logic for UserInfoWindow.xaml
-    /// </summary>
     public partial class UserInfoWindow : Window
     {
+        private MainWindow _mainWindow;
         public UserInfoWindow()
         {
             InitializeComponent();
+            OkButton.IsEnabled = true;
+            _mainWindow = (WPF_UI.MainWindow)Application.Current.MainWindow;
         }
 
         private static Regex _portRegex = new Regex("[0-9]+");
-        private static Regex _nameRegex = new Regex("[A-z 0-9_]+", RegexOptions.IgnoreCase);
+        private static Regex _nameRegex = new Regex("[A-Za-z 0-9_]+");
+        private static Regex _ipRegex = new Regex("[A-Za-z0-9-.]+");
 
         private enum CheckType
         {
             eDefault,
             ePort,
             eName,
+            eIP,
         }
 
         private static bool IsTextAllowed(string text, CheckType type)
@@ -33,6 +36,8 @@ namespace WPF_UI
                     return _portRegex.IsMatch(text);
                 case CheckType.eName:
                     return _nameRegex.IsMatch(text);
+                case CheckType.eIP:
+                    return _ipRegex.IsMatch(text);
                 case CheckType.eDefault:
                     break;
             }
@@ -58,18 +63,37 @@ namespace WPF_UI
 
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!string.IsNullOrEmpty(PortTextBox.Text))
-            { 
-            }
-
-            MainWindow mainWindow = (WPF_UI.MainWindow)Application.Current.MainWindow;
             this.Hide();
-            mainWindow.Show();
+
+            MainWindow.ClientInfo.Name = NameTextBox.Text;
+            MainWindow.ClientInfo.Adress = IP_TextBox.Text;
+            MainWindow.ClientInfo.Port = PortTextBox.Text;
+
+            _mainWindow.NameLabel.Content = NameTextBox.Text;
+
+            _mainWindow.Show();
+            _mainWindow.MainLoop();
         }
 
+        private void ButtonOkTryEnable()
+        {
+            if (this.IsLoaded)
+            {
+                if (!string.IsNullOrEmpty(NameTextBox.Text) &&
+                    !string.IsNullOrEmpty(PortTextBox.Text) &&
+                    !string.IsNullOrEmpty(IP_TextBox.Text))
+                {
+                    OkButton.IsEnabled = true;
+                }
+                else
+                {
+                    OkButton.IsEnabled = false;
+                }
+            }
+        }
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
-
+            _mainWindow.Button_Exit_OnClick(sender, e);
         }
 
         private void PortTextBox_OnPreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -90,6 +114,46 @@ namespace WPF_UI
         private void NameTextBox_OnPasting(object sender, DataObjectPastingEventArgs e)
         {
             TrashPastingPrevent(sender, e, CheckType.eName);
+        }
+
+        private void IP_TextBox_OnPreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = !IsTextAllowed(e.Text, CheckType.eName);
+        }
+
+        private void IP_TextBox_OnPasting(object sender, DataObjectPastingEventArgs e)
+        {
+            TrashPastingPrevent(sender, e, CheckType.eIP);
+        }
+
+        private void NameTextBox_OnGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            NameTextBox.Clear();
+        }
+
+        private void PortTextBox_OnGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            PortTextBox.Clear();
+        }
+
+        private void IP_TextBox_OnGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            IP_TextBox.Clear();
+        }
+
+        private void NameTextBox_OnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            ButtonOkTryEnable();
+        }
+
+        private void PortTextBox_OnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            ButtonOkTryEnable();
+        }
+
+        private void IP_TextBox_OnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            ButtonOkTryEnable();
         }
     }
 }

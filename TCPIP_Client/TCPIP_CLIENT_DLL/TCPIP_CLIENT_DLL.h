@@ -23,8 +23,9 @@
 		std::string Name;
 		std::string ServerIP;
 		std::string ServerPort;
-		int Socket = NULL;
 
+		int Socket = NULL;
+		bool IsStarted = false;
 
 		static TCPIP_Client* Instance();
 
