@@ -12,6 +12,7 @@ namespace WPF_UI
     public partial class MainWindow : Window
     {
         private Thread _threadDllMain;
+        private bool _clientExecuted = false;
 
         public static class Native
         {
@@ -30,22 +31,53 @@ namespace WPF_UI
             public static extern void ClientTerminate();
 
             [DllImport("TCPIP_CLIENT_DLL.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+            public static extern bool ClientIsStarted();
+
+            [DllImport("TCPIP_CLIENT_DLL.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
             public static extern void SetConnectionParams([MarshalAs(UnmanagedType.AnsiBStr)] string name, [MarshalAs(UnmanagedType.AnsiBStr)] string ip, [MarshalAs(UnmanagedType.AnsiBStr)] string port);
         }
-
+        public static class ClientInfo
+        {
+            public static string Name;
+            public static string Adress;
+            public static string Port;
+        }
         public MainWindow()
         {
             InitializeComponent();
 
+            Hide();
+
+            UserInfoWindow userInfoWindow = new UserInfoWindow();
+            userInfoWindow.Show();
+        }
+
+        public void MainLoop()
+        {
+            Native.SetConnectionParams(ClientInfo.Name, ClientInfo.Adress, ClientInfo.Port);
             Native.setCallbackMessageReceived(MessageRecievedCallback);
 
-            
-            Native.SetConnectionParams("WPF_UI", "127.0.0.1", "7700");
+            if (Native.ClientIsStarted())
+            {
+                _threadDllMain = new Thread(ClientThreadFunc);
+                _threadDllMain.Start();
 
-            _threadDllMain = new Thread(Native.ClientMainLoop);
-            _threadDllMain.Start();
+                _clientExecuted = true;
+            }
         }
-        
+
+        private static void  ClientThreadFunc()
+        {
+            try
+            {
+                Native.ClientMainLoop();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            //    throw;
+            }
+        }
         private void button_SendMesage_OnClick(object sender, RoutedEventArgs e)
         {
             ////TODO how to check which side used
@@ -75,7 +107,6 @@ namespace WPF_UI
         {
             //TODO not implemented
         }
-
         public void ClientsListBox_Add(string text)
         {
             //TODO not implemented
@@ -84,32 +115,18 @@ namespace WPF_UI
         {
             //TODO not implemented
         }
-
-        //private string prepareText(string text, ETextSide side)
-        //{
-        //    if (side == ETextSide.eLeft)
-        //    {
-        //        //TODO 
-        //        while (text.Length < OutputTextBox.ActualWidth)
-        //        {
-        //        }
-        //    }
-        //}
-
-        private void Button_Exit_OnClick(object sender, RoutedEventArgs e)
+        public void Button_Exit_OnClick(object sender, RoutedEventArgs e)
         {
-            Native.ClientTerminate();
+            if (_clientExecuted)
+            {
+                Native.ClientTerminate();
 
-            _threadDllMain.Abort();
-            while (_threadDllMain.ThreadState != ThreadState.Stopped);
-
+                _threadDllMain.Abort();
+                while (_threadDllMain.ThreadState != ThreadState.Stopped || _threadDllMain.ThreadState != ThreadState.Unstarted) ;
+            }
             Application.Current.Shutdown();
         }
 
-        //private void InputTextBox_OnIsKeyboardFocusedChanged(object sender, DependencyPropertyChangedEventArgs e)
-        //{
-        //    InputTextBox.Clear();
-        //}
         private void InputTextBox_OnGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
                 InputTextBox.Clear();
@@ -118,15 +135,6 @@ namespace WPF_UI
         private void InputTextBox_OnLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
             InputTextBox.Text = "...enter your message";
-        }
-
-        private void InputNameBox_OnGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
-        {
-            inputNameBox.Clear();
-        }
-
-        private void NameOk_OnClick(object sender, RoutedEventArgs e)
-        {
         }
     }
 }

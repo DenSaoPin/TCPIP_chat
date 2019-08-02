@@ -7,6 +7,8 @@ add_executable(WPF_UI
     App.xaml.cs
     MainWindow.xaml
     MainWindow.xaml.cs
+	UserInfoWindow.xaml
+	UserInfoWindow.xaml.cs
 
     Properties/AssemblyInfo.cs
     Properties/Resources.Designer.cs
@@ -28,8 +30,8 @@ csharp_set_xaml_cs_properties(
     App.xaml.cs
     MainWindow.xaml
     MainWindow.xaml.cs
-	UserInfoWindow.xaml
-	UserInfoWindow.xaml.cs   
+    UserInfoWindow.xaml
+    UserInfoWindow.xaml.cs   
 )
 
 set_property(SOURCE App.xaml PROPERTY VS_XAML_TYPE "ApplicationDefinition")

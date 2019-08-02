@@ -8,8 +8,6 @@
 #include "CallbacksHolder.h"
 #include "UIInterface.h"
 
-
-
 		TCPIP_Client* TCPIP_Client::_instance = nullptr;
 
 		TCPIP_Client* TCPIP_Client::Instance()
@@ -93,6 +91,7 @@
 
 		 IntroduceToServer();
 
+		 IsStarted = true;
 		 while (!m_NeedTerminate)
 		 {
 			 //TODO how to delete right
