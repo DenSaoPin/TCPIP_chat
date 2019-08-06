@@ -87,18 +87,53 @@ namespace WPF_UI
             /// 
             string text = InputTextBox.Text;
             if (!string.IsNullOrEmpty(text) && text != "...enter your message")
-                OutputTextBox_PrintText(InputTextBox.Text);
-
+                ShowText(text, ETextAligment.eLeft);
             //TODO send message to selected Client
             Native.ClientSendMessage(InputTextBox.Text);
 
             InputTextBox.Clear();
         }
+        public enum ETextAligment
+        {
+            eUnknown,
+            eLeft,
+            eRight,
+        }
+
+        public void ShowText(string text, ETextAligment aligment)
+        {
+            text += "\n";
+            switch (aligment)
+            {
+                case ETextAligment.eLeft:
+
+
+                    break;
+                case ETextAligment.eRight:
+                    if (OutputTextBox.ActualWidth > text.Length)
+                    {
+                        double tail = OutputTextBox.ActualWidth % (double)(text.Length);
+                    }
+                    else
+                    {
+                        while (text.Length < OutputTextBox.MaxLength)
+                        {
+                            text = " " + text;
+                        }
+                    }
+                    break;
+                case ETextAligment.eUnknown:
+                    break;
+            }
+
+
+            OutputTextBox.Text += text + "\n";
+        }
 
         public void MessageRecievedCallback(IntPtr ptr)
         {
             string text = Marshal.PtrToStringAnsi(ptr);
-            OutputTextBox_PrintText(text);
+            ShowText(text, ETextAligment.eLeft);
         }
 
         public void OutputTextBox_PrintText(string text)
@@ -145,5 +180,9 @@ namespace WPF_UI
         //    if (IsLoaded && string.IsNullOrEmpty(InputTextBox.Text))
         //        InputTextBox.Text = "...enter your message";
         //}
+        private void MainWindow_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            ShowText("Test", ETextAligment.eRight);
+        }
     }
 }

@@ -7,8 +7,11 @@ add_executable(WPF_UI
     App.xaml.cs
     MainWindow.xaml
     MainWindow.xaml.cs
-	UserInfoWindow.xaml
-	UserInfoWindow.xaml.cs
+    UserInfoWindow.xaml
+    UserInfoWindow.xaml.cs
+
+    AutoScroll.cs
+    WatermarkedTextBox.cs
 
     Properties/AssemblyInfo.cs
     Properties/Resources.Designer.cs
