@@ -159,8 +159,10 @@ namespace WPF_UI
             {
                 Native.ClientTerminate();
 
-                _threadDllMain.Abort();
-                while (_threadDllMain.ThreadState != ThreadState.Stopped || _threadDllMain.ThreadState != ThreadState.Unstarted) ;
+                while (_threadDllMain.ThreadState != ThreadState.Stopped)
+                {
+                    Thread.Sleep(0);
+                }
             }
             Application.Current.Shutdown();
         }
