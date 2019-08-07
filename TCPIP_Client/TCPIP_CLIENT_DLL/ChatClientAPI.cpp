@@ -10,7 +10,14 @@ extern "C"
 	}
 	void ClientMainLoop()
 	{
-		TCPIP_Client::Instance()->ClientMainLoop();
+		try
+		{
+			TCPIP_Client::Instance()->ClientMainLoop();
+		}
+		catch (...)
+		{
+			CallbacksHolder::clbMessageReceive("Exception");
+		}
 	}
 	void ClientSendMessage(const char* szStr)
 	{
