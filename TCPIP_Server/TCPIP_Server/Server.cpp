@@ -5,7 +5,7 @@
 
 #define MAX_LENGTH 1024
 
-const char * Server::DefaultAddress = "127.0.0.1";
+const char * Server::DefaultAddress = "0.0.0.0";
 
 Server::Server(std::string address, std::string port)
 {
