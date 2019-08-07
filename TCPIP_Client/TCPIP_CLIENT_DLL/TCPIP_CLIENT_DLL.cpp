@@ -168,6 +168,7 @@
 		 }
 		 closesocket(sockfd);
 		 WSACleanup();
+		 m_IsTerminate = true;
 	 }
 
 void TCPIP_Client::SendTextMessage(const char* sz_str)
