@@ -1,5 +1,3 @@
-#include "stdafx.h"
-
 #include "BaseLogger.h"
 #include <cstdarg>
 #include <cstdio>
