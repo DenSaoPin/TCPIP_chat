@@ -45,6 +45,7 @@ bool ServerClient::ProcessSocket()
 			std::cout << "Exception catched" << std::endl;
 			IInvalid = true;
 			closesocket(Socket);
+			return false;
 		}
 		catch (ChatLib::Protocol::ConnectionLostException)
 		{
