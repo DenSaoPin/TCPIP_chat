@@ -86,28 +86,6 @@ namespace WPF_UI
             _mainWindow.Show();
             _mainWindow.MainLoop();
         }
-
-        //private bool IsInputEmpty()
-        //{
-        //    if ((!string.IsNullOrEmpty(NameTextBox.Text) &&
-        //         !string.IsNullOrEmpty(PortTextBox.Text) &&
-        //         !string.IsNullOrEmpty(IP_TextBox.Text)) || (!string.IsNullOrEmpty(NameTextBox.WatermarkText) &&
-        //                                                     !string.IsNullOrEmpty(PortTextBox.WatermarkText) &&
-        //                                                     !string.IsNullOrEmpty(IP_TextBox.WatermarkText)))
-        //    {
-        //        return true;
-        //    }
-
-        //    return false;
-        //}
-
-        //private void ButtonOkTryEnable()
-        //{
-        //    if (this.IsLoaded)
-        //    {
-        //        OkButton.IsEnabled = IsInputEmpty();
-        //    }
-        //}
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
             _mainWindow.Button_Exit_OnClick(sender, e);
@@ -143,31 +121,5 @@ namespace WPF_UI
             TrashPastingPrevent(sender, e, CheckType.eIP);
         }
 
-        //private void NameTextBox_OnGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
-        //{
-        //}
-
-        //private void PortTextBox_OnGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
-        //{
-        //}
-
-        //private void IP_TextBox_OnGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
-        //{
-        //}
-
-        //private void NameTextBox_OnTextChanged(object sender, TextChangedEventArgs e)
-        //{
-        //    ButtonOkTryEnable();
-        //}
-
-        //private void PortTextBox_OnTextChanged(object sender, TextChangedEventArgs e)
-        //{
-        //    ButtonOkTryEnable();
-        //}
-
-        //private void IP_TextBox_OnTextChanged(object sender, TextChangedEventArgs e)
-        //{
-        //    ButtonOkTryEnable();
-        //}
     }
 }

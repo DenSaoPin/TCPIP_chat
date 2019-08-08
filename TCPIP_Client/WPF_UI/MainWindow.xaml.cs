@@ -7,9 +7,6 @@ using AttachedPropertyTest;
 
 namespace WPF_UI
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         private Thread _threadDllMain;
@@ -60,13 +57,10 @@ namespace WPF_UI
             Native.SetConnectionParams(ClientInfo.Name, ClientInfo.Adress, ClientInfo.Port);
             Native.setCallbackMessageReceived(MessageRecievedCallback);
 
-            //if (Native.ClientIsStarted())
-            //{
-                _threadDllMain = new Thread(ClientThreadFunc);
-                _threadDllMain.Start();
+            _threadDllMain = new Thread(ClientThreadFunc);
+            _threadDllMain.Start();
 
-                _clientExecuted = true;
-            //}
+            _clientExecuted = true;
         }
 
         private static void  ClientThreadFunc()
@@ -127,19 +121,13 @@ namespace WPF_UI
             }
 
 
-            OutputTextBox.Text += text + "\n";
+            OutputTextBox.Text += text;
         }
 
         public void MessageRecievedCallback(IntPtr ptr)
         {
             string text = Marshal.PtrToStringAnsi(ptr);
             ShowText(text, ETextAligment.eLeft);
-        }
-
-        public void OutputTextBox_PrintText(string text)
-        {
-            OutputTextBox.Text = OutputTextBox.Text + "\n" + text;
-            //TODO how to check which side used
         }
         public void ClientsListBox_Initialize(string text)
         {
@@ -171,17 +159,6 @@ namespace WPF_UI
         {
             InputTextBox.Clear();
         }
-
-        //private void InputTextBox_OnLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
-        //{
-        //    InputTextBox.Text = "...enter your message";
-        //}
-
-        //private void InputTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        //{
-        //    if (IsLoaded && string.IsNullOrEmpty(InputTextBox.Text))
-        //        InputTextBox.Text = "...enter your message";
-        //}
         private void MainWindow_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             ShowText("Test", ETextAligment.eRight);
