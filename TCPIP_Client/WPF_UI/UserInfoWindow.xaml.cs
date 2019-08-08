@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace WPF_UI
@@ -65,6 +64,19 @@ namespace WPF_UI
         {
             this.Hide();
 
+            if (string.IsNullOrEmpty(NameTextBox.Text))
+            {
+                NameTextBox.Text = NameTextBox.WatermarkText;
+            }
+            if (string.IsNullOrEmpty(IP_TextBox.Text))
+            {
+                IP_TextBox.Text = IP_TextBox.WatermarkText;
+            }
+            if (string.IsNullOrEmpty(PortTextBox.Text))
+            {
+                PortTextBox.Text = PortTextBox.WatermarkText;
+            }
+
             MainWindow.ClientInfo.Name = NameTextBox.Text;
             MainWindow.ClientInfo.Adress = IP_TextBox.Text;
             MainWindow.ClientInfo.Port = PortTextBox.Text;
@@ -75,22 +87,27 @@ namespace WPF_UI
             _mainWindow.MainLoop();
         }
 
-        private void ButtonOkTryEnable()
-        {
-            if (this.IsLoaded)
-            {
-                if (!string.IsNullOrEmpty(NameTextBox.Text) &&
-                    !string.IsNullOrEmpty(PortTextBox.Text) &&
-                    !string.IsNullOrEmpty(IP_TextBox.Text))
-                {
-                    OkButton.IsEnabled = true;
-                }
-                else
-                {
-                    OkButton.IsEnabled = false;
-                }
-            }
-        }
+        //private bool IsInputEmpty()
+        //{
+        //    if ((!string.IsNullOrEmpty(NameTextBox.Text) &&
+        //         !string.IsNullOrEmpty(PortTextBox.Text) &&
+        //         !string.IsNullOrEmpty(IP_TextBox.Text)) || (!string.IsNullOrEmpty(NameTextBox.WatermarkText) &&
+        //                                                     !string.IsNullOrEmpty(PortTextBox.WatermarkText) &&
+        //                                                     !string.IsNullOrEmpty(IP_TextBox.WatermarkText)))
+        //    {
+        //        return true;
+        //    }
+
+        //    return false;
+        //}
+
+        //private void ButtonOkTryEnable()
+        //{
+        //    if (this.IsLoaded)
+        //    {
+        //        OkButton.IsEnabled = IsInputEmpty();
+        //    }
+        //}
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
             _mainWindow.Button_Exit_OnClick(sender, e);
@@ -126,34 +143,31 @@ namespace WPF_UI
             TrashPastingPrevent(sender, e, CheckType.eIP);
         }
 
-        private void NameTextBox_OnGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
-        {
-            NameTextBox.Clear();
-        }
+        //private void NameTextBox_OnGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        //{
+        //}
 
-        private void PortTextBox_OnGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
-        {
-            PortTextBox.Clear();
-        }
+        //private void PortTextBox_OnGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        //{
+        //}
 
-        private void IP_TextBox_OnGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
-        {
-            IP_TextBox.Clear();
-        }
+        //private void IP_TextBox_OnGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        //{
+        //}
 
-        private void NameTextBox_OnTextChanged(object sender, TextChangedEventArgs e)
-        {
-            ButtonOkTryEnable();
-        }
+        //private void NameTextBox_OnTextChanged(object sender, TextChangedEventArgs e)
+        //{
+        //    ButtonOkTryEnable();
+        //}
 
-        private void PortTextBox_OnTextChanged(object sender, TextChangedEventArgs e)
-        {
-            ButtonOkTryEnable();
-        }
+        //private void PortTextBox_OnTextChanged(object sender, TextChangedEventArgs e)
+        //{
+        //    ButtonOkTryEnable();
+        //}
 
-        private void IP_TextBox_OnTextChanged(object sender, TextChangedEventArgs e)
-        {
-            ButtonOkTryEnable();
-        }
+        //private void IP_TextBox_OnTextChanged(object sender, TextChangedEventArgs e)
+        //{
+        //    ButtonOkTryEnable();
+        //}
     }
 }

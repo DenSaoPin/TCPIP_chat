@@ -4,8 +4,42 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WPF_UI"
+        xmlns:attachedPropertyTest="clr-namespace:AttachedPropertyTest"
         mc:Ignorable="d"
         Title="Enter your user settings" Height="150" Width="400">
+    <Window.Resources>
+        <Style TargetType="{x:Type attachedPropertyTest:WatermarkedTextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type attachedPropertyTest:WatermarkedTextBox}">
+                        <Border BorderThickness="1" BorderBrush="Gray">
+                            <Grid>
+                                <ScrollViewer x:Name="PART_ContentHost" />
+                                <TextBlock x:Name="WatermarkText" Text="{TemplateBinding WatermarkText}" Foreground="Gray" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Visibility="Collapsed" IsHitTestVisible="False"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsKeyboardFocusWithin" Value="False"/>
+                                    <Condition Property="Text" Value=""/>
+                                </MultiTrigger.Conditions>
+                                <Setter Property="Visibility" TargetName="WatermarkText" Value="Visible"/>
+                            </MultiTrigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsKeyboardFocusWithin" Value="False"/>
+                                    <Condition Property="Text" Value="{x:Null}"/>
+                                </MultiTrigger.Conditions>
+                                <Setter Property="Visibility" TargetName="WatermarkText" Value="Visible"/>
+                            </MultiTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height = "0.5*"/>
@@ -34,8 +68,8 @@
         <Button Name="OkButton" Grid.Row = "5" Grid.Column="4" Content="Ok" Grid.ColumnSpan="2 " Click="OkButton_Click"/>
         <Button Name="ExitButton" Grid.Row = "5" Grid.Column="1" Content="Exit" Click="ExitButton_Click"/>
 
-        <TextBox Name="NameTextBox" Grid.Row="1" Grid.Column="3" Grid.ColumnSpan="3" MaxLength="20" PreviewTextInput="NameTextBox_OnPreviewTextInput" DataObject.Pasting="NameTextBox_OnPasting" GotKeyboardFocus="NameTextBox_OnGotKeyboardFocus" TextChanged="NameTextBox_OnTextChanged"  Text="Denis"></TextBox>
-        <TextBox Name="PortTextBox" Grid.Row="2" Grid.Column="3" Grid.ColumnSpan="3" MaxLength="5" PreviewTextInput="PortTextBox_OnPreviewTextInput" DataObject.Pasting="PortTextBox_OnPastingTextBoxPasting" GotKeyboardFocus="PortTextBox_OnGotKeyboardFocus" TextChanged="PortTextBox_OnTextChanged" Text="7700"></TextBox>
-        <TextBox Name="IP_TextBox" Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="3" MaxLength="255" PreviewTextInput="IP_TextBox_OnPreviewTextInput" DataObject.Pasting="IP_TextBox_OnPasting" GotKeyboardFocus="IP_TextBox_OnGotKeyboardFocus" Text="localhost" TextChanged="IP_TextBox_OnTextChanged"></TextBox>
+        <attachedPropertyTest:WatermarkedTextBox x:Name="NameTextBox" Grid.Row="1" Grid.Column="3" Grid.ColumnSpan="3" MaxLength="20" PreviewTextInput="NameTextBox_OnPreviewTextInput" DataObject.Pasting="NameTextBox_OnPasting" WatermarkText="Denis"></attachedPropertyTest:WatermarkedTextBox>
+        <attachedPropertyTest:WatermarkedTextBox x:Name="PortTextBox" Grid.Row="2" Grid.Column="3" Grid.ColumnSpan="3" MaxLength="5" PreviewTextInput="PortTextBox_OnPreviewTextInput" DataObject.Pasting="PortTextBox_OnPastingTextBoxPasting" WatermarkText="7700"></attachedPropertyTest:WatermarkedTextBox>
+        <attachedPropertyTest:WatermarkedTextBox x:Name="IP_TextBox" Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="3" MaxLength="255" PreviewTextInput="IP_TextBox_OnPreviewTextInput" DataObject.Pasting="IP_TextBox_OnPasting" WatermarkText="localhost"></attachedPropertyTest:WatermarkedTextBox>
     </Grid>
 </Window>
