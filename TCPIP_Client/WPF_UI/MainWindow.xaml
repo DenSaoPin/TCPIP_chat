@@ -5,8 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:attachedPropertyTest="clr-namespace:AttachedPropertyTest"
         mc:Ignorable="d"
-        Title="ChatClient" Height="450" Width="800"
-        MouseDoubleClick="MainWindow_OnMouseDoubleClick">
+        Title="ChatClient" Height="450" Width="800">
     <Window.Resources>
         <Style x:Key="MultiLineTB" TargetType="TextBox">
             <Setter Property="IsReadOnly" Value="True"/>
@@ -45,7 +44,6 @@
             </Setter>
         </Style>
     </Window.Resources>
-
     
     <Grid>
         <Grid.RowDefinitions>
@@ -64,7 +62,7 @@
         </TextBox>
 
         <attachedPropertyTest:WatermarkedTextBox x:Name="InputTextBox" Grid.Row="1" Grid.RowSpan="2" Background="LightCyan" Grid.ColumnSpan="1"
-                                                 Grid.Column="0" TextAlignment="Right" VerticalContentAlignment="Bottom" TextWrapping="Wrap" FontSize="20" SpellCheck.IsEnabled="True" MaxLength="255" WatermarkText="...enter your message">
+                                                 Grid.Column="0" TextAlignment="Right" VerticalContentAlignment="Bottom" TextWrapping="Wrap" FontSize="20" SpellCheck.IsEnabled="True" MaxLength="249" WatermarkText="...enter your message">
         </attachedPropertyTest:WatermarkedTextBox>
         
         <ScrollViewer Grid.Column="1" Grid.RowSpan="2" Grid.ColumnSpan="2" VerticalScrollBarVisibility="Auto" CanContentScroll="True">
@@ -73,12 +71,12 @@
         </ScrollViewer>
 
         <Label Name="NameLabel" Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2" FontSize="20" Background="DarkGray" HorizontalContentAlignment="Center"></Label>
-        <!--<Button Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Name="userSettings" Click="userSettings_Click">User settings</Button>-->
 
         <GridSplitter Grid.Column="0" Grid.RowSpan="2" Width="3" VerticalAlignment="Stretch" ShowsPreview ="True" MinWidth="4"></GridSplitter>
         <GridSplitter Grid.Row="1" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Top" ShowsPreview ="True" MinHeight="4"></GridSplitter>
 
         <Button Grid.Row="3" Name="button_SendMesage" Click="button_SendMesage_OnClick" IsDefault="True">SEND MESSAGE</Button>
         <Button Grid.Row="3" Grid.ColumnSpan="2" Name="button_Exit" Grid.Column="1" Click="Button_Exit_OnClick" >EXIT </Button>
+        <Button Name="Status_Button" Background="Red" Grid.Row="2" Grid.Column="2" IsEnabled="False" ToolTip="You are offline"/>
     </Grid>
 </Window>
