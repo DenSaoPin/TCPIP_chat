@@ -42,14 +42,17 @@ bool ServerClient::ProcessSocket()
 		catch (ChatLib::Protocol::ConnectionClosedException& ex)
 		{
 			//TODO need implement print exception text 
-			std::cout << "Exception catched" << std::endl;
+			std::cout << "Exception ConnectionClosedException catched" << std::endl;
 			IInvalid = true;
 			closesocket(Socket);
 			return false;
 		}
 		catch (ChatLib::Protocol::ConnectionLostException)
 		{
-			//TODO not implemented
+			std::cout << "Exception ConnectionLostException catched" << std::endl;
+			IInvalid = true;
+			closesocket(Socket);
+			return false;
 		}
 
 		ChatLib::byte *p = &rawMessage[0];

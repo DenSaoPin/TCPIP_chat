@@ -16,7 +16,6 @@ namespace ChatLib
 		timeval timeout;
 		timeout.tv_sec = 0;
 		timeout.tv_usec = 500;
-		//Message message(eInvalid);
 		RawBytes rawData;
 
 		int result = select(maxFD, &rfds, NULL, NULL, &timeout);

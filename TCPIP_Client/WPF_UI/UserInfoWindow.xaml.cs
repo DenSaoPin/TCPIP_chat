@@ -77,9 +77,9 @@ namespace WPF_UI
                 PortTextBox.Text = PortTextBox.WatermarkText;
             }
 
-            MainWindow.ClientInfo.Name = NameTextBox.Text;
-            MainWindow.ClientInfo.Adress = IP_TextBox.Text;
-            MainWindow.ClientInfo.Port = PortTextBox.Text;
+            ClientInfo.Name = NameTextBox.Text;
+            ClientInfo.Adress = IP_TextBox.Text;
+            ClientInfo.Port = PortTextBox.Text;
 
             _mainWindow.NameLabel.Content = NameTextBox.Text;
 
