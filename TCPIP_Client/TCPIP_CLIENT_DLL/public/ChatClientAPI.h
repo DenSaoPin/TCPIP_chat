@@ -6,7 +6,7 @@
 #define TCPIPCLIENTDLL_EXPORT __declspec(dllimport)
 #endif
 
-typedef void (*callbackMessageReceivedFunc) (const char *);
+typedef void (*callbackMessageReceivedFunc) (const char *, const int*, const char*);
 
 extern "C"
 {

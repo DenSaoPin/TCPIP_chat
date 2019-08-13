@@ -108,6 +108,7 @@
 				 {
 					 const ChatLib::BroadcastMessage BroadMessage(p);
 					 text = BroadMessage.Text;
+					 CallbacksHolder::clbMessageReceive( BroadMessage.SourceName.c_str(), reinterpret_cast<int*>(BroadMessage.GetMyType()) , BroadMessage.Text.c_str() );
 					 break;
 				 }
 				 case ChatLib::eDirectMessage:
@@ -127,7 +128,6 @@
 				 //if (text.length() != 0)
 				 //	 ui.PrintMessage(text);
 
-				 CallbacksHolder::clbMessageReceive(text.c_str());
 			 }
 
 

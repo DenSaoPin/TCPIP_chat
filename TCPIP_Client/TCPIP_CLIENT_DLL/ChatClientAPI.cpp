@@ -16,7 +16,7 @@ extern "C"
 		}
 		catch (...)
 		{
-			CallbacksHolder::clbMessageReceive("Exception");
+			CallbacksHolder::clbMessageReceive(TCPIP_Client::Instance()->Name.c_str(), reinterpret_cast<int*>(ChatLib::eInvalid) , "Exception");
 		}
 	}
 	void ClientSendMessage(const char* szStr)

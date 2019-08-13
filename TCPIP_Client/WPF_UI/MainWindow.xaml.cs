@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Media;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -9,18 +9,13 @@ namespace WPF_UI
 {
     public static class Native
     {
-        public delegate void MessageRecievedCallbackDelegate(IntPtr ptr);
-
-        public delegate void ClientStatusCallbackDelegate(IntPtr ptr);
+        public delegate void MessageRecievedCallbackDelegate([MarshalAs(UnmanagedType.LPStr)] string name, [MarshalAs(UnmanagedType.I4)] int type, [MarshalAs(UnmanagedType.LPStr)] string text);
 
         [DllImport("TCPIP_CLIENT_DLL.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         public static extern void ClientMainLoop();
 
         [DllImport("TCPIP_CLIENT_DLL.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         public static extern void setCallbackMessageReceived([MarshalAs(UnmanagedType.FunctionPtr)] MessageRecievedCallbackDelegate ptr);
-
-        //[DllImport("TCPIP_CLIENT_DLL.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        //public static extern void setCallbackClientStatus([MarshalAs(UnmanagedType.FunctionPtr)] ClientStatusCallbackDelegate ptr);
 
         [DllImport("TCPIP_CLIENT_DLL.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         public static extern void ClientSendMessage([MarshalAs(UnmanagedType.LPStr)] string szStr);
@@ -127,15 +122,13 @@ namespace WPF_UI
             OutputTextBox.Text += text;
         }
 
-        public static void MessageRecievedCallback(IntPtr ptr)
+        public static void MessageRecievedCallback(string sourceName, int messageType, string text)
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
                 MainWindow mw = Application.Current.MainWindow as MainWindow;
                 if (mw == null)
                     throw new Exception("ALARM: Lost MainWindow ");
-
-                string text = Marshal.PtrToStringAnsi(ptr);
 
                 mw.ShowText(text, ETextAligment.eLeft);
 
