@@ -21,6 +21,11 @@ namespace ChatLib
 		return GetType(&(rawData[0]));
 	}
 
+	MessageType BaseMessage::GetMyType() const
+	{
+		return (ChatLib::MessageType)_messageType;
+	}
+
 	int BaseMessage::Construct(ChatLib::byte* pBuff)
 	{
 		int count = 0;

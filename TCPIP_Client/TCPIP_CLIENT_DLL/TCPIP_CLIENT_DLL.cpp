@@ -150,11 +150,11 @@
 						 int finishIndex = textMessage.find("@", startIndex);
 						 std::string forName = textMessage.substr(startIndex, finishIndex - startIndex);
 						 std::string fullMessage = Name + ": " + textMessage;
-						 message = new ChatLib::DirectMessage(forName, fullMessage);
+						 message = new ChatLib::DirectMessage(Name, forName, fullMessage);
 					 }
 					 else
 					 {
-						 message = new ChatLib::BroadcastMessage(textMessage);
+						 message = new ChatLib::BroadcastMessage(Name, textMessage);
 					 }
 
 					 ChatLib::Response response = ChatLib::Protocol::TrySendMessage(message, sockfd);

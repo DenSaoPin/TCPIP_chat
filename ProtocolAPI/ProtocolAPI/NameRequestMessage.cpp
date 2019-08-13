@@ -4,7 +4,7 @@ ChatLib::NameRequestMessage::NameRequestMessage(byteP &ppBuff): BroadcastMessage
 {
 }
 
-ChatLib::NameRequestMessage::NameRequestMessage(std::string& name): BroadcastMessage(name)
+ChatLib::NameRequestMessage::NameRequestMessage(std::string& name): BroadcastMessage(name, name)
 {
 	_messageType = eNameRequest;
 }

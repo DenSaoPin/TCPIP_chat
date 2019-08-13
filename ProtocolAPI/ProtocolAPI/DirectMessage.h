@@ -6,12 +6,13 @@ namespace ChatLib
 		public BaseMessage
 	{
 	public:
+		std::string SourceName;
 		std::string Text;
 		std::string TargetName;
 	public:
 		DirectMessage(byteP &pBuff);
-
-		DirectMessage(std::string& targetName, std::string& text);
+		
+		DirectMessage(std::string& sourceName, std::string& targetName, std::string& text);
 
 		int Construct(ChatLib::byte* pBuff) override;
 

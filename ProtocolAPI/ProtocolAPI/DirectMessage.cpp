@@ -11,6 +11,13 @@ ChatLib::DirectMessage::DirectMessage(byteP &pBuff): BaseMessage(pBuff)
 
 	pBuff += targetNameLength;
 
+	int sourceNameTextLength = *(pBuff++);
+
+	if (sourceNameTextLength > 0)
+		SourceName = std::string((char*)pBuff, sourceNameTextLength);
+
+	pBuff += sourceNameTextLength;
+
 	int textLength = *(pBuff++);
 
 	if (textLength > 0)
@@ -19,10 +26,11 @@ ChatLib::DirectMessage::DirectMessage(byteP &pBuff): BaseMessage(pBuff)
 	pBuff += textLength;
 }
 
-ChatLib::DirectMessage::DirectMessage(std::string& targetName, std::string& text): BaseMessage(eDirectMessage)
+ChatLib::DirectMessage::DirectMessage(std::string& sourceName, std::string& targetName, std::string& text): BaseMessage(eDirectMessage)
 {
 	Text = text;
 	TargetName = targetName;
+	SourceName = sourceName;
 }
 
 int ChatLib::DirectMessage::Construct(byte* pBuff)
