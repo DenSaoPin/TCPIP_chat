@@ -53,6 +53,7 @@ set_property(TARGET WPF_UI PROPERTY VS_DOTNET_REFERENCES
     "System.Core"
     "System.Data"
     "System.Data.DataSetExtensions"
+    "System.Drawing"
     "System.Net.Http"
     "System.Xaml"
     "System.Xml"
