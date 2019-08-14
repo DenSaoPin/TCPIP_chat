@@ -35,10 +35,15 @@ TCPIP_Client* TCPIP_Client::_instance = nullptr;
 
 			ChatLib::NameRequestMessage NameReqMessage(Name);
 			ChatLib::Response response(ChatLib::eResponseInvalid);
+
+			std::chrono::milliseconds mSecs(1000);
 			do
 			{
+				std::this_thread::sleep_for(mSecs);
 				response = ChatLib::Protocol::TrySendMessage(&NameReqMessage, Socket);
-			} while (response.GetStatus() != ChatLib::ResponseStatus::eOk);
+			}
+			while (response.GetStatus() != ChatLib::eOk);
+
 			return response;
 		}
 				
@@ -98,10 +103,7 @@ TCPIP_Client* TCPIP_Client::_instance = nullptr;
 
 		 IntroduceToServer();
 
-		 std::mutex locker;
-		 locker.lock();
-			m_IsStarted = true;
-		 locker.unlock();
+		 m_IsStarted = true;
 
 		 while (!m_NeedTerminate)
 		 {
@@ -138,9 +140,7 @@ TCPIP_Client* TCPIP_Client::_instance = nullptr;
 
 				 //if (text.length() != 0)
 				 //	 ui.PrintMessage(text);
-
 			 }
-
 
 			 if(!m_outgoingMessages.empty())
 			 { 
