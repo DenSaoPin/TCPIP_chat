@@ -59,5 +59,24 @@ namespace Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap icq {
+            get {
+                object obj = ResourceManager.GetObject("icq", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
+        public static System.IO.UnmanagedMemoryStream icq_sound {
+            get {
+                return ResourceManager.GetStream("icq_sound", resourceCulture);
+            }
+        }
     }
 }

@@ -44,7 +44,6 @@ set_property(TARGET WPF_UI PROPERTY WIN32_EXECUTABLE TRUE)
 
 set_property(TARGET WPF_UI PROPERTY VS_GLOBAL_ProjectTypeGuids "{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}" )
 
-
 set_property(TARGET WPF_UI PROPERTY VS_DOTNET_REFERENCES
     "Microsoft.CSharp"
     "PresentationCore"
