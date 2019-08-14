@@ -54,16 +54,8 @@ namespace ChatLib
 	{
 		//TODO check recieved num
 		char buff[MAX_PACKAGE_LENGTH];
-		int recived = recv(socket, buff, MAX_PACKAGE_LENGTH, NULL);
-		printf("RecieveMessage %d bytes: ", recived);
+		const int recived = recv(socket, buff, MAX_PACKAGE_LENGTH, NULL);
 
-		//TODO check raw data
-		RawBytes rawData(buff, buff + recived);
-		for (int i = 0; i < recived; i++)
-		{
-			printf("%02X ", buff[i]);
-		}
-		printf("\n");
 		if (recived == 0)
 		{
 			printf("Recieve message: connection softly closed");
@@ -79,17 +71,27 @@ namespace ChatLib
 			//TODO check Unix error
 		}
 
-			printf("Message was recieved \n");
+		printf("RecieveMessage %d bytes: ", recived);
 
-			//MessageType type = BaseMessage::GetType(buff);
-			
-			//printf("Recieved message type equal %d \n", type);
+		//TODO check raw data
+		RawBytes rawData(buff, buff + recived);
+		for (int i = 0; i < recived; i++)
+		{
+			printf("%02X ", buff[i]);
+		}
+		printf("\n");
 
-			////Message message (type, buff);
+		printf("Message was recieved \n");
 
-			//printf("Recieved message equal %s \n", message.GetText());
-			
-			return rawData;
+		//MessageType type = BaseMessage::GetType(buff);
+
+		//printf("Recieved message type equal %d \n", type);
+
+		////Message message (type, buff);
+
+		//printf("Recieved message equal %s \n", message.GetText());
+
+		return rawData;
 	}
 
 	Response Protocol::TrySendMessage(BaseMessage* message, const CROSS_SOCKET& socket)
@@ -126,10 +128,10 @@ namespace ChatLib
 		SendMessagee(&response, socket);
 	}
 
-	const bool Protocol::IsLegalPackage(const char* buff)
-	{
-		return false;
-	}
+	//const bool Protocol::IsLegalPackage(const char* buff)
+	//{
+	//	return false;
+	//}
 
 	//const MessageType Protocol::GetMessageType(const char* buff)
 	//{
