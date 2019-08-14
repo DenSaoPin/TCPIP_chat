@@ -79,7 +79,7 @@ bool ServerClient::ProcessSocket()
 
 			if (!broadMessagePtr->Text.empty())
 			{
-				if (Name != "")
+				if (!Name.empty())
 				{
 					std::cout << broadMessagePtr->Text << std::endl;
 					//TODO send responce;
@@ -102,7 +102,7 @@ bool ServerClient::ProcessSocket()
 
 			if (!directMessagePtr->Text.empty())
 			{
-				if (Name != "")
+				if (!Name.empty())
 				{
 					//std::cout << directMessagePtr->Text << std::endl;
 					//TODO send responce;
