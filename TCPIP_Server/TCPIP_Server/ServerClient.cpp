@@ -66,9 +66,12 @@ bool ServerClient::ProcessSocket()
 			m_log->info("Received message eNameRequest for %s", NameMessage.Text.c_str());
 
 			if (!m_pServer->Assign(NameMessage.Text, this))
+			{
 				status = ChatLib::eNameConflict;
+				IInvalid = true;
+			}
 
-			ChatLib::Protocol::SendResponse(ChatLib::ResponseStatus::eOk, Socket);
+			ChatLib::Protocol::SendResponse(status, Socket);
 			break;
 		}
 		case ChatLib::eBroadcastMessage:
