@@ -31,8 +31,8 @@ extern "C"
 	{
 		TCPIP_Client::Instance()->Initialize(name, ip, port);
 	}
-	bool ClientIsStarted()
+	bool IsWorkingState()
 	{
-		return TCPIP_Client::Instance()->IsStarted;
+		return TCPIP_Client::Instance()->GetStatus();
 	}
 }

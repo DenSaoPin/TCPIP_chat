@@ -15,5 +15,5 @@ extern "C"
 	TCPIPCLIENTDLL_EXPORT void ClientSendMessage(const char *);
 	TCPIPCLIENTDLL_EXPORT void ClientTerminate();
 	TCPIPCLIENTDLL_EXPORT void SetConnectionParams(const char *, const char *, const char *);
-	TCPIPCLIENTDLL_EXPORT bool ClientIsStarted();
+	TCPIPCLIENTDLL_EXPORT bool IsWorkingState();
 }

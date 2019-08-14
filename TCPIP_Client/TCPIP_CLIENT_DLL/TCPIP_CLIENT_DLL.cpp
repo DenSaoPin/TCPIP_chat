@@ -7,8 +7,9 @@
 #include <ProtocolAPI/NameRequestMessage.h>
 #include "CallbacksHolder.h"
 #include "UIInterface.h"
+#include <mutex>
 
-		TCPIP_Client* TCPIP_Client::_instance = nullptr;
+TCPIP_Client* TCPIP_Client::_instance = nullptr;
 
 		TCPIP_Client* TCPIP_Client::Instance()
 		{
@@ -40,7 +41,7 @@
 			} while (response.GetStatus() != ChatLib::ResponseStatus::eOk);
 			return response;
 		}
-
+				
 		void TCPIP_Client::InitializeSocketRoutine()
 		{
 			WSADATA wsaData;
@@ -77,6 +78,12 @@
 			}
 		}
 
+		bool TCPIP_Client::GetStatus()
+		{
+			return m_IsStarted && !m_IsTerminate;
+		}
+
+
 		int TCPIP_Client::GetSocket()
 		{
 			return Socket;
@@ -91,7 +98,11 @@
 
 		 IntroduceToServer();
 
-		 IsStarted = true;
+		 std::mutex locker;
+		 locker.lock();
+			m_IsStarted = true;
+		 locker.unlock();
+
 		 while (!m_NeedTerminate)
 		 {
 			 //TODO how to delete right
@@ -168,6 +179,7 @@
 		 }
 		 closesocket(sockfd);
 		 WSACleanup();
+
 		 m_IsTerminate = true;
 	 }
 

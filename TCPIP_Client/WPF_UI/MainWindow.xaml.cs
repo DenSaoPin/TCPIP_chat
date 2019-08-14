@@ -1,8 +1,9 @@
-using System;
+﻿using System;
 using System.Media;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
+using System.Windows.Media;
 using AttachedPropertyTest;
 
 namespace WPF_UI
@@ -24,7 +25,7 @@ namespace WPF_UI
         public static extern void ClientTerminate();
 
         [DllImport("TCPIP_CLIENT_DLL.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        public static extern bool ClientIsStarted();
+        public static extern bool IsWorkingState();
 
         [DllImport("TCPIP_CLIENT_DLL.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         public static extern void SetConnectionParams([MarshalAs(UnmanagedType.LPStr)] string name, [MarshalAs(UnmanagedType.LPStr)] string ip, [MarshalAs(UnmanagedType.LPStr)] string port);
@@ -38,7 +39,9 @@ namespace WPF_UI
     public partial class MainWindow : Window
     {
         private static Thread _threadDllMain;
+        private static Thread _threadStatusChecker;
         private static bool _clientExecuted = false;
+
         public static Native.MessageRecievedCallbackDelegate _staticMRDelegate = MainWindow.MessageRecievedCallback;
         public MainWindow()
         {
@@ -55,10 +58,19 @@ namespace WPF_UI
         {
             Native.SetConnectionParams(ClientInfo.Name, ClientInfo.Adress, ClientInfo.Port);
             Native.setCallbackMessageReceived(_staticMRDelegate);
-           // Native.setCallbackClientStatus(p);
 
             _threadDllMain = new Thread(ClientThreadFunc);
             _threadDllMain.Start();
+
+            Timer timer = new Timer(x =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    _clientExecuted = Native.IsWorkingState();
+                    Status_Button.Background = _clientExecuted ? Brushes.Green : Brushes.Red;
+                });
+            });
+            timer.Change(0, 1000);
         }
 
         private static void  ClientThreadFunc()
@@ -73,6 +85,7 @@ namespace WPF_UI
             //    throw;
             }
         }
+
         private void button_SendMesage_OnClick(object sender, RoutedEventArgs e)
         {
             ////TODO how to check which side used
@@ -85,6 +98,7 @@ namespace WPF_UI
 
             InputTextBox.Clear();
         }
+
         public enum ETextAligment
         {
             eUnknown,
@@ -130,17 +144,13 @@ namespace WPF_UI
                 if (mw == null)
                     throw new Exception("ALARM: Lost MainWindow ");
 
-                mw.ShowText(text, ETextAligment.eLeft);
+                mw.ShowText(sourceName + ": " + text, ETextAligment.eLeft);
 
                 SoundPlayer player = new SoundPlayer(Properties.Resources.icq);
                 player.Play();
             });
         }
 
-        //public void StatusChangedCallback(IntPtr ptr)
-        //{
-        //    _clientExecuted = 
-        //}
         public void ClientsListBox_Initialize(string text)
         {
             //TODO not implemented
@@ -153,6 +163,7 @@ namespace WPF_UI
         {
             //TODO not implemented
         }
+
         public void Button_Exit_OnClick(object sender, RoutedEventArgs e)
         {
             if (_clientExecuted)
