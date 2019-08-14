@@ -78,5 +78,15 @@ namespace Properties {
                 return ResourceManager.GetStream("icq_sound", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        public static System.Drawing.Icon icq1 {
+            get {
+                object obj = ResourceManager.GetObject("icq1", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
     }
 }
