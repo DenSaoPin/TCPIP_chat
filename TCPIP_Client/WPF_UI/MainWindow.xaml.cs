@@ -146,8 +146,8 @@ namespace WPF_UI
 
                 mw.ShowText(sourceName + ": " + text, ETextAligment.eLeft);
 
-                SoundPlayer player = new SoundPlayer(Properties.Resources.icq);
-                player.Play();
+                //SoundPlayer player = new SoundPlayer(Properties.Resources.icq);
+                //player.Play();
             });
         }
 
