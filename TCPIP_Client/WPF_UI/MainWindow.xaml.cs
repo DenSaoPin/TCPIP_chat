@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Media;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -36,14 +37,17 @@ namespace WPF_UI
         public static string Adress;
         public static string Port;
     }
+
+
     public partial class MainWindow : Window
     {
         private static Thread _threadDllMain;
-        private static Thread _threadStatusChecker;
         private static bool _clientExecuted = false;
         private static FlashWindowHelper _flashHelper;
+        private Timer _statusChecker;
 
         public static Native.MessageRecievedCallbackDelegate _staticMRDelegate = MainWindow.MessageRecievedCallback;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -65,6 +69,8 @@ namespace WPF_UI
             _threadDllMain = new Thread(ClientThreadFunc);
             _threadDllMain.Start();
 
+            const int sec = 1000;
+
             Timer timer = new Timer(x =>
             {
                 Dispatcher.Invoke(() =>
@@ -72,8 +78,10 @@ namespace WPF_UI
                     _clientExecuted = Native.IsWorkingState();
                     Status_Button.Background = _clientExecuted ? Brushes.Green : Brushes.Red;
                 });
-            });
-            timer.Change(0, 1000);
+
+            },null, 0, sec);
+
+
         }
 
         private static void  ClientThreadFunc()
@@ -115,7 +123,6 @@ namespace WPF_UI
             switch (aligment)
             {
                 case ETextAligment.eLeft:
-
 
                     break;
                 case ETextAligment.eRight:
@@ -171,6 +178,11 @@ namespace WPF_UI
 
         public void Button_Exit_OnClick(object sender, RoutedEventArgs e)
         {
+            Close();
+        }
+
+        private void MainWindow_OnClosing(object sender, CancelEventArgs e)
+        {
             if (_clientExecuted)
             {
                 Native.ClientTerminate();
@@ -180,6 +192,9 @@ namespace WPF_UI
                     Thread.Sleep(0);
                 }
             }
+
+            _statusChecker.Change(Timeout.Infinite, Timeout.Infinite);
+
             Application.Current.Shutdown();
         }
     }

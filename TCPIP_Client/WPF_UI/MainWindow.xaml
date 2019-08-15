@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:attachedPropertyTest="clr-namespace:AttachedPropertyTest"
         mc:Ignorable="d"
-        Title="ChatClient" Height="450" Width="800">
+        Title="ChatClient" Height="450" Width="800"
+        Closing="MainWindow_OnClosing"
+        >
     <Window.Resources>
         <Style x:Key="MultiLineTB" TargetType="TextBox">
             <Setter Property="IsReadOnly" Value="True"/>
