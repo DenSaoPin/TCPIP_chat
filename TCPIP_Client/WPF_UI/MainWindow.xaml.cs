@@ -41,6 +41,7 @@ namespace WPF_UI
         private static Thread _threadDllMain;
         private static Thread _threadStatusChecker;
         private static bool _clientExecuted = false;
+        private static FlashWindowHelper _flashHelper;
 
         public static Native.MessageRecievedCallbackDelegate _staticMRDelegate = MainWindow.MessageRecievedCallback;
         public MainWindow()
@@ -52,6 +53,8 @@ namespace WPF_UI
             UserInfoWindow userInfoWindow = new UserInfoWindow();
             userInfoWindow.Show();
             TextBoxUtilities.SetAlwaysScrollToEnd(OutputTextBox, true);
+
+            _flashHelper = new FlashWindowHelper(Application.Current);
         }
 
         public void MainLoop()
@@ -148,6 +151,8 @@ namespace WPF_UI
 
                 SoundPlayer player = new SoundPlayer(Properties.Resources.icq_sound);
                 player.Play();
+
+                _flashHelper.FlashApplicationWindow();
             });
         }
 

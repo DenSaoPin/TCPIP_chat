@@ -12,6 +12,7 @@ add_executable(WPF_UI
 
     AutoScroll.cs
     WatermarkedTextBox.cs
+    FlashingHelper.cs
 
     Properties/AssemblyInfo.cs
     Properties/Resources.Designer.cs
