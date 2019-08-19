@@ -6,6 +6,8 @@ set(HEADER_FILES
 	CallbacksHolder.h
  	TCPIP_CLIENT_DLL.h
  	UIInterface.h
+	Defines.h
+	Exceptions.h
 )
 
 set(CPP_FILES

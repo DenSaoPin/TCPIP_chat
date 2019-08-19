@@ -1,10 +1,12 @@
 #include "ServerClient.h"
-#include "Server.h"
 #include <iostream>
+#include <string>
 #include "../../ProtocolAPI/ProtocolAPI/NameRequestMessage.h"
 #include "loggerAPI/LoggerManager.h"
+#include "TCPServer.h"
+#include "Exceptions.h"
 
-ServerClient::ServerClient(Server* pServer, SOCKET socket)
+ServerClient::ServerClient(TCPServer* pServer, SOCKET socket)
 {
 	m_log = LoggerManager::GetLogger("ServerClient");
 	m_log->error("Test");
@@ -37,9 +39,9 @@ bool ServerClient::ProcessSocket()
 		ChatLib::RawBytes rawMessage;
 		try
 		{
-			rawMessage = ChatLib::Protocol::RecieveMessage(Socket);
+			rawMessage = m_pServer->RecieveMessage(Socket);
 		}
-		catch (ChatLib::Protocol::ConnectionClosedException& ex)
+		catch (Exceptions::ConnectionClosedException& ex)
 		{
 			//TODO need implement print exception text 
 			std::cout << "Exception ConnectionClosedException catched" << std::endl;
@@ -47,7 +49,7 @@ bool ServerClient::ProcessSocket()
 			closesocket(Socket);
 			return false;
 		}
-		catch (ChatLib::Protocol::ConnectionLostException)
+		catch (Exceptions::ConnectionLostException)
 		{
 			std::cout << "Exception ConnectionLostException catched" << std::endl;
 			IInvalid = true;
@@ -71,7 +73,7 @@ bool ServerClient::ProcessSocket()
 				IInvalid = true;
 			}
 
-			ChatLib::Protocol::SendResponse(status, Socket);
+			m_pServer->SendResponse(status, Socket);
 			break;
 		}
 		case ChatLib::eBroadcastMessage:
@@ -89,7 +91,7 @@ bool ServerClient::ProcessSocket()
 					m_pServer->SetToSendForAllClients(this, broadMessagePtr);
 
 					printf("Message Responce \n");
-					ChatLib::Protocol::SendResponse(ChatLib::ResponseStatus::eOk, Socket);
+					m_pServer->SendResponse(ChatLib::ResponseStatus::eOk, Socket);
 				}
 				else
 				{
@@ -113,7 +115,7 @@ bool ServerClient::ProcessSocket()
 					m_pServer->SetToSendFor(m_pServer->Clients.Find(directMessagePtr->TargetName), directMessagePtr);
 
 					printf("Message Responce \n");
-					ChatLib::Protocol::SendResponse(ChatLib::ResponseStatus::eOk, Socket);
+					m_pServer->SendResponse(ChatLib::ResponseStatus::eOk, Socket);
 				}
 				else
 				{
@@ -139,7 +141,7 @@ bool ServerClient::ProcessSocket()
 
 	if(FD_ISSET(Socket, &wfds))
 	{
-		ChatLib::Response response = ChatLib::Protocol::TrySendMessage(ForSend.front().get(), Socket);
+		ChatLib::Response response = m_pServer->TrySendMessage(ForSend.front().get(), Socket);
 
 		if(response.GetStatus() == ChatLib::eOk)
 		{

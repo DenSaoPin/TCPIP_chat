@@ -1,13 +1,22 @@
-#include "Server.h"
 #include "ServerClient.h"
 #include <iostream>
 #include <WS2tcpip.h>
-
+#include "LoggerManager.h"
+#include "ProtocolAPI/Defines.h"
+#include "Exceptions.h"
 #define MAX_LENGTH 1024
 
-const char * Server::DefaultAddress = "0.0.0.0";
+#if defined _WIN32
+#include <WinSock2.h>
+#define PrintErrors printWsaError()
+#define CROSS_SOCKET SOCKET
+#else
+#define PrintErrors printLinuxError()
+#endif
 
-Server::Server(std::string address, std::string port)
+const char * DefaultAddress = "0.0.0.0";
+
+TCPServer::TCPServer(std::string address, std::string port)
 {
 	m_log = LoggerManager::GetLogger("ServerLog");
 	m_log->error("test%d", 1);
@@ -20,7 +29,7 @@ Server::Server(std::string address, std::string port)
 	ListenSockInitialization(address, port);
 }
 
-bool Server::Assign(const std::string& name, ServerClient* pClient)
+bool TCPServer::Assign(const std::string& name, ServerClient* pClient)
 {
 	//TODO check
 	if (Clients.Check(name))
@@ -36,7 +45,7 @@ bool Server::Assign(const std::string& name, ServerClient* pClient)
 	//return Clients.Find(name);
 }
 
-bool Server::SetToSendForAllClients(ServerClient* server_client, ChatLib::BroadcastMessagePtr& broadMessagePtr)
+bool TCPServer::SetToSendForAllClients(ServerClient* server_client, ChatLib::BroadcastMessagePtr& broadMessagePtr)
 {
 	for (auto it = this->Clients.Begin(); it != this->Clients.End(); ++it)
 	{
@@ -50,7 +59,7 @@ bool Server::SetToSendForAllClients(ServerClient* server_client, ChatLib::Broadc
 	return true;
 }
 
-void Server::SetToSendFor(ServerClient * server_client, ChatLib::DirectMessagePtr& directMessagePtr)
+void TCPServer::SetToSendFor(ServerClient * server_client, ChatLib::DirectMessagePtr& directMessagePtr)
 {
 
 	for(auto it = this->Clients.Begin(); it != this->Clients.End(); ++it)
@@ -61,15 +70,8 @@ void Server::SetToSendFor(ServerClient * server_client, ChatLib::DirectMessagePt
 		}
 	}
 }
-//
-//ServerClient* Server::GetClientByName(std::string& name)
-//{
-//	if(_iknowThisNames.find(name) != _iknowThisNames.end())
-//		 return _iknowThisNames[name];
-//	return nullptr;
-//}
 
-void Server::InitialWSARoutine()
+void TCPServer::InitialWSARoutine()
 {
 	char buffer[MAX_LENGTH];
 
@@ -91,7 +93,7 @@ void Server::InitialWSARoutine()
 	}
 }
 
-void Server::ListenSockInitialization(std::string& IPv4_Adress,std::string& port)
+void TCPServer::ListenSockInitialization(std::string& IPv4_Adress,std::string& port)
 {
 	struct addrinfo hints, *p;
 	struct addrinfo* pResults;
@@ -156,7 +158,7 @@ void Server::ListenSockInitialization(std::string& IPv4_Adress,std::string& port
 	freeaddrinfo(pResults);
 }
 
-void Server::Accept()
+void TCPServer::Accept()
 {
 	fd_set rfds;
 
@@ -191,3 +193,83 @@ void Server::Accept()
 		}
 	}
 }
+
+ChatLib::Response TCPServer::TrySendMessage(ChatLib::BaseMessage* message, const CROSS_SOCKET& socket)
+{
+	//TODO need to know sent message or not
+	SendMessagee(message, socket);
+
+	auto rawResponseData = RecieveMessage(socket);
+
+	ChatLib::MessageType type = ChatLib::BaseMessage::GetType(rawResponseData);
+
+	if (type != ChatLib::eResponse)
+		throw std::exception("I received not response after sending");
+
+	return ChatLib::Response(rawResponseData);
+}
+
+void TCPServer::SendMessagee(ChatLib::BaseMessage* message, const CROSS_SOCKET& socket)
+{
+	byte pBuffer[255];
+	int length = message->Construct(pBuffer);
+
+	int sended = 0;
+	do
+	{
+		sended = send(socket, (char *)&pBuffer[sended], length, NULL);
+		length -= sended;
+	} while (length > 0);
+
+}
+
+void TCPServer::SendResponse(ChatLib::ResponseStatus status, const CROSS_SOCKET& socket)
+{
+	ChatLib::Response response(status);
+	SendMessagee(&response, socket);
+}
+
+ChatLib::RawBytes TCPServer::RecieveMessage(const CROSS_SOCKET& socket)
+{
+	//TODO check recieved num
+	char buff[MAX_PACKAGE_LENGTH];
+	const int recived = recv(socket, buff, MAX_PACKAGE_LENGTH, NULL);
+
+	if (recived == 0)
+	{
+		printf("Recieve message: connection softly closed");
+		throw Exceptions::ConnectionClosedException("connection softly closed");
+		//TODO error check Win and Timeout
+	}
+	else if (recived == -1)
+	{
+		PrintErrors;
+		closesocket(socket);
+		throw Exceptions::ConnectionLostException("connection lost closed");
+		//WSACleanup();
+		//TODO check Unix error
+	}
+
+	printf("RecieveMessage %d bytes: ", recived);
+
+	//TODO check raw data
+	ChatLib::RawBytes rawData(buff, buff + recived);
+	for (int i = 0; i < recived; i++)
+	{
+		printf("%02X ", buff[i]);
+	}
+	printf("\n");
+
+	printf("Message was recieved \n");
+
+	//MessageType type = BaseMessage::GetType(buff);
+
+	//printf("Recieved message type equal %d \n", type);
+
+	////Message message (type, buff);
+
+	//printf("Recieved message equal %s \n", message.GetText());
+
+	return rawData;
+}
+

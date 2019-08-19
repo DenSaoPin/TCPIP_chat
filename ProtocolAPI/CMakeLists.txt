@@ -6,7 +6,6 @@ set(SRC_FOLDER ProtocolAPI)
 set(HEADER_FILES 
 	${SRC_FOLDER}/DirectMessage.h
  	${SRC_FOLDER}/Defines.h
-	${SRC_FOLDER}/Protocol.h
 	${SRC_FOLDER}/Enums.h
 	${SRC_FOLDER}/BroadcastMessage.h
 	${SRC_FOLDER}/Response.h
@@ -18,7 +17,6 @@ set(CPP_FILES
 	${SRC_FOLDER}/BaseMessage.cpp
 	${SRC_FOLDER}/BroadcastMessage.cpp
 	${SRC_FOLDER}/Response.cpp
-	${SRC_FOLDER}/Protocol.cpp
 	${SRC_FOLDER}/DirectMessage.cpp
 	${SRC_FOLDER}/NameRequestMessage.cpp
 )

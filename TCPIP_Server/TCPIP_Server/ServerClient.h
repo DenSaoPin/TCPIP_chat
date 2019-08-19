@@ -1,16 +1,16 @@
 #pragma once
 #include "../../ProtocolAPI/ProtocolAPI/Protocol.h"
-#include "loggerAPI/LoggerManager.h"
 #include <queue>
+#include "TCPServer.h"
 
-class Server;
+class TCPServer;
 
 class ServerClient
 {
 	ILogger *m_log;
-	Server *m_pServer;
+	TCPServer *m_pServer;
 public:
-	ServerClient(Server* pServer, CROSS_SOCKET socket);
+	ServerClient(TCPServer* pServer, CROSS_SOCKET socket);
 
 	std::string Name = "";
 	CROSS_SOCKET Socket = NULL;

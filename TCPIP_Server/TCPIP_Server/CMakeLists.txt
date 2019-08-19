@@ -3,14 +3,16 @@ set (PROJECT TCPIP_Server)
 set (CPP_SOURCES
  	ClientSet.cpp
 	ServerClient.cpp
-	Server.cpp
+	TCPServer.cpp
 	TCPIP_Server.cpp
 	)	
 
 set (H_SOURCES
 	ServerClient.h
 	ClientSet.h
-	Server.h
+	TCPServer.h
+	Defines.h
+	Exceptions.h
 	)
 
 add_executable (${PROJECT}  ${CPP_SOURCES} ${H_SOURCES})
