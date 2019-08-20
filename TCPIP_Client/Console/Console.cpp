@@ -5,9 +5,11 @@
 #include <iostream>
 #include <string>
 #include <future>
+#include "ProtocolAPI/DirectMessage.h"
+#include "ProtocolAPI/BroadcastMessage.h"
 
 
-	void OnRecieveMessage(const char *szName, const int* messageType, const char *szMessage);
+void OnRecieveMessage(const char *szName, const int* messageType, const char *szMessage);
 	void OnExit();
 
 	std::thread chatThread;
@@ -27,7 +29,23 @@
 		while (true)
 		{
 			std::getline(std::cin, message);
-			ClientSendMessage(message.c_str());
+
+			int startIndex = message.find("for @");
+
+			ChatLib::MessageType messageType = ChatLib::eInvalid;
+			if (startIndex != std::string::npos)
+			{
+				startIndex += 5;
+				int finishIndex = message.find("@", startIndex);
+				std::string forName = message.substr(startIndex, finishIndex - startIndex);
+				messageType = ChatLib::eDirectMessage;
+			}
+			else
+			{
+				messageType = ChatLib::eBroadcastMessage;
+			}
+
+			ClientSendMessage(nullptr, reinterpret_cast<const int*>(messageType), reinterpret_cast<void*>(messageType), reinterpret_cast<const int *>(sizeof(message.c_str())));
 		}
 	}
 

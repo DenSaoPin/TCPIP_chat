@@ -58,7 +58,7 @@
 		eStartWSA,
 		eInitializeSocket,
 		eIntroduce,
-		eAwaitResponce,
+		eReceiveMessage,
 		eSendingMessage,
 		eShutdown,
 	};
@@ -72,14 +72,16 @@
 		TCPIP_Client& operator=(const TCPIP_Client&);
 
 		static TCPIP_Client* _instance;
-		std::queue<std::string> m_outgoingMessages;
+
+		std::queue<ChatLib::BaseMessagePtr> m_outgoingMessages;
+		//std::queue<std::string> m_awaitResponseMessages;
+		std::queue<ChatLib::BaseMessagePtr> m_incomingMessages;
 
 		bool m_NeedTerminate = false;
-		ThreadSafe <bool> m_IsTerminate = false;
+		ThreadSafe <bool> m_IsTerminated = false;
 		ThreadSafe <bool> m_IsStarted = false;
 
-		EStatus m_ClientStatus = eInvalid;
-
+		EStatus m_ClientStatus = eStartWSA;
 	public:
 
 		std::string Name;
@@ -92,11 +94,7 @@
 
 		void Initialize(const std::string& name, const std::string& serverIP, const std::string& serverPort);
 
-		ChatLib::Response NEW_IntroduceToServer();
-		ChatLib::Response IntroduceToServer();
-
 		bool InitializeSocketRoutine();
-		bool TrySocketConnect();
 		bool InitWinSockDll();
 
 		void ShowError(const std::string &);
@@ -104,16 +102,12 @@
 		int GetSocket();
 
 		bool GetStatus();
-		void ClientMain();
 		void ClientMainLoop();
-		void SendTextMessage(const char* sz_str);
 		void Shutdown();
 
-		ChatLib::RawBytes TCPIP_Client::RecieveMessageAndReply(const CROSS_SOCKET& socket);
 		ChatLib::RawBytes TCPIP_Client::RecieveMessage(const CROSS_SOCKET& socket);
 
-		ChatLib::Response TCPIP_Client::TrySendMessage(ChatLib::BaseMessage* message, const CROSS_SOCKET& socket);
-		void TCPIP_Client::SendMessagee(ChatLib::BaseMessage* message, const CROSS_SOCKET& socket);
+		bool TCPIP_Client::SendMessagee(ChatLib::BaseMessagePtr message, const CROSS_SOCKET& socket);
 
-		void TCPIP_Client::SendResponse(ChatLib::ResponseStatus status, const CROSS_SOCKET& socket);
-};
+		void TCPIP_Client::AddForSend(const char* sz_target_name, const int status, const void* data, const int data_len);
+	};

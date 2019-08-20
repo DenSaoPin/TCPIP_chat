@@ -11,5 +11,7 @@ namespace ChatLib
 
 		std::string GetDebugString() override;
 	};
+
+	typedef std::shared_ptr<NameRequestMessage> NameRequestMessagePtr;
 }
 

@@ -34,39 +34,6 @@ void TCPIP_Client::Initialize(const std::string& name, const std::string& server
 	ServerPort = serverPort;
 }
 
-ChatLib::Response TCPIP_Client::NEW_IntroduceToServer()
-{
-	//TODO exception handle
-	if (Name.length() == 0)
-		throw new std::exception("You must fill pClient->Name before call IntroduceToServer() \n");
-
-	ChatLib::NameRequestMessage NameReqMessage(Name);
-	ChatLib::Response response(ChatLib::eResponseInvalid);
-
-	std::chrono::milliseconds mSecs(1000);
-
-
-}
-
-ChatLib::Response TCPIP_Client::IntroduceToServer()
-{
-	if (Name.length() == 0)
-		throw new std::exception("You must fill pClient->Name before call IntroduceToServer() \n");
-
-	ChatLib::NameRequestMessage NameReqMessage(Name);
-	ChatLib::Response response(ChatLib::eResponseInvalid);
-
-	std::chrono::milliseconds mSecs(1000);
-	do
-	{
-		std::this_thread::sleep_for(mSecs);
-		response = TrySendMessage(&NameReqMessage, Socket);
-	}
-	while (response.GetStatus() != ChatLib::eOk);
-
-	return response;
-}
-
 void TCPIP_Client::ShowError(const std::string& text)
 {
 	std::string name = "ClientDLL";
@@ -139,6 +106,7 @@ bool TCPIP_Client::InitializeSocketRoutine()
 	int status = 0;
 	status = connect(Socket, pServinfo->ai_addr, pServinfo->ai_addrlen);
 
+	//TODO check if
 	if ((status == SOCKET_ERROR) && (WSAGetLastError() == WSAEWOULDBLOCK))
 	{
 		fd_set write, except;
@@ -194,264 +162,389 @@ int TCPIP_Client::GetSocket()
 	return Socket;
 }
 
-void TCPIP_Client::ClientMain()
+void TCPIP_Client::ClientMainLoop()
 {
 	while (!m_NeedTerminate)
 	{
+
 		switch (m_ClientStatus)
 		{
-		//case eInvalid:
-		//	throw new std::exception(" Invalid client state ");
-		//	break;
 		case eStartWSA:
 			if (InitWinSockDll())
 				m_ClientStatus = eInitializeSocket;
 			break;
 		case eInitializeSocket:
-			if(InitializeSocketRoutine())
-				m_IsStarted = eIntroduce;
+			if (InitializeSocketRoutine())
+				m_ClientStatus = eIntroduce;
 			break;
-		case eIntroduce:
-			IntroduceToServer();
-			m_IsStarted = eAwaitResponce;
+		default:
 			break;
-		case eShutdown:
-			break;
-		case eAwaitResponce:
-			break;
-		case eSendingMessage:
-			break;
+		}
+
+		fd_set rfds;
+		FD_ZERO(&rfds);
+		FD_SET(Socket, &rfds);
+
+		fd_set wfds;
+		FD_ZERO(&wfds);
+		FD_SET(Socket, &wfds);
+
+		fd_set exfds;
+		FD_ZERO(&exfds);
+		FD_SET(Socket, &exfds);
+
+		const int maxFD = (int)Socket + 1;
+
+		timeval timeout;
+		timeout.tv_sec = 0;
+		timeout.tv_usec = 500;
+		ChatLib::RawBytes rawData;
+
+		int result = select(maxFD, &rfds, NULL, NULL, &timeout);
+		if (result < 0)
+		{
+			PrintErrors;
+			//win errors
+			//TODO UNIX check error
+		}
+		else if (result == 0)
+		{
+			PrintErrors;
+			//TODO win check error and timeout
+		}
+		else
+		{
+			switch (m_ClientStatus)
+			{
+				//case eInvalid:
+				//	throw new std::exception(" Invalid client state ");
+				//	break;
+			case eStartWSA:
+			{
+				//throw new std::exception(" Invalid client state ");
+				break;
+			}
+			case eInitializeSocket:
+			{
+				//throw new std::exception(" Invalid client state ");
+				break;
+			}
+			case eIntroduce:
+			{
+				if (Name.length() == 0)
+					throw new std::exception("You must fill pClient->Name before call IntroduceToServer() \n");
+
+				ChatLib::NameRequestMessage NameReqMessage(Name);
+				ChatLib::NameRequestMessagePtr NameReqMessagePtr;
+				m_outgoingMessages.push(NameReqMessagePtr);
+
+				m_ClientStatus = eSendingMessage;
+				break;
+			}
+			case eShutdown:
+			{
+				break;
+			}
+
+			case eReceiveMessage:
+			{
+				if (FD_ISSET(Socket, &rfds))
+				{
+					ChatLib::RawBytes rawData = RecieveMessage(Socket);
+				
+
+					if (!rawData.empty())
+					{
+						const ChatLib::MessageType type = ChatLib::BaseMessage::GetType(rawData);
+						ChatLib::byte *p = &rawData[0];
+						std::string text;
+						switch (type)
+						{
+						case ChatLib::eBroadcastMessage:
+						{
+							const ChatLib::BroadcastMessage BroadMessage(p);
+							text = BroadMessage.Text;
+							CallbacksHolder::clbMessageReceive(BroadMessage.SourceName.c_str(), reinterpret_cast<int*>(BroadMessage.GetMyType()), BroadMessage.Text.c_str());
+							break;
+						}
+						case ChatLib::eDirectMessage:
+						{
+							const ChatLib::DirectMessage DirectMessage(p);
+							text = DirectMessage.Text;
+							break;
+						}
+						case ChatLib::eResponse:
+						{
+							const ChatLib::Response Responce(p);
+
+							switch (Responce.GetStatus())
+							{
+							case ChatLib::ResponseStatus::eOk:
+								m_outgoingMessages.pop();
+								break;
+							case ChatLib::ResponseStatus::eNameConflict:
+								break;
+							case ChatLib::ResponseStatus::eError:
+
+								break;
+							case ChatLib::ResponseStatus::eResponseInvalid:
+
+								break;
+							default:
+								break;
+							}
+							break;
+						}
+						case ChatLib::eNameRequest:
+						{
+							throw std::exception("Main receiving error: I received NameRequest in main");
+							break;
+						}
+						default:
+						{
+							throw std::exception("Main receiving error: I received unknown message type");
+							break;
+						}
+						}
+					}
+				}
+				break;
+			}
+			case eSendingMessage:
+			{
+				if(FD_ISSET(Socket, &wfds))
+				{
+					if (SendMessagee(m_outgoingMessages.front(), Socket))
+					{
+						m_ClientStatus = eReceiveMessage;
+					}
+					else
+					{
+						m_ClientStatus = eIntroduce;
+					}
+				}
+				break;
+			}
+			default:
+			{
+				break;
+			}
+			}
+
 		}
 
 		closesocket(GetSocket());
 		WSACleanup();
-		m_IsTerminate = true;
+		m_IsTerminated = true;
 	}
 }
-//TODO check
-void TCPIP_Client::ClientMainLoop()
+////TODO check
+//void TCPIP_Client::MainLoop()
+//{
+//	InitializeSocketRoutine();
+//
+//	int sockfd = GetSocket();
+//
+//	IntroduceToServer();
+//
+//	m_IsStarted = true;
+//
+//	while (!m_NeedTerminate)
+//	{
+//		//TODO how to delete right
+//		ChatLib::RawBytes rawData = RecieveMessageAndReply(sockfd);
+//
+//		if (!rawData.empty())
+//		{
+//			const ChatLib::MessageType type = ChatLib::BaseMessage::GetType(rawData);
+//			ChatLib::byte *p = &rawData[0];
+//			std::string text;
+//			switch (type)
+//			{
+//			case ChatLib::eBroadcastMessage:
+//			{
+//				const ChatLib::BroadcastMessage BroadMessage(p);
+//				text = BroadMessage.Text;
+//				CallbacksHolder::clbMessageReceive(BroadMessage.SourceName.c_str(), reinterpret_cast<int*>(BroadMessage.GetMyType()), BroadMessage.Text.c_str());
+//				break;
+//			}
+//			case ChatLib::eDirectMessage:
+//			{
+//				const ChatLib::DirectMessage DirectMessage(p);
+//				text = DirectMessage.Text;
+//				break;
+//			}
+//			case ChatLib::eResponse:
+//				throw std::exception("Main receiving error: I received Response in main");
+//			case ChatLib::eNameRequest:
+//				throw std::exception("Main receiving error: I received NameRequest in main");
+//			default:
+//				throw std::exception("Main receiving error: I received unknown message type");
+//			}
+//
+//			//if (text.length() != 0)
+//			//	 ui.PrintMessage(text);
+//		}
+//
+//		if (!m_outgoingMessages.empty())
+//		{
+//			std::string &textMessage = m_outgoingMessages.front();
+//
+//
+//			if (textMessage.length() > 0)
+//			{
+//
+//				////TODO how to delete?
+//				ChatLib::BaseMessage* message;
+//
+//				//TODO shall we improve?
+//				int startIndex = textMessage.find("for @");
+//				if (startIndex != std::string::npos)
+//				{
+//					startIndex += 5;
+//					int finishIndex = textMessage.find("@", startIndex);
+//					std::string forName = textMessage.substr(startIndex, finishIndex - startIndex);
+//					std::string fullMessage = Name + ": " + textMessage;
+//					message = new ChatLib::DirectMessage(Name, forName, fullMessage);
+//				}
+//				else
+//				{
+//					message = new ChatLib::BroadcastMessage(Name, textMessage);
+//				}
+//
+//				ChatLib::Response response = TrySendMessage(message, sockfd);
+//
+//				//TODO behavior may depend on the response
+//				delete(message);
+//			}
+//
+//			m_outgoingMessages.pop();
+//		}
+//	}
+//	closesocket(sockfd);
+//	WSACleanup();
+//
+//	m_IsTerminate = true;
+//}
+//
+void TCPIP_Client::AddForSend(const char* sz_target_name, const int messageType, const void* data, const int data_len)
 {
-	InitializeSocketRoutine();
+	const auto type = static_cast<ChatLib::MessageType>(messageType);
 
-	int sockfd = GetSocket();
-
-	IntroduceToServer();
-
-	m_IsStarted = true;
-
-	while (!m_NeedTerminate)
+	switch (type)
 	{
-		//TODO how to delete right
-		ChatLib::RawBytes rawData = RecieveMessageAndReply(sockfd);
-
-		if (!rawData.empty())
-		{
-			const ChatLib::MessageType type = ChatLib::BaseMessage::GetType(rawData);
-			ChatLib::byte *p = &rawData[0];
-			std::string text;
-			switch (type)
-			{
-			case ChatLib::eBroadcastMessage:
-			{
-				const ChatLib::BroadcastMessage BroadMessage(p);
-				text = BroadMessage.Text;
-				CallbacksHolder::clbMessageReceive(BroadMessage.SourceName.c_str(), reinterpret_cast<int*>(BroadMessage.GetMyType()), BroadMessage.Text.c_str());
-				break;
-			}
-			case ChatLib::eDirectMessage:
-			{
-				const ChatLib::DirectMessage DirectMessage(p);
-				text = DirectMessage.Text;
-				break;
-			}
-			case ChatLib::eResponse:
-				throw std::exception("Main receiving error: I received Response in main");
-			case ChatLib::eNameRequest:
-				throw std::exception("Main receiving error: I received NameRequest in main");
-			default:
-				throw std::exception("Main receiving error: I received unknown message type");
-			}
-
-			//if (text.length() != 0)
-			//	 ui.PrintMessage(text);
-		}
-
-		if (!m_outgoingMessages.empty())
-		{
-			std::string &textMessage = m_outgoingMessages.front();
-
-
-			if (textMessage.length() > 0)
-			{
-
-				////TODO how to delete?
-				ChatLib::BaseMessage* message;
-
-				//TODO shall we improve?
-				int startIndex = textMessage.find("for @");
-				if (startIndex != std::string::npos)
-				{
-					startIndex += 5;
-					int finishIndex = textMessage.find("@", startIndex);
-					std::string forName = textMessage.substr(startIndex, finishIndex - startIndex);
-					std::string fullMessage = Name + ": " + textMessage;
-					message = new ChatLib::DirectMessage(Name, forName, fullMessage);
-				}
-				else
-				{
-					message = new ChatLib::BroadcastMessage(Name, textMessage);
-				}
-
-				ChatLib::Response response = TrySendMessage(message, sockfd);
-
-				//TODO behavior may depend on the response
-				delete(message);
-			}
-
-			m_outgoingMessages.pop();
-		}
+	case ChatLib::MessageType::eInvalid:
+		throw new std::exception("Invalid message type");
+		break;
+	case ChatLib::MessageType::eBroadcastMessage:
+	{
+		const ChatLib::BroadcastMessagePtr broadPtr(new ChatLib::BroadcastMessage(Name, std::string((const char *)data, data_len * sizeof(char))));
+		m_outgoingMessages.push(broadPtr);
+		break;
 	}
-	closesocket(sockfd);
-	WSACleanup();
-
-	m_IsTerminate = true;
-}
-
-void TCPIP_Client::SendTextMessage(const char* sz_str)
-{
-m_outgoingMessages.push(sz_str);
+	case ChatLib::MessageType::eDirectMessage:
+	{
+		const ChatLib::DirectMessagePtr directPtr(new ChatLib::DirectMessage(Name, std::string(sz_target_name), std::string((const char *)data, data_len * sizeof(char))));
+		m_outgoingMessages.push(directPtr);
+		break;
+	}
+	case ChatLib::MessageType::eNameRequest:
+	{
+		const ChatLib::NameRequestMessagePtr nameReqPtr(new ChatLib::NameRequestMessage(Name));
+		m_outgoingMessages.push(nameReqPtr);
+		break;
+	}
+	case ChatLib::MessageType::eResponse:
+		throw new std::exception(" Cathed Response from UI \n");
+		break;
+	}
 }
 
 void TCPIP_Client::Shutdown()
 {
-m_NeedTerminate = true;
-while (!m_IsTerminate);
-}
-
-ChatLib::RawBytes TCPIP_Client::RecieveMessageAndReply(const CROSS_SOCKET& socket)
-{
-fd_set rfds;
-FD_ZERO(&rfds);
-FD_SET(socket, &rfds);
-int maxFD = (int)socket + 1;
-
-timeval timeout;
-timeout.tv_sec = 0;
-timeout.tv_usec = 500;
-ChatLib::RawBytes rawData;
-
-int result = select(maxFD, &rfds, NULL, NULL, &timeout);
-if (result < 0)
-{
-PrintErrors;
-//win errors
-//TODO UNIX check error
-}
-else if (result == 0)
-{
-//TODO win check error and timeout
-}
-else
-{
-if (FD_ISSET(socket, &rfds))
-{
-	rawData = RecieveMessage(socket);
-
-	//TODO refactor this
-	switch (ChatLib::BaseMessage::GetType(rawData))
-	{
-	case eInvalid:
-	case ChatLib::eResponse:
-		break;
-	default:
-		SendResponse(ChatLib::ResponseStatus::eOk, socket);
-		break;
-	}
-}
-}
-return rawData;
+	m_NeedTerminate = true;
+	while (!m_IsTerminated);
 }
 
 ChatLib::RawBytes TCPIP_Client::RecieveMessage(const CROSS_SOCKET& socket)
 {
-//TODO check recieved num
-char buff[MAX_PACKAGE_LENGTH];
-const int recived = recv(socket, buff, MAX_PACKAGE_LENGTH, NULL);
+		//TODO check recieved num
+		char buff[MAX_PACKAGE_LENGTH];
+		const int recived = recv(socket, buff, MAX_PACKAGE_LENGTH, NULL);
 
-if (recived == 0)
-{
-printf("Recieve message: connection softly closed");
-throw Exceptions::ConnectionClosedException("connection softly closed");
-//TODO error check Win and Timeout
-}
-else if (recived == -1)
-{
-PrintErrors;
-closesocket(socket);
-throw Exceptions::ConnectionLostException("connection lost closed");
-//WSACleanup();
-//TODO check Unix error
-}
+		if (recived == 0)
+		{
+			PrintErrors;
+			printf("Recieve message: connection softly closed");
+			throw Exceptions::ConnectionClosedException("connection softly closed");
+			//TODO error check Win and Timeout
+		}
+		else if (recived == -1)
+		{
+			PrintErrors;
+			throw Exceptions::ConnectionLostException("connection lost closed");
+			//WSACleanup();
+			//TODO check Unix error
+		}
 
-printf("RecieveMessage %d bytes: ", recived);
+		printf("RecieveMessage %d bytes: ", recived);
 
-//TODO check raw data
-ChatLib::RawBytes rawData(buff, buff + recived);
-for (int i = 0; i < recived; i++)
-{
-printf("%02X ", buff[i]);
-}
-printf("\n");
+		//TODO check raw data
+		ChatLib::RawBytes rawData(buff, buff + recived);
+		for (int i = 0; i < recived; i++)
+		{
+			printf("%02X ", buff[i]);
+		}
+		printf("\n");
 
-printf("Message was recieved \n");
+		printf("Message was recieved \n");
 
-//MessageType type = BaseMessage::GetType(buff);
-
-//printf("Recieved message type equal %d \n", type);
-
-////Message message (type, buff);
-
-//printf("Recieved message equal %s \n", message.GetText());
-
-return rawData;
+		return rawData;
 }
 
-ChatLib::Response TCPIP_Client::TrySendMessage(ChatLib::BaseMessage* message, const CROSS_SOCKET& socket)
+bool TCPIP_Client::SendMessagee(ChatLib::BaseMessagePtr message, const CROSS_SOCKET& socket)
 {
-//TODO need to know sent message or not
-SendMessagee(message, socket);
+	fd_set wfds;
+	FD_ZERO(&wfds);
+	FD_SET(socket, &wfds);
+	int maxFD = (int)socket + 1;
 
-auto rawResponseData = RecieveMessage(socket);
+	timeval timeout;
+	timeout.tv_sec = 0;
+	timeout.tv_usec = 500;
+	ChatLib::RawBytes rawData;
 
-ChatLib::MessageType type = ChatLib::BaseMessage::GetType(rawResponseData);
+	const int result = select(maxFD, NULL, &wfds, NULL, &timeout);
+	if (result < 0)
+	{
+		PrintErrors;
+		//win errors
+		//TODO UNIX check error
+		return false;
+	}
+	else if (result == 0)
+	{
+		PrintErrors;
+		//TODO win check error and timeout
+		return false;
+	}
+	else
+	{
+		byte pBuffer[255];
+		int length = message->Construct(pBuffer);
 
-if (type != ChatLib::eResponse)
-throw std::exception("I received not response after sending");
+		//TODO should we use while
+		int sended = 0;
+		do
+		{
+			sended = send(socket, (char *)&pBuffer[sended], length, NULL);
+			length -= sended;
+		} while (length > 0);
 
-return ChatLib::Response(rawResponseData);
+		return true;
+	}
 }
-
-void TCPIP_Client::SendMessagee(ChatLib::BaseMessage* message, const CROSS_SOCKET& socket)
-{
-byte pBuffer[255];
-int length = message->Construct(pBuffer);
-
-int sended = 0;
-do
-{
-sended = send(socket, (char *)&pBuffer[sended], length, NULL);
-length -= sended;
-} while (length > 0);
-
-}
-
-void TCPIP_Client::SendResponse(ChatLib::ResponseStatus status, const CROSS_SOCKET& socket)
-{
-ChatLib::Response response(status);
-SendMessagee(&response, socket);
-}
-
 bool TCPIP_Client::GetStatus()
 {
-	return _instance->m_IsStarted && !_instance->m_IsTerminate;
+	return _instance->m_IsStarted && !_instance->m_IsTerminated;
 }

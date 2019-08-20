@@ -220,7 +220,6 @@ void TCPServer::SendMessagee(ChatLib::BaseMessage* message, const CROSS_SOCKET& 
 		sended = send(socket, (char *)&pBuffer[sended], length, NULL);
 		length -= sended;
 	} while (length > 0);
-
 }
 
 void TCPServer::SendResponse(ChatLib::ResponseStatus status, const CROSS_SOCKET& socket)

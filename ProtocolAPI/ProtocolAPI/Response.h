@@ -22,4 +22,6 @@ namespace ChatLib
 
 		std::string GetDebugString() override;
 	};
+
+	typedef std::shared_ptr<Response> ResponsePtr;
 }
