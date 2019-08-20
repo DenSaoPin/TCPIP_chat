@@ -45,7 +45,7 @@ void OnRecieveMessage(const char *szName, const int* messageType, const char *sz
 				messageType = ChatLib::eBroadcastMessage;
 			}
 
-			ClientSendMessage(nullptr, reinterpret_cast<const int*>(messageType), reinterpret_cast<void*>(messageType), reinterpret_cast<const int *>(sizeof(message.c_str())));
+			ClientSendMessage(nullptr, static_cast<const int>(messageType), reinterpret_cast<void*>(messageType), static_cast<const int>(sizeof(message.c_str())));
 		}
 	}
 
