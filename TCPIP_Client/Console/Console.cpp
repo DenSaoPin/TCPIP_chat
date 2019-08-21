@@ -4,8 +4,6 @@
 #include <thread>
 #include <iostream>
 #include <string>
-#include <future>
-#include "ProtocolAPI/DirectMessage.h"
 #include "ProtocolAPI/BroadcastMessage.h"
 
 
@@ -30,6 +28,9 @@ void OnRecieveMessage(const char *szName, const int* messageType, const char *sz
 		{
 			std::getline(std::cin, message);
 
+			if(message.empty())
+				continue;
+
 			int startIndex = message.find("for @");
 
 			ChatLib::MessageType messageType = ChatLib::eInvalid;
@@ -45,7 +46,9 @@ void OnRecieveMessage(const char *szName, const int* messageType, const char *sz
 				messageType = ChatLib::eBroadcastMessage;
 			}
 
-			ClientSendMessage(nullptr, static_cast<const int>(messageType), reinterpret_cast<void*>(messageType), static_cast<const int>(sizeof(message.c_str())));
+			std::string szStr = message.c_str();
+
+			ClientSendMessage(nullptr, static_cast<const int>(messageType), reinterpret_cast<const void*>(message.c_str()), szStr.size());
 		}
 	}
 

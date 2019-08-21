@@ -14,7 +14,7 @@ namespace ChatLib
 
 		Response(byteP & ppBuffer);
 
-		Response(ResponseStatus status);
+		Response(ResponseStatus status, const unsigned short &id);
 
 		int Construct(byte* pBuff) override;
 

@@ -12,7 +12,7 @@ namespace ChatLib
 		_responseStatus = (ResponseStatus)*(pBuffer++);
 	}
 
-	Response::Response(ResponseStatus status) : BaseMessage(eResponse)
+	Response::Response(ResponseStatus status, const unsigned short &id) : BaseMessage(eResponse, id)
 	{
 		_responseStatus = status;
 	}

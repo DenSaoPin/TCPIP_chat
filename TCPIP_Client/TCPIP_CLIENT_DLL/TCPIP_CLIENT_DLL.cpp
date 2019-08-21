@@ -234,8 +234,7 @@ void TCPIP_Client::ClientMainLoop()
 				if (Name.length() == 0)
 					throw new std::exception("You must fill pClient->Name before call IntroduceToServer() \n");
 
-				ChatLib::NameRequestMessage NameReqMessage(Name);
-				ChatLib::NameRequestMessagePtr NameReqMessagePtr;
+				ChatLib::NameRequestMessagePtr NameReqMessagePtr( new ChatLib::NameRequestMessage(Name, GenerateId()));
 				m_outgoingMessages.push(NameReqMessagePtr);
 
 				m_ClientStatus = eSendingMessage;
@@ -438,19 +437,24 @@ void TCPIP_Client::AddForSend(const char* sz_target_name, const int messageType,
 		break;
 	case ChatLib::MessageType::eBroadcastMessage:
 	{
-		const ChatLib::BroadcastMessagePtr broadPtr(new ChatLib::BroadcastMessage(Name, std::string((const char *)data, data_len * sizeof(char))));
+
+		//const char * text = (const char *)data;
+		//size_t len = data_len * sizeof(char);
+		//std::string data(text, len);
+
+		const ChatLib::BroadcastMessagePtr broadPtr(new ChatLib::BroadcastMessage(Name, std::string((const char *)data, data_len * sizeof(char)), GenerateId()));
 		m_outgoingMessages.push(broadPtr);
 		break;
 	}
 	case ChatLib::MessageType::eDirectMessage:
 	{
-		const ChatLib::DirectMessagePtr directPtr(new ChatLib::DirectMessage(Name, std::string(sz_target_name), std::string((const char *)data, data_len * sizeof(char))));
+		const ChatLib::DirectMessagePtr directPtr(new ChatLib::DirectMessage(Name, std::string(sz_target_name), std::string((const char *)data, data_len * sizeof(char)), GenerateId()));
 		m_outgoingMessages.push(directPtr);
 		break;
 	}
 	case ChatLib::MessageType::eNameRequest:
 	{
-		const ChatLib::NameRequestMessagePtr nameReqPtr(new ChatLib::NameRequestMessage(Name));
+		const ChatLib::NameRequestMessagePtr nameReqPtr(new ChatLib::NameRequestMessage(Name, GenerateId()));
 		m_outgoingMessages.push(nameReqPtr);
 		break;
 	}
@@ -458,6 +462,11 @@ void TCPIP_Client::AddForSend(const char* sz_target_name, const int messageType,
 		throw new std::exception(" Cathed Response from UI \n");
 		break;
 	}
+}
+
+unsigned short TCPIP_Client::GenerateId()
+{
+	return ++m_currentMessageId;
 }
 
 void TCPIP_Client::Shutdown()
@@ -544,6 +553,7 @@ bool TCPIP_Client::SendMessagee(ChatLib::BaseMessagePtr message, const CROSS_SOC
 		return true;
 	}
 }
+
 bool TCPIP_Client::GetStatus()
 {
 	return _instance->m_IsStarted && !_instance->m_IsTerminated;

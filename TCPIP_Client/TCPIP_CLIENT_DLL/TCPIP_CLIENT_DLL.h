@@ -74,8 +74,9 @@
 		static TCPIP_Client* _instance;
 
 		std::queue<ChatLib::BaseMessagePtr> m_outgoingMessages;
-		//std::queue<std::string> m_awaitResponseMessages;
 		std::queue<ChatLib::BaseMessagePtr> m_incomingMessages;
+
+		unsigned short m_currentMessageId = 0;
 
 		bool m_NeedTerminate = false;
 		ThreadSafe <bool> m_IsTerminated = false;
@@ -110,4 +111,6 @@
 		bool TCPIP_Client::SendMessagee(ChatLib::BaseMessagePtr message, const CROSS_SOCKET& socket);
 
 		void TCPIP_Client::AddForSend(const char* sz_target_name, const int status, const void* data, const int data_len);
+
+		unsigned short GenerateId();
 	};

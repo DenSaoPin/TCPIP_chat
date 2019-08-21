@@ -33,6 +33,7 @@ namespace ChatLib
 		pBuff[count++] = 0xFF;
 		pBuff[count++] = 0xFF;
 		pBuff[count++] = 0xFF;
+		((unsigned short *)pBuff)[count += 2] = this->_id;
 		pBuff[count++] = this->_messageType;
 		return count;
 	}
@@ -56,14 +57,15 @@ namespace ChatLib
 		if (rawData[MESSAGE_TYPE_INDEX] < ChatLib::eInvalid || rawData[MESSAGE_TYPE_INDEX] > ChatLib::eResponse)
 			throw std::exception("BaseMesage constructor error: message type not recognized");
 
+		_id = rawData[MESSAGE_ID_INDEX];
 		_messageType = rawData[MESSAGE_TYPE_INDEX];
 	}
 
-	BaseMessage::BaseMessage(const ChatLib::MessageType& messageType)
+	BaseMessage::BaseMessage(const ChatLib::MessageType& messageType, const unsigned short& id)
 	{
 		if (messageType < ChatLib::eInvalid || messageType > ChatLib::eResponse)
 			throw std::exception("BaseMesage constructor error: message type not recognized");
-
+		_id = id;
 		_messageType = messageType;
 	}
 
@@ -72,9 +74,12 @@ namespace ChatLib
 		//TODO check!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		if (*(unsigned int*)(pBuffer) == HEADER_START)
 		{
-			pBuffer += 4;
+			pBuffer += MAGIC_NUMBER_LENGTH;
 			if (*pBuffer < ChatLib::eInvalid || *pBuffer > ChatLib::eResponse)
 				throw std::exception("BaseMesage constructor error: message type not recognized");
+
+			_id = *((unsigned short*)pBuffer);
+			pBuffer += MESSAGE_ID_LENGTH;
 			_messageType = *(pBuffer++);
 		}
 	}

@@ -14,7 +14,7 @@ namespace ChatLib
 	public:
 		BroadcastMessage(byteP &pBuff);
 
-		BroadcastMessage(std::string& sourceName, std::string& text);
+		BroadcastMessage(std::string& sourceName, std::string& text, const unsigned short & id);
 		//~BroadcastMessage();
 
 		int Construct(byte* pBuff) override;

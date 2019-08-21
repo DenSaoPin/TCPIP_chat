@@ -12,7 +12,7 @@ namespace ChatLib
 	public:
 		DirectMessage(byteP &pBuff);
 		
-		DirectMessage(std::string& sourceName, std::string& targetName, std::string& text);
+		DirectMessage(std::string& sourceName, std::string& targetName, std::string& text, const unsigned short& id);
 
 		int Construct(ChatLib::byte* pBuff) override;
 
