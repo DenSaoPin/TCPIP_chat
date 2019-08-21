@@ -222,9 +222,9 @@ void TCPServer::SendMessagee(ChatLib::BaseMessage* message, const CROSS_SOCKET& 
 	} while (length > 0);
 }
 
-void TCPServer::SendResponse(ChatLib::ResponseStatus status, const CROSS_SOCKET& socket)
+void TCPServer::SendResponse(ChatLib::ResponseStatus status, const CROSS_SOCKET& socket, const unsigned short &id)
 {
-	ChatLib::Response response(status);
+	ChatLib::Response response(status, id);
 	SendMessagee(&response, socket);
 }
 

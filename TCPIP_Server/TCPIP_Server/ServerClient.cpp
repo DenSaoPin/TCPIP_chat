@@ -61,7 +61,7 @@ bool ServerClient::ProcessSocket()
 
 		switch (ChatLib::BaseMessage::GetType(rawMessage))
 		{
-			case ChatLib::eNameRequest:
+		case ChatLib::eNameRequest:
 		{
 			const ChatLib::NameRequestMessage NameMessage(p);
 			ChatLib::ResponseStatus status = ChatLib::eOk;
@@ -73,7 +73,7 @@ bool ServerClient::ProcessSocket()
 				IInvalid = true;
 			}
 
-			m_pServer->SendResponse(status, Socket);
+			m_pServer->SendResponse(status, Socket, NameMessage.GetMyID());
 			break;
 		}
 		case ChatLib::eBroadcastMessage:
@@ -91,7 +91,7 @@ bool ServerClient::ProcessSocket()
 					m_pServer->SetToSendForAllClients(this, broadMessagePtr);
 
 					printf("Message Responce \n");
-					m_pServer->SendResponse(ChatLib::ResponseStatus::eOk, Socket);
+					m_pServer->SendResponse(ChatLib::ResponseStatus::eOk, Socket, broadMessagePtr->GetMyID());
 				}
 				else
 				{
@@ -115,7 +115,7 @@ bool ServerClient::ProcessSocket()
 					m_pServer->SetToSendFor(m_pServer->Clients.Find(directMessagePtr->TargetName), directMessagePtr);
 
 					printf("Message Responce \n");
-					m_pServer->SendResponse(ChatLib::ResponseStatus::eOk, Socket);
+					m_pServer->SendResponse(ChatLib::ResponseStatus::eOk, Socket, directMessagePtr->GetMyID());
 				}
 				else
 				{

@@ -39,6 +39,9 @@ namespace ChatLib
 		static MessageType GetType(RawBytes& rawData);
 
 		MessageType GetMyType() const;
+
+		unsigned short GetMyID() const;
+
 	public:
 		virtual int Construct(byte* pBuff);
 

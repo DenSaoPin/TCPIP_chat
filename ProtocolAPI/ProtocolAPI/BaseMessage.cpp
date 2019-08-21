@@ -26,6 +26,11 @@ namespace ChatLib
 		return (ChatLib::MessageType)_messageType;
 	}
 
+	unsigned short BaseMessage::GetMyID() const
+	{
+		return _id;
+	}
+
 	int BaseMessage::Construct(ChatLib::byte* pBuff)
 	{
 		int count = 0;
