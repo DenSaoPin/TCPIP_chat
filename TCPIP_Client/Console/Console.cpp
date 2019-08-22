@@ -41,7 +41,10 @@ int main()
 		chatThread = std::thread(ClientMainLoop);
 
 		//TODO need close thread when console closing
-		//atexit(OnExit);
+		if(atexit(OnExit))
+		{
+			std::cout << " Error at atexit() callback setter";
+		}
 
 		std::string message;
 		while (true)
@@ -67,7 +70,7 @@ int main()
 			}
 
 			std::string szStr = message.c_str();
-			ClientSendMessage(settings.Name.c_str(), static_cast<const int>(messageType), reinterpret_cast<const void*>(message.c_str()), szStr.size());
+			ClientSendMessage(nullptr, static_cast<const int>(messageType), reinterpret_cast<const void*>(message.c_str()), szStr.size());
 		}
 	}
 

@@ -15,7 +15,7 @@ static inline char* rtrim(char* buffer);
 int main()
 {
 	std::string strNameClient;
-
+	
 	TCPServer server("0.0.0.0", "7700");
 
 	for (;; Sleep(75))

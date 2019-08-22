@@ -22,7 +22,14 @@ extern "C"
 	void ClientSendMessage(const char* szTargetName, const int status, const void * data, const int dataLen)
 	{
 
-		TCPIP_Client::Instance()->AddForSend(szTargetName, status, data, dataLen);
+		std::string szName;
+
+		if (szTargetName != nullptr)
+		{
+			std::string szName(szTargetName);
+		}
+
+		TCPIP_Client::Instance()->AddForSend(szName, status, data, dataLen);
 	}
 	void ClientTerminate()
 	{

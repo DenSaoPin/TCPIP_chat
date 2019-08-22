@@ -2,6 +2,7 @@
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 #include <mutex>
+#include <chrono>
 
 #include <ProtocolAPI/BroadcastMessage.h>
 #include <ProtocolAPI/DirectMessage.h>
@@ -14,6 +15,8 @@
 #include "UIInterface.h"
 #include "Exceptions.h"
 #include "Defines.h"
+
+
 
 TCPIP_Client* TCPIP_Client::_instance = nullptr;
 
@@ -164,21 +167,26 @@ int TCPIP_Client::GetSocket()
 
 void TCPIP_Client::ClientMainLoop()
 {
+	using Time = std::chrono::steady_clock;
+	using ms = std::chrono::milliseconds;
+	using int_sec = std::chrono::duration<int>;
+	using int_time_point = std::chrono::time_point<Time, int_sec>;
+
+	Time::time_point lapStartTime;
+	int_sec timeGap{ 76 };
+
 	while (!m_NeedTerminate)
 	{
-
-		switch (m_ClientStatus)
+		if(m_ClientStatus == eStartWSA)
 		{
-		case eStartWSA:
 			if (InitWinSockDll())
 				m_ClientStatus = eInitializeSocket;
-			break;
-		case eInitializeSocket:
+		}
+
+		if (m_ClientStatus == eInitializeSocket)
+		{
 			if (InitializeSocketRoutine())
 				m_ClientStatus = eIntroduce;
-			break;
-		default:
-			break;
 		}
 
 		fd_set rfds;
@@ -198,9 +206,8 @@ void TCPIP_Client::ClientMainLoop()
 		timeval timeout;
 		timeout.tv_sec = 0;
 		timeout.tv_usec = 500;
-		ChatLib::RawBytes rawData;
 
-		int result = select(maxFD, &rfds, NULL, NULL, &timeout);
+		int result = select(maxFD, &rfds, &wfds, &exfds, &timeout);
 		if (result < 0)
 		{
 			PrintErrors;
@@ -216,9 +223,6 @@ void TCPIP_Client::ClientMainLoop()
 		{
 			switch (m_ClientStatus)
 			{
-				//case eInvalid:
-				//	throw new std::exception(" Invalid client state ");
-				//	break;
 			case eStartWSA:
 			{
 				//throw new std::exception(" Invalid client state ");
@@ -234,23 +238,18 @@ void TCPIP_Client::ClientMainLoop()
 				if (Name.length() == 0)
 					throw new std::exception("You must fill pClient->Name before call IntroduceToServer() \n");
 
-				ChatLib::NameRequestMessagePtr NameReqMessagePtr( new ChatLib::NameRequestMessage(Name, GenerateId()));
+				ChatLib::NameRequestMessagePtr NameReqMessagePtr(new ChatLib::NameRequestMessage(Name, GenerateId()));
 				m_outgoingMessages.push(NameReqMessagePtr);
 
-				m_ClientStatus = eSendingMessage;
+				m_ClientStatus = eIdle;
 				break;
 			}
-			case eShutdown:
-			{
-				break;
-			}
-
-			case eReceiveMessage:
+			case eIdle:
 			{
 				if (FD_ISSET(Socket, &rfds))
 				{
-					ChatLib::RawBytes rawData = RecieveMessage(Socket);
-				
+					ChatLib::RawBytes rawData;
+					rawData = RecieveMessage(Socket);
 
 					if (!rawData.empty())
 					{
@@ -262,14 +261,13 @@ void TCPIP_Client::ClientMainLoop()
 						case ChatLib::eBroadcastMessage:
 						{
 							const ChatLib::BroadcastMessage BroadMessage(p);
-							text = BroadMessage.Text;
 							CallbacksHolder::clbMessageReceive(BroadMessage.SourceName.c_str(), reinterpret_cast<int*>(BroadMessage.GetMyType()), BroadMessage.Text.c_str());
 							break;
 						}
 						case ChatLib::eDirectMessage:
 						{
 							const ChatLib::DirectMessage DirectMessage(p);
-							text = DirectMessage.Text;
+							CallbacksHolder::clbMessageReceive(DirectMessage.SourceName.c_str(), reinterpret_cast<int*>(DirectMessage.GetMyType()), DirectMessage.Text.c_str());
 							break;
 						}
 						case ChatLib::eResponse:
@@ -279,154 +277,77 @@ void TCPIP_Client::ClientMainLoop()
 							switch (Responce.GetStatus())
 							{
 							case ChatLib::ResponseStatus::eOk:
-								m_outgoingMessages.pop();
+								if (m_outgoingMessages.front()->GetMyID() == Responce.GetMyID())
+									m_outgoingMessages.pop();
 								break;
 							case ChatLib::ResponseStatus::eNameConflict:
+							{
+								text = " Name already in use \n";
+								CallbacksHolder::clbMessageReceive(Name.c_str(), reinterpret_cast<int*>(Responce.GetMyType()), text.c_str());
 								break;
+							}
 							case ChatLib::ResponseStatus::eError:
-
+							{
+								text = " Unhandled error response ";
+								CallbacksHolder::clbMessageReceive(Name.c_str(), reinterpret_cast<int*>(Responce.GetMyType()), text.c_str());
 								break;
+							}
 							case ChatLib::ResponseStatus::eResponseInvalid:
-
+							{
+								text = " Unhandled invalid response ";
+								CallbacksHolder::clbMessageReceive(Name.c_str(), reinterpret_cast<int*>(Responce.GetMyType()), text.c_str());
 								break;
+							}
 							default:
+								text = " Unhandled default response ";
+								CallbacksHolder::clbMessageReceive(Name.c_str(), reinterpret_cast<int*>(Responce.GetMyType()), text.c_str());
 								break;
 							}
 							break;
 						}
 						case ChatLib::eNameRequest:
 						{
-							throw std::exception("Main receiving error: I received NameRequest in main");
+							const ChatLib::NameRequestMessage NameRequestMessage(p);
+							text = " Error: catched nameRequest in main ";
+							CallbacksHolder::clbMessageReceive(Name.c_str(), reinterpret_cast<int*>(NameRequestMessage.GetMyType()), text.c_str());
 							break;
 						}
 						default:
 						{
-							throw std::exception("Main receiving error: I received unknown message type");
+							text = " Error: catched nameRequest in main ";
+							CallbacksHolder::clbMessageReceive(Name.c_str(), reinterpret_cast<int*>(ChatLib::eError), text.c_str());
 							break;
 						}
 						}
 					}
 				}
-				break;
-			}
-			case eSendingMessage:
-			{
-				if(FD_ISSET(Socket, &wfds))
+
+				if (!m_outgoingMessages.empty() &&
+					Time::now() > lapStartTime + timeGap &&
+					FD_ISSET(Socket, &wfds))
 				{
-					if (SendMessagee(m_outgoingMessages.front(), Socket))
-					{
-						m_ClientStatus = eReceiveMessage;
-					}
-					else
-					{
-						m_ClientStatus = eIntroduce;
-					}
+					lapStartTime = Time::now();
+					SendMessagee(m_outgoingMessages.front(), Socket);
 				}
 				break;
 			}
 			default:
 			{
+				std::string text = " Unhandled default case in main \n";
+				std::string name = " ClientDll";
+				CallbacksHolder::clbMessageReceive(name.c_str(), reinterpret_cast<int*>(ChatLib::eError), text.c_str());
 				break;
 			}
 			}
-
 		}
-
-		closesocket(GetSocket());
-		WSACleanup();
-		m_IsTerminated = true;
 	}
+	closesocket(GetSocket());
+	WSACleanup();
+	m_IsTerminated = true;
 }
-////TODO check
-//void TCPIP_Client::MainLoop()
-//{
-//	InitializeSocketRoutine();
-//
-//	int sockfd = GetSocket();
-//
-//	IntroduceToServer();
-//
-//	m_IsStarted = true;
-//
-//	while (!m_NeedTerminate)
-//	{
-//		//TODO how to delete right
-//		ChatLib::RawBytes rawData = RecieveMessageAndReply(sockfd);
-//
-//		if (!rawData.empty())
-//		{
-//			const ChatLib::MessageType type = ChatLib::BaseMessage::GetType(rawData);
-//			ChatLib::byte *p = &rawData[0];
-//			std::string text;
-//			switch (type)
-//			{
-//			case ChatLib::eBroadcastMessage:
-//			{
-//				const ChatLib::BroadcastMessage BroadMessage(p);
-//				text = BroadMessage.Text;
-//				CallbacksHolder::clbMessageReceive(BroadMessage.SourceName.c_str(), reinterpret_cast<int*>(BroadMessage.GetMyType()), BroadMessage.Text.c_str());
-//				break;
-//			}
-//			case ChatLib::eDirectMessage:
-//			{
-//				const ChatLib::DirectMessage DirectMessage(p);
-//				text = DirectMessage.Text;
-//				break;
-//			}
-//			case ChatLib::eResponse:
-//				throw std::exception("Main receiving error: I received Response in main");
-//			case ChatLib::eNameRequest:
-//				throw std::exception("Main receiving error: I received NameRequest in main");
-//			default:
-//				throw std::exception("Main receiving error: I received unknown message type");
-//			}
-//
-//			//if (text.length() != 0)
-//			//	 ui.PrintMessage(text);
-//		}
-//
-//		if (!m_outgoingMessages.empty())
-//		{
-//			std::string &textMessage = m_outgoingMessages.front();
-//
-//
-//			if (textMessage.length() > 0)
-//			{
-//
-//				////TODO how to delete?
-//				ChatLib::BaseMessage* message;
-//
-//				//TODO shall we improve?
-//				int startIndex = textMessage.find("for @");
-//				if (startIndex != std::string::npos)
-//				{
-//					startIndex += 5;
-//					int finishIndex = textMessage.find("@", startIndex);
-//					std::string forName = textMessage.substr(startIndex, finishIndex - startIndex);
-//					std::string fullMessage = Name + ": " + textMessage;
-//					message = new ChatLib::DirectMessage(Name, forName, fullMessage);
-//				}
-//				else
-//				{
-//					message = new ChatLib::BroadcastMessage(Name, textMessage);
-//				}
-//
-//				ChatLib::Response response = TrySendMessage(message, sockfd);
-//
-//				//TODO behavior may depend on the response
-//				delete(message);
-//			}
-//
-//			m_outgoingMessages.pop();
-//		}
-//	}
-//	closesocket(sockfd);
-//	WSACleanup();
-//
-//	m_IsTerminate = true;
-//}
-//
-void TCPIP_Client::AddForSend(const char* sz_target_name, const int messageType, const void* data, const int data_len)
+
+
+void TCPIP_Client::AddForSend(std::string& sz_target_name, const int messageType, const void* data, const int data_len)
 {
 	const auto type = static_cast<ChatLib::MessageType>(messageType);
 
@@ -437,18 +358,13 @@ void TCPIP_Client::AddForSend(const char* sz_target_name, const int messageType,
 		break;
 	case ChatLib::MessageType::eBroadcastMessage:
 	{
-
-		//const char * text = (const char *)data;
-		//size_t len = data_len * sizeof(char);
-		//std::string data(text, len);
-
 		const ChatLib::BroadcastMessagePtr broadPtr(new ChatLib::BroadcastMessage(Name, std::string((const char *)data, data_len * sizeof(char)), GenerateId()));
 		m_outgoingMessages.push(broadPtr);
 		break;
 	}
 	case ChatLib::MessageType::eDirectMessage:
 	{
-		const ChatLib::DirectMessagePtr directPtr(new ChatLib::DirectMessage(Name, std::string(sz_target_name), std::string((const char *)data, data_len * sizeof(char)), GenerateId()));
+		const ChatLib::DirectMessagePtr directPtr(new ChatLib::DirectMessage(Name, sz_target_name, std::string((const char *)data, data_len * sizeof(char)), GenerateId()));
 		m_outgoingMessages.push(directPtr);
 		break;
 	}
@@ -513,32 +429,6 @@ ChatLib::RawBytes TCPIP_Client::RecieveMessage(const CROSS_SOCKET& socket)
 
 bool TCPIP_Client::SendMessagee(ChatLib::BaseMessagePtr message, const CROSS_SOCKET& socket)
 {
-	fd_set wfds;
-	FD_ZERO(&wfds);
-	FD_SET(socket, &wfds);
-	int maxFD = (int)socket + 1;
-
-	timeval timeout;
-	timeout.tv_sec = 0;
-	timeout.tv_usec = 500;
-	ChatLib::RawBytes rawData;
-
-	const int result = select(maxFD, NULL, &wfds, NULL, &timeout);
-	if (result < 0)
-	{
-		PrintErrors;
-		//win errors
-		//TODO UNIX check error
-		return false;
-	}
-	else if (result == 0)
-	{
-		PrintErrors;
-		//TODO win check error and timeout
-		return false;
-	}
-	else
-	{
 		byte pBuffer[255];
 		int length = message->Construct(pBuffer);
 
@@ -551,7 +441,6 @@ bool TCPIP_Client::SendMessagee(ChatLib::BaseMessagePtr message, const CROSS_SOC
 		} while (length > 0);
 
 		return true;
-	}
 }
 
 bool TCPIP_Client::GetStatus()
