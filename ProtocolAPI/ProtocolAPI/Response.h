@@ -5,8 +5,7 @@ namespace ChatLib
 {
 	class Response : public BaseMessage
 	{
-#define RESPONSE_OK_LENGTH 5
-#define RESPONSE_STATUS_INDEX 5
+#define RESPONSE_STATUS_INDEX 7
 
 		ChatLib::ResponseStatus _responseStatus = eResponseInvalid;
 	public:
@@ -14,7 +13,7 @@ namespace ChatLib
 
 		Response(byteP & ppBuffer);
 
-		Response(ResponseStatus status);
+		Response(ResponseStatus status, const unsigned short &id);
 
 		int Construct(byte* pBuff) override;
 
@@ -22,4 +21,6 @@ namespace ChatLib
 
 		std::string GetDebugString() override;
 	};
+
+	typedef std::shared_ptr<Response> ResponsePtr;
 }

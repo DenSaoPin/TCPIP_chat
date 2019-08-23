@@ -12,7 +12,7 @@ extern "C"
 {
 	TCPIPCLIENTDLL_EXPORT void setCallbackMessageReceived(callbackMessageReceivedFunc);
 	TCPIPCLIENTDLL_EXPORT void ClientMainLoop();
-	TCPIPCLIENTDLL_EXPORT void ClientSendMessage(const char *);
+	TCPIPCLIENTDLL_EXPORT void ClientSendMessage(const char* szTargetName, const int status, const void * data, const int dataLen);
 	TCPIPCLIENTDLL_EXPORT void ClientTerminate();
 	TCPIPCLIENTDLL_EXPORT void SetConnectionParams(const char *, const char *, const char *);
 	TCPIPCLIENTDLL_EXPORT bool IsWorkingState();

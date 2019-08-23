@@ -1,9 +1,12 @@
 #pragma once
 
-#include <ProtocolAPI/Protocol.h>
 #include <string>
 #include <queue>
 #include <mutex>
+
+#include "ProtocolAPI/BaseMessage.h"
+#include "ProtocolAPI/Response.h"
+#include "Defines.h"
 
 #define MAX_PORT_DIGIT 5
 
@@ -49,6 +52,15 @@
 		}
 	};
 
+	enum EStatus
+	{
+		eInvalid = 0,
+		eStartWSA,
+		eInitializeSocket,
+		eIntroduce,
+		eIdle,
+	};
+
 	class TCPIP_Client
 	{
 	private:
@@ -58,12 +70,17 @@
 		TCPIP_Client& operator=(const TCPIP_Client&);
 
 		static TCPIP_Client* _instance;
-		std::queue<std::string> m_outgoingMessages;
+
+		std::queue<ChatLib::BaseMessagePtr> m_outgoingMessages;
+		ChatLib::BaseMessagePtr awaitResponse;
+
+		unsigned short m_currentMessageId = 0;
 
 		bool m_NeedTerminate = false;
-		ThreadSafe <bool> m_IsTerminate = false;
+		ThreadSafe <bool> m_IsTerminated = false;
 		ThreadSafe <bool> m_IsStarted = false;
 
+		EStatus m_ClientStatus = eStartWSA;
 	public:
 
 		std::string Name;
@@ -76,17 +93,24 @@
 
 		void Initialize(const std::string& name, const std::string& serverIP, const std::string& serverPort);
 
-		ChatLib::Response IntroduceToServer();
+		bool InitializeSocketRoutine();
+		bool InitWinSockDll();
 
-		void InitializeSocketRoutine();
+		void ShowError(const std::string &);
 
 		int GetSocket();
 
 		bool GetStatus();
-
 		void ClientMainLoop();
-		void SendTextMessage(const char* sz_str);
 		void Shutdown();
 
-		//const char* ClientSendMessage(const char *);
-};
+		ChatLib::RawBytes TCPIP_Client::RecieveMessage(const CROSS_SOCKET& socket);
+
+		bool TCPIP_Client::SendMessagee(ChatLib::BaseMessagePtr message, const CROSS_SOCKET& socket);
+
+		void TCPIP_Client::AddForSend(std::string& sz_target_name, const int status, const void* data, const int data_len);
+
+		void TCPIP_Client::SetResponse(ChatLib::ResponseStatus status, const unsigned short &id);
+
+		unsigned short GenerateId();
+	};

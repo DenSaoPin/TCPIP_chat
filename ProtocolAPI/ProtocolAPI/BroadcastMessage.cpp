@@ -29,7 +29,7 @@ namespace  ChatLib
 		return std::string("It is BroadcastMessage. Text = " + Text + "\n");
 	}
 
-	BroadcastMessage::BroadcastMessage(std::string& sourceName, std::string& text): BaseMessage(ChatLib::eBroadcastMessage)
+	BroadcastMessage::BroadcastMessage(std::string& sourceName, std::string& text, const unsigned short& id) : BaseMessage(ChatLib::eBroadcastMessage, id)
 	{
 		Text = text;
 		SourceName = sourceName;

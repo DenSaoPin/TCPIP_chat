@@ -26,7 +26,7 @@ ChatLib::DirectMessage::DirectMessage(byteP &pBuff): BaseMessage(pBuff)
 	pBuff += textLength;
 }
 
-ChatLib::DirectMessage::DirectMessage(std::string& sourceName, std::string& targetName, std::string& text): BaseMessage(eDirectMessage)
+ChatLib::DirectMessage::DirectMessage(std::string& sourceName, std::string& targetName, std::string& text, const unsigned short & id): BaseMessage(eDirectMessage, id)
 {
 	Text = text;
 	TargetName = targetName;

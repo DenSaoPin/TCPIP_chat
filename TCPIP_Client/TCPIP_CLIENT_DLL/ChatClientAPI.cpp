@@ -19,9 +19,17 @@ extern "C"
 			CallbacksHolder::clbMessageReceive(TCPIP_Client::Instance()->Name.c_str(), reinterpret_cast<int*>(ChatLib::eInvalid) , "Exception");
 		}
 	}
-	void ClientSendMessage(const char* szStr)
+	void ClientSendMessage(const char* szTargetName, const int status, const void * data, const int dataLen)
 	{
-		TCPIP_Client::Instance()->SendTextMessage(szStr);
+
+		std::string szName;
+
+		if (szTargetName != nullptr)
+		{
+			std::string szName(szTargetName);
+		}
+
+		TCPIP_Client::Instance()->AddForSend(szName, status, data, dataLen);
 	}
 	void ClientTerminate()
 	{

@@ -7,9 +7,11 @@ namespace ChatLib
 	public:
 		NameRequestMessage(byteP &ppBuff);
 
-		NameRequestMessage(std::string& name);
+		NameRequestMessage(std::string& name, const unsigned short & id);
 
 		std::string GetDebugString() override;
 	};
+
+	typedef std::shared_ptr<NameRequestMessage> NameRequestMessagePtr;
 }
 
