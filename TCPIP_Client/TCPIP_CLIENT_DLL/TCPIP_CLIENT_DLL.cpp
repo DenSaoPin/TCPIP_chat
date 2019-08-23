@@ -170,10 +170,9 @@ void TCPIP_Client::ClientMainLoop()
 	using Time = std::chrono::steady_clock;
 	using ms = std::chrono::milliseconds;
 	using int_sec = std::chrono::duration<int>;
-	using int_time_point = std::chrono::time_point<Time, int_sec>;
 
 	Time::time_point lapStartTime;
-	int_sec timeGap{ 76 };
+	const int_sec timeGap{ 76 };
 
 	while (!m_NeedTerminate)
 	{
@@ -262,12 +261,16 @@ void TCPIP_Client::ClientMainLoop()
 						{
 							const ChatLib::BroadcastMessage BroadMessage(p);
 							CallbacksHolder::clbMessageReceive(BroadMessage.SourceName.c_str(), reinterpret_cast<int*>(BroadMessage.GetMyType()), BroadMessage.Text.c_str());
+
+							SetResponse(ChatLib::eOk, BroadMessage.GetMyID());
 							break;
 						}
 						case ChatLib::eDirectMessage:
 						{
 							const ChatLib::DirectMessage DirectMessage(p);
 							CallbacksHolder::clbMessageReceive(DirectMessage.SourceName.c_str(), reinterpret_cast<int*>(DirectMessage.GetMyType()), DirectMessage.Text.c_str());
+							
+							SetResponse(ChatLib::eOk, DirectMessage.GetMyID());
 							break;
 						}
 						case ChatLib::eResponse:
@@ -322,12 +325,28 @@ void TCPIP_Client::ClientMainLoop()
 					}
 				}
 
-				if (!m_outgoingMessages.empty() &&
-					Time::now() > lapStartTime + timeGap &&
+				if ((!m_outgoingMessages.empty()) &&
 					FD_ISSET(Socket, &wfds))
 				{
-					lapStartTime = Time::now();
-					SendMessagee(m_outgoingMessages.front(), Socket);
+					ChatLib::BaseMessagePtr currentMessage = m_outgoingMessages.front();
+
+					if(currentMessage == awaitResponse)
+					{
+						if(Time::now() > lapStartTime + timeGap)
+						{
+							SendMessagee(currentMessage, Socket);
+							awaitResponse = currentMessage;
+							lapStartTime = Time::now();
+						}
+					}
+					else
+					{
+						SendMessagee(currentMessage, Socket);
+						awaitResponse = currentMessage;
+					}
+
+					if (m_outgoingMessages.front()->GetMyType() == ChatLib::eResponse)
+						m_outgoingMessages.pop();
 				}
 				break;
 			}
@@ -447,3 +466,10 @@ bool TCPIP_Client::GetStatus()
 {
 	return _instance->m_IsStarted && !_instance->m_IsTerminated;
 }
+
+void TCPIP_Client::SetResponse(ChatLib::ResponseStatus status, const unsigned short &id)
+{
+	const ChatLib::ResponsePtr responsePtr(new ChatLib::Response(status, id));
+	m_outgoingMessages.push(responsePtr);
+}
+

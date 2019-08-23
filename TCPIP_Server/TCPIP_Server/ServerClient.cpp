@@ -5,6 +5,7 @@
 #include "loggerAPI/LoggerManager.h"
 #include "TCPServer.h"
 #include "Exceptions.h"
+#include <chrono>
 
 ServerClient::ServerClient(TCPServer* pServer, SOCKET socket)
 {
@@ -14,6 +15,12 @@ ServerClient::ServerClient(TCPServer* pServer, SOCKET socket)
 	Socket = socket;
 }
 
+//TODO move this
+using Time = std::chrono::steady_clock;
+Time::time_point loopStartTime;
+using int_sec = std::chrono::duration<int>;
+const int_sec timeGap{ 76 };
+
 bool ServerClient::ProcessSocket()
 {
 	fd_set rfds, wfds;
@@ -22,11 +29,7 @@ bool ServerClient::ProcessSocket()
 	FD_ZERO(&wfds);
 
 	FD_SET(Socket, &rfds);
-
-	if(!ForSend.empty())
-	{
-		FD_SET(Socket, &wfds);
-	}
+	FD_SET(Socket, &wfds);
 
 	timeval tv;
 	tv.tv_sec = 0;
@@ -61,25 +64,48 @@ bool ServerClient::ProcessSocket()
 
 		switch (ChatLib::BaseMessage::GetType(rawMessage))
 		{
+		case ChatLib::eInvalid:
+		{
+			std::cout << "Invalid in ServerClient main switch" << std::endl;
+			break;
+		}
 		case ChatLib::eNameRequest:
 		{
-			const ChatLib::NameRequestMessage NameMessage(p);
+			const ChatLib::NameRequestMessagePtr NameMessagePtr(new ChatLib::NameRequestMessage(p));
 			ChatLib::ResponseStatus status = ChatLib::eOk;
-			m_log->info("Received message eNameRequest for %s", NameMessage.Text.c_str());
+			m_log->info("Received message eNameRequest for %s", NameMessagePtr->Text.c_str());
 
-			if (!m_pServer->Assign(NameMessage.Text, this))
+			if (!m_pServer->Assign(NameMessagePtr->Text, this))
 			{
 				status = ChatLib::eNameConflict;
 				IInvalid = true;
 			}
 
-			m_pServer->SendResponse(status, Socket, NameMessage.GetMyID());
+			m_pServer->SetResponse(status, *this, NameMessagePtr->GetMyID());
+			break;
+		}
+		case ChatLib::eDirectMessage:
+		{
+			ChatLib::DirectMessagePtr directMessagePtr(new ChatLib::DirectMessage(p));
+
+			if (!directMessagePtr->Text.empty())
+			{
+				if (!Name.empty())
+				{
+					m_pServer->SetToSendFor(m_pServer->Clients.Find(directMessagePtr->TargetName), directMessagePtr);
+
+					printf("Message Responce \n");
+					m_pServer->SetResponse(ChatLib::ResponseStatus::eOk, *this, directMessagePtr->GetMyID());
+				}
+				else
+				{
+					std::cout << "Error socket don`t have Name" << std::endl;
+				}
+			}
 			break;
 		}
 		case ChatLib::eBroadcastMessage:
 		{
-			//ChatLib::BroadcastMessage BroadMessage(p);
-
 			ChatLib::BroadcastMessagePtr broadMessagePtr(new ChatLib::BroadcastMessage(p));
 
 			if (!broadMessagePtr->Text.empty())
@@ -87,11 +113,11 @@ bool ServerClient::ProcessSocket()
 				if (!Name.empty())
 				{
 					std::cout << broadMessagePtr->Text << std::endl;
-					//TODO send responce;
 					m_pServer->SetToSendForAllClients(this, broadMessagePtr);
 
 					printf("Message Responce \n");
-					m_pServer->SendResponse(ChatLib::ResponseStatus::eOk, Socket, broadMessagePtr->GetMyID());
+
+					m_pServer->SetResponse(ChatLib::ResponseStatus::eOk, *this, broadMessagePtr->GetMyID());
 				}
 				else
 				{
@@ -100,54 +126,48 @@ bool ServerClient::ProcessSocket()
 			}
 			break;
 		}
-		case ChatLib::eDirectMessage:
+		case ChatLib::eResponse:
 		{
-			//ChatLib::DirectMessage DirMessage(p);
-			ChatLib::DirectMessagePtr directMessagePtr(new ChatLib::DirectMessage(p));
-
-			if (!directMessagePtr->Text.empty())
+			ChatLib::ResponsePtr responsePtr(new ChatLib::Response(p));
+			if (this->ForSend.front()->GetMyID() == responsePtr->GetMyID())
 			{
-				if (!Name.empty())
-				{
-					//std::cout << directMessagePtr->Text << std::endl;
-					//TODO send responce;
-
-					m_pServer->SetToSendFor(m_pServer->Clients.Find(directMessagePtr->TargetName), directMessagePtr);
-
-					printf("Message Responce \n");
-					m_pServer->SendResponse(ChatLib::ResponseStatus::eOk, Socket, directMessagePtr->GetMyID());
-				}
-				else
-				{
-					std::cout << "Error socket don`t have Name" << std::endl;
-				}
+				this->ForSend.pop();
+			}
+			else
+			{
+				std::cout << "Warning: Unhandled response in serverClient processing \n";
 			}
 			break;
 		}
-		//case ChatLib::eResponseOk:
-		//case ChatLib::eResponceError:
-		//	std::cout << "Responce in Client" << std::endl;
-		//	break;
-		//case ChatLib::MessageType::e
-		//	std::cout << "Invalid in Client" << std::endl;
-		//	break;
-		case ChatLib::eInvalid:
-			std::cout << "Invalid in Client" << std::endl;
+		default:
+			std::cout << "Default in ServerClient main switch" << std::endl;
 			break;
 		}
-		//std::cout << "Byte recieved: " << message.GetTextLength() << std::endl;
-		//m_log->info("Received %d bytes", message.GetTextLength());
 	}
-
-	if(FD_ISSET(Socket, &wfds))
+	   
+	if( (!this->ForSend.empty()) &&
+		FD_ISSET(Socket, &wfds)
+		)
 	{
-		ChatLib::Response response = m_pServer->TrySendMessage(ForSend.front().get(), Socket);
+		ChatLib::BaseMessagePtr currentMessage = this->ForSend.front();
 
-		if(response.GetStatus() == ChatLib::eOk)
+		if (currentMessage == awaitResponse)
 		{
-			ForSend.pop();
+			if (Time::now() > loopStartTime + timeGap)
+			{
+				m_pServer->SendMessagee(currentMessage.get(), Socket);
+				awaitResponse = currentMessage;
+				loopStartTime = Time::now();
+			}
 		}
-		//TODO refactored MEssage Type to status and type
+		else
+		{
+			m_pServer->SendMessagee(currentMessage.get(), Socket);
+			awaitResponse = currentMessage;
+		}
+
+		if (ForSend.front()->GetMyType() == ChatLib::eResponse)
+			ForSend.pop();
 	}
 	return true;
 }

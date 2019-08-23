@@ -54,14 +54,13 @@ bool TCPServer::SetToSendForAllClients(ServerClient* server_client, ChatLib::Bro
 			continue;
 		}
 
-		(*it)->ForSend.push(std::static_pointer_cast<ChatLib::BaseMessage>(broadMessagePtr));
+		(*it)->ForSend.push(broadMessagePtr);
 	}
 	return true;
 }
 
 void TCPServer::SetToSendFor(ServerClient * server_client, ChatLib::DirectMessagePtr& directMessagePtr)
 {
-
 	for(auto it = this->Clients.Begin(); it != this->Clients.End(); ++it)
 	{
 		if (*it == server_client)
@@ -194,21 +193,6 @@ void TCPServer::Accept()
 	}
 }
 
-ChatLib::Response TCPServer::TrySendMessage(ChatLib::BaseMessage* message, const CROSS_SOCKET& socket)
-{
-	//TODO need to know sent message or not
-	SendMessagee(message, socket);
-
-	auto rawResponseData = RecieveMessage(socket);
-
-	ChatLib::MessageType type = ChatLib::BaseMessage::GetType(rawResponseData);
-
-	if (type != ChatLib::eResponse)
-		throw std::exception("I received not response after sending");
-
-	return ChatLib::Response(rawResponseData);
-}
-
 void TCPServer::SendMessagee(ChatLib::BaseMessage* message, const CROSS_SOCKET& socket)
 {
 	byte pBuffer[255];
@@ -222,10 +206,10 @@ void TCPServer::SendMessagee(ChatLib::BaseMessage* message, const CROSS_SOCKET& 
 	} while (length > 0);
 }
 
-void TCPServer::SendResponse(ChatLib::ResponseStatus status, const CROSS_SOCKET& socket, const unsigned short &id)
+void TCPServer::SetResponse(ChatLib::ResponseStatus status, ServerClient& client, const unsigned short &id)
 {
-	ChatLib::Response response(status, id);
-	SendMessagee(&response, socket);
+	const ChatLib::ResponsePtr responsePtr(new ChatLib::Response(status, id));
+	client.ForSend.push(responsePtr);
 }
 
 ChatLib::RawBytes TCPServer::RecieveMessage(const CROSS_SOCKET& socket)

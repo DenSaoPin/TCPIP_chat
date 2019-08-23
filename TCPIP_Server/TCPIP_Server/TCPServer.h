@@ -50,11 +50,11 @@ public:
 
 	void Accept();
 
-	ChatLib::Response TrySendMessage(ChatLib::BaseMessage* message, const CROSS_SOCKET& socket);
+	//ChatLib::Response TrySendMessage(ChatLib::BaseMessage* message, const CROSS_SOCKET& socket);
 
 	void SendMessagee(ChatLib::BaseMessage* message, const CROSS_SOCKET& socket);
 
-	void SendResponse(ChatLib::ResponseStatus status, const CROSS_SOCKET& socket, const unsigned short& id);
+	void SetResponse(ChatLib::ResponseStatus status, ServerClient& client, const unsigned short& id);
 
 	ChatLib::RawBytes RecieveMessage(const CROSS_SOCKET& socket);
 

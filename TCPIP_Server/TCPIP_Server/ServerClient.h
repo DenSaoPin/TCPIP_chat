@@ -17,6 +17,7 @@ public:
 	bool IInvalid = false;
 
 	std::queue<ChatLib::BaseMessagePtr> ForSend;
+	ChatLib::BaseMessagePtr awaitResponse = nullptr;
 
 	bool ProcessSocket();
 };

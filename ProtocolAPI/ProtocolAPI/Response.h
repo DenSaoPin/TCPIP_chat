@@ -5,8 +5,7 @@ namespace ChatLib
 {
 	class Response : public BaseMessage
 	{
-#define RESPONSE_OK_LENGTH 5
-#define RESPONSE_STATUS_INDEX 5
+#define RESPONSE_STATUS_INDEX 7
 
 		ChatLib::ResponseStatus _responseStatus = eResponseInvalid;
 	public:
