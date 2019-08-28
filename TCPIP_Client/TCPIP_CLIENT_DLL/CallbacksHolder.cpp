@@ -1,4 +1,4 @@
 #include "CallbacksHolder.h"
 
 
-callbackMessageReceivedFunc CallbacksHolder::clbMessageReceive = 0;
+callbackMessageReceivedFunc CallbacksHolder::clbMessageReceive = nullptr;

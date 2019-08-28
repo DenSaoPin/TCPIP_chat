@@ -21,7 +21,6 @@ extern "C"
 	}
 	void ClientSendMessage(const char* szTargetName, const int status, const void * data, const int dataLen)
 	{
-
 		std::string szName;
 
 		if (szTargetName != nullptr)
@@ -39,7 +38,7 @@ extern "C"
 	{
 		TCPIP_Client::Instance()->Initialize(name, ip, port);
 	}
-	bool IsWorkingState()
+	EClientStatus GetClientDllStatus()
 	{
 		return TCPIP_Client::Instance()->GetStatus();
 	}

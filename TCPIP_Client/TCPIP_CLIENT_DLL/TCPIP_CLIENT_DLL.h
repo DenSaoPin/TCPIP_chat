@@ -7,59 +7,11 @@
 #include "ProtocolAPI/BaseMessage.h"
 #include "ProtocolAPI/Response.h"
 #include "Defines.h"
+#include "public/ChatClientAPI.h"
 
 #define MAX_PORT_DIGIT 5
 
-	class MutexLocker
-	{
-		std::mutex *_mutex;
-	public:
-		MutexLocker(std::mutex *mutex)
-		{
-			_mutex = mutex;
-			_mutex->lock();
-		}
-		~MutexLocker()
-		{
-			_mutex->unlock();
-		}
-	};
 
-	template <typename T>
-	class ThreadSafe
-	{
-		std::mutex _mutexRead;
-		std::mutex _mutexWrite;
-		T value;
-	public:
-		ThreadSafe(const T& other)
-		{
-			MutexLocker ml1(&_mutexRead);
-			MutexLocker ml2(&_mutexWrite);
-			value = other;
-		}
-		ThreadSafe& operator=(const T& other)
-		{
-			MutexLocker ml1(&_mutexRead);
-			MutexLocker ml2(&_mutexWrite);
-			value = other;
-			return *this;
-		}
-		operator T()
-		{
-			MutexLocker ml(&_mutexWrite);
-			return value;
-		}
-	};
-
-	enum EStatus
-	{
-		eInvalid = 0,
-		eStartWSA,
-		eInitializeSocket,
-		eIntroduce,
-		eIdle,
-	};
 
 	class TCPIP_Client
 	{
@@ -76,11 +28,7 @@
 
 		unsigned short m_currentMessageId = 0;
 
-		bool m_NeedTerminate = false;
-		ThreadSafe <bool> m_IsTerminated = false;
-		ThreadSafe <bool> m_IsStarted = false;
-
-		EStatus m_ClientStatus = eStartWSA;
+		ThreadSafe <EClientStatus> m_ClientStatus = eStartWSA;
 	public:
 
 		std::string Name;
@@ -100,7 +48,7 @@
 
 		int GetSocket();
 
-		bool GetStatus();
+		EClientStatus GetStatus();
 		void ClientMainLoop();
 		void Shutdown();
 

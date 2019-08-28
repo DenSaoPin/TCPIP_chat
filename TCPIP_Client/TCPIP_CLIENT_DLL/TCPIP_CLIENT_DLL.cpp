@@ -16,8 +16,6 @@
 #include "Exceptions.h"
 #include "Defines.h"
 
-
-
 TCPIP_Client* TCPIP_Client::_instance = nullptr;
 
 TCPIP_Client* TCPIP_Client::Instance()
@@ -155,7 +153,6 @@ bool TCPIP_Client::InitializeSocketRoutine()
 		closesocket(Socket);
 		return false;
 	}
-
 	//closesocket(Socket);
 	return true;
 }
@@ -171,23 +168,32 @@ void TCPIP_Client::ClientMainLoop()
 	using ms = std::chrono::milliseconds;
 	using int_sec = std::chrono::duration<int>;
 
+    m_ClientStatus = eStartWSA;
+
+    if (m_ClientStatus == eStartWSA)
+    {
+        if (InitWinSockDll())
+            m_ClientStatus = eInitializeSocket;
+        else
+        {
+            throw new std::exception(" Start WSA failed \n");
+        }
+    }
+
+    if (m_ClientStatus == eInitializeSocket)
+    {
+        if (InitializeSocketRoutine())
+            m_ClientStatus = eIntroduce;
+        else
+        {
+            throw new std::exception(" Initialize socket failed \n");
+        }
+    }
+
 	Time::time_point lapStartTime;
-	const int_sec timeGap{ 76 };
-
-	while (!m_NeedTerminate)
+	const int_sec timeGap{ 76 };   
+	while (true)
 	{
-		if(m_ClientStatus == eStartWSA)
-		{
-			if (InitWinSockDll())
-				m_ClientStatus = eInitializeSocket;
-		}
-
-		if (m_ClientStatus == eInitializeSocket)
-		{
-			if (InitializeSocketRoutine())
-				m_ClientStatus = eIntroduce;
-		}
-
 		fd_set rfds;
 		FD_ZERO(&rfds);
 		FD_SET(Socket, &rfds);
@@ -224,12 +230,12 @@ void TCPIP_Client::ClientMainLoop()
 			{
 			case eStartWSA:
 			{
-				//throw new std::exception(" Invalid client state ");
+				throw new std::exception(" Invalid client state ");
 				break;
 			}
 			case eInitializeSocket:
 			{
-				//throw new std::exception(" Invalid client state ");
+				throw new std::exception(" Invalid client state ");
 				break;
 			}
 			case eIntroduce:
@@ -350,7 +356,14 @@ void TCPIP_Client::ClientMainLoop()
 				}
 				break;
 			}
-			default:
+			case eTerminating:
+			{
+				closesocket(GetSocket());
+				WSACleanup();
+				m_ClientStatus = eShutDown;
+				break;
+			}
+				default:
 			{
 				std::string text = " Unhandled default case in main \n";
 				std::string name = " ClientDll";
@@ -358,13 +371,12 @@ void TCPIP_Client::ClientMainLoop()
 				break;
 			}
 			}
+
+			if(m_ClientStatus == eShutDown)
+				break;
 		}
 	}
-	closesocket(GetSocket());
-	WSACleanup();
-	m_IsTerminated = true;
 }
-
 
 void TCPIP_Client::AddForSend(std::string& sz_target_name, const int messageType, const void* data, const int data_len)
 {
@@ -406,8 +418,8 @@ unsigned short TCPIP_Client::GenerateId()
 
 void TCPIP_Client::Shutdown()
 {
-	m_NeedTerminate = true;
-	while (!m_IsTerminated);
+	m_ClientStatus = eTerminating;
+	while (m_ClientStatus != eShutDown);
 }
 
 ChatLib::RawBytes TCPIP_Client::RecieveMessage(const CROSS_SOCKET& socket)
@@ -462,9 +474,9 @@ bool TCPIP_Client::SendMessagee(ChatLib::BaseMessagePtr message, const CROSS_SOC
 		return true;
 }
 
-bool TCPIP_Client::GetStatus()
+EClientStatus TCPIP_Client::GetStatus()
 {
-	return _instance->m_IsStarted && !_instance->m_IsTerminated;
+	return m_ClientStatus;
 }
 
 void TCPIP_Client::SetResponse(ChatLib::ResponseStatus status, const unsigned short &id)
