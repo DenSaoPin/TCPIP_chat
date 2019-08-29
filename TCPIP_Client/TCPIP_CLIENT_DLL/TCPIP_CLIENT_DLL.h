@@ -6,6 +6,7 @@
 
 #include "ProtocolAPI/BaseMessage.h"
 #include "ProtocolAPI/Response.h"
+#include "ProtocolAPI/NameRequestMessage.h"
 #include "Defines.h"
 #include "public/ChatClientAPI.h"
 
@@ -25,6 +26,7 @@
 
 		std::queue<ChatLib::BaseMessagePtr> m_outgoingMessages;
 		ChatLib::BaseMessagePtr awaitResponse;
+        ChatLib::NameRequestMessagePtr m_NameRequest = nullptr;
 
 		unsigned short m_currentMessageId = 0;
 
@@ -49,6 +51,7 @@
 		int GetSocket();
 
 		EClientStatus GetStatus();
+	    //bool IntroduceToServer();
 		void ClientMainLoop();
 		void Shutdown();
 

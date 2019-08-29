@@ -189,7 +189,6 @@ void TCPIP_Client::ClientMainLoop()
             throw new std::exception(" Initialize socket failed \n");
         }
     }
-
 	Time::time_point lapStartTime;
 	const int_sec timeGap{ 76 };   
 	while (true)
@@ -244,118 +243,129 @@ void TCPIP_Client::ClientMainLoop()
 					throw new std::exception("You must fill pClient->Name before call IntroduceToServer() \n");
 
 				ChatLib::NameRequestMessagePtr NameReqMessagePtr(new ChatLib::NameRequestMessage(Name, GenerateId()));
-				m_outgoingMessages.push(NameReqMessagePtr);
-
+                m_NameRequest = NameReqMessagePtr;
+                    
 				m_ClientStatus = eIdle;
 				break;
 			}
 			case eIdle:
-			{
-				if (FD_ISSET(Socket, &rfds))
-				{
-					ChatLib::RawBytes rawData;
-					rawData = RecieveMessage(Socket);
+            {
+                if (FD_ISSET(Socket, &rfds))
+                {
+                    ChatLib::RawBytes rawData;
+                    rawData = RecieveMessage(Socket);
 
-					if (!rawData.empty())
-					{
-						const ChatLib::MessageType type = ChatLib::BaseMessage::GetType(rawData);
-						ChatLib::byte *p = &rawData[0];
-						std::string text;
-						switch (type)
-						{
-						case ChatLib::eBroadcastMessage:
-						{
-							const ChatLib::BroadcastMessage BroadMessage(p);
-							CallbacksHolder::clbMessageReceive(BroadMessage.SourceName.c_str(), reinterpret_cast<int*>(BroadMessage.GetMyType()), BroadMessage.Text.c_str());
+                    if (!rawData.empty())
+                    {
+                        const ChatLib::MessageType type = ChatLib::BaseMessage::GetType(rawData);
+                        ChatLib::byte *p = &rawData[0];
+                        std::string text;
+                        switch (type)
+                        {
+                        case ChatLib::eBroadcastMessage:
+                        {
+                            const ChatLib::BroadcastMessage BroadMessage(p);
+                            CallbacksHolder::clbMessageReceive(BroadMessage.SourceName.c_str(), reinterpret_cast<int*>(BroadMessage.GetMyType()), BroadMessage.Text.c_str());
 
-							SetResponse(ChatLib::eOk, BroadMessage.GetMyID());
-							break;
-						}
-						case ChatLib::eDirectMessage:
-						{
-							const ChatLib::DirectMessage DirectMessage(p);
-							CallbacksHolder::clbMessageReceive(DirectMessage.SourceName.c_str(), reinterpret_cast<int*>(DirectMessage.GetMyType()), DirectMessage.Text.c_str());
-							
-							SetResponse(ChatLib::eOk, DirectMessage.GetMyID());
-							break;
-						}
-						case ChatLib::eResponse:
-						{
-							const ChatLib::Response Responce(p);
+                            SetResponse(ChatLib::eOk, BroadMessage.GetMyID());
+                            break;
+                        }
+                        case ChatLib::eDirectMessage:
+                        {
+                            const ChatLib::DirectMessage DirectMessage(p);
+                            CallbacksHolder::clbMessageReceive(DirectMessage.SourceName.c_str(), reinterpret_cast<int*>(DirectMessage.GetMyType()), DirectMessage.Text.c_str());
 
-							switch (Responce.GetStatus())
-							{
-							case ChatLib::ResponseStatus::eOk:
-								if (m_outgoingMessages.front()->GetMyID() == Responce.GetMyID())
-									m_outgoingMessages.pop();
-								break;
-							case ChatLib::ResponseStatus::eNameConflict:
-							{
-								text = " Name already in use \n";
-								CallbacksHolder::clbMessageReceive(Name.c_str(), reinterpret_cast<int*>(Responce.GetMyType()), text.c_str());
-								break;
-							}
-							case ChatLib::ResponseStatus::eError:
-							{
-								text = " Unhandled error response ";
-								CallbacksHolder::clbMessageReceive(Name.c_str(), reinterpret_cast<int*>(Responce.GetMyType()), text.c_str());
-								break;
-							}
-							case ChatLib::ResponseStatus::eResponseInvalid:
-							{
-								text = " Unhandled invalid response ";
-								CallbacksHolder::clbMessageReceive(Name.c_str(), reinterpret_cast<int*>(Responce.GetMyType()), text.c_str());
-								break;
-							}
-							default:
-								text = " Unhandled default response ";
-								CallbacksHolder::clbMessageReceive(Name.c_str(), reinterpret_cast<int*>(Responce.GetMyType()), text.c_str());
-								break;
-							}
-							break;
-						}
-						case ChatLib::eNameRequest:
-						{
-							const ChatLib::NameRequestMessage NameRequestMessage(p);
-							text = " Error: catched nameRequest in main ";
-							CallbacksHolder::clbMessageReceive(Name.c_str(), reinterpret_cast<int*>(NameRequestMessage.GetMyType()), text.c_str());
-							break;
-						}
-						default:
-						{
-							text = " Error: catched nameRequest in main ";
-							CallbacksHolder::clbMessageReceive(Name.c_str(), reinterpret_cast<int*>(ChatLib::eError), text.c_str());
-							break;
-						}
-						}
-					}
-				}
+                            SetResponse(ChatLib::eOk, DirectMessage.GetMyID());
+                            break;
+                        }
+                        case ChatLib::eResponse:
+                        {
+                            const ChatLib::Response Responce(p);
 
-				if ((!m_outgoingMessages.empty()) &&
-					FD_ISSET(Socket, &wfds))
-				{
-					ChatLib::BaseMessagePtr currentMessage = m_outgoingMessages.front();
+                            switch (Responce.GetStatus())
+                            {
+                            case ChatLib::ResponseStatus::eOk:
+                                if ((!m_outgoingMessages.empty()) && m_outgoingMessages.front()->GetMyID() == Responce.GetMyID())
+                                    m_outgoingMessages.pop();
+                                if ((m_NameRequest != nullptr) && (m_NameRequest->GetMyID() == Responce.GetMyID()))
+                                    m_NameRequest = nullptr;
+                                break;
+                            case ChatLib::ResponseStatus::eNameConflict:
+                            {
+                                text = " Name already in use \n";
+                                CallbacksHolder::clbMessageReceive(Name.c_str(), reinterpret_cast<int*>(Responce.GetMyType()), text.c_str());
+                                break;
+                            }
+                            case ChatLib::ResponseStatus::eError:
+                            {
+                                text = " Unhandled error response ";
+                                CallbacksHolder::clbMessageReceive(Name.c_str(), reinterpret_cast<int*>(Responce.GetMyType()), text.c_str());
+                                break;
+                            }
+                            case ChatLib::ResponseStatus::eResponseInvalid:
+                            {
+                                text = " Unhandled invalid response ";
+                                CallbacksHolder::clbMessageReceive(Name.c_str(), reinterpret_cast<int*>(Responce.GetMyType()), text.c_str());
+                                break;
+                            }
+                            default:
+                                text = " Unhandled default response ";
+                                CallbacksHolder::clbMessageReceive(Name.c_str(), reinterpret_cast<int*>(Responce.GetMyType()), text.c_str());
+                                break;
+                            }
+                            break;
+                        }
+                        case ChatLib::eNameRequest:
+                        {
+                            const ChatLib::NameRequestMessage NameRequestMessage(p);
+                            text = " Error: catched nameRequest in main ";
+                            CallbacksHolder::clbMessageReceive(Name.c_str(), reinterpret_cast<int*>(NameRequestMessage.GetMyType()), text.c_str());
+                            break;
+                        }
+                        default:
+                        {
+                            text = " Error: catched nameRequest in main ";
+                            CallbacksHolder::clbMessageReceive(Name.c_str(), reinterpret_cast<int*>(ChatLib::eError), text.c_str());
+                            break;
+                        }
+                        }
+                    }
+                }
 
-					if(currentMessage == awaitResponse)
-					{
-						if(Time::now() > lapStartTime + timeGap)
-						{
-							SendMessagee(currentMessage, Socket);
-							awaitResponse = currentMessage;
-							lapStartTime = Time::now();
-						}
-					}
-					else
-					{
-						SendMessagee(currentMessage, Socket);
-						awaitResponse = currentMessage;
-					}
+                if(m_NameRequest != nullptr || !m_outgoingMessages.empty())
+                {
+                    ChatLib::BaseMessagePtr currentMessage;
+                    if (m_NameRequest != nullptr &&
+                        FD_ISSET(Socket, &wfds))
+                    {
+                        currentMessage = m_NameRequest;
+                    }
+                    else if ((!m_outgoingMessages.empty()) &&
+                        FD_ISSET(Socket, &wfds))
+                    {
+                        currentMessage = m_outgoingMessages.front();
+                    }
 
-					if (m_outgoingMessages.front()->GetMyType() == ChatLib::eResponse)
-						m_outgoingMessages.pop();
-				}
-				break;
-			}
+                    if (currentMessage == awaitResponse)
+                    {
+                        if (Time::now() > lapStartTime + timeGap)
+                        {
+                            SendMessagee(currentMessage, Socket);
+                            awaitResponse = currentMessage;
+                            lapStartTime = Time::now();
+                        }
+                    }
+                    else
+                    {
+                        SendMessagee(currentMessage, Socket);
+                        awaitResponse = currentMessage;
+                    }
+
+                    if ((!m_outgoingMessages.empty()) && (m_outgoingMessages.front()->GetMyType() == ChatLib::eResponse))
+                        m_outgoingMessages.pop();
+                }
+                break;
+            }
 			case eTerminating:
 			{
 				closesocket(GetSocket());
@@ -418,7 +428,9 @@ unsigned short TCPIP_Client::GenerateId()
 
 void TCPIP_Client::Shutdown()
 {
-	m_ClientStatus = eTerminating;
+    if(m_ClientStatus != eShutDown)
+	    m_ClientStatus = eTerminating;
+
 	while (m_ClientStatus != eShutDown);
 }
 
@@ -470,7 +482,6 @@ bool TCPIP_Client::SendMessagee(ChatLib::BaseMessagePtr message, const CROSS_SOC
 			sended = send(socket, (char *)&pBuffer[sended], length, NULL);
 			length -= sended;
 		} while (length > 0);
-
 		return true;
 }
 
@@ -484,4 +495,3 @@ void TCPIP_Client::SetResponse(ChatLib::ResponseStatus status, const unsigned sh
 	const ChatLib::ResponsePtr responsePtr(new ChatLib::Response(status, id));
 	m_outgoingMessages.push(responsePtr);
 }
-

@@ -125,7 +125,6 @@ void AwaitUserInput()
             //TODO how to check valid async thread or not? m_clientDllMainThread.valid();
             if (m_clientStatus == EClientStatus::eTerminating)
             {
-                std::this_thread::sleep_for(std::chrono::milliseconds(500));
             }
             else if (m_clientStatus == EClientStatus::eShutDown)
             {
@@ -135,14 +134,7 @@ void AwaitUserInput()
                 ClientTerminate();
             }
 
-            //if (m_clientDllStatusThread.joinable())
-            //    m_clientDllStatusThread.join();
-            //else
-            //{
-            //    m_clientDllStatusThread.detach();
-            //}
-
-            //m_clientDllStatusThread = std::thread(DllStatusChecker);
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
             m_clientDllMainThread = std::async(std::launch::async, ClientMainLoop);
         }
             break;

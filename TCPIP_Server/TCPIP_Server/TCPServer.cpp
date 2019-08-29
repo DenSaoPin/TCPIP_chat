@@ -159,7 +159,12 @@ void TCPServer::ListenSockInitialization(std::string& IPv4_Adress,std::string& p
 
 void TCPServer::Accept()
 {
-	fd_set rfds;
+    //WSADATA wsaData;
+    //WORD wVersion = MAKEWORD(2, 2);
+
+    //int wsaInitError = WSAStartup(wVersion, &wsaData);
+
+    fd_set rfds;
 
 	FD_ZERO(&rfds);
 	FD_SET(ListenSock, &rfds);
@@ -170,27 +175,36 @@ void TCPServer::Accept()
 
 	int result = select(ListenSock + 1, &rfds, NULL, NULL, &tv);
 
-	//TODO errors! -1
+    if (result == 0)
+    {
+        //TODO timeout, it is normal case
+    }
+    else if (result == SOCKET_ERROR)
+    {
+        PrintErrors;
+    }
+    else
+    {
+        if (FD_ISSET(ListenSock, &rfds))
+        {
+            struct sockaddr_storage their_addr;
 
-	if (FD_ISSET(ListenSock, &rfds))
-	{
-		struct sockaddr_storage their_addr;
+            socklen_t addr_size = sizeof their_addr;
 
-		socklen_t addr_size = sizeof their_addr;
-
-		CROSS_SOCKET result = accept(ListenSock, (struct sockaddr*)&their_addr, &addr_size);
-		if (result <= 0)
-		{
-			printf("server: accept error \n");
-			//TODO error check
-		}
-		else
-		{
-			printf("Client was connected \n");
-			//TODO check!!!!!
-			Clients.Add(new ServerClient(this, result));
-		}
-	}
+            CROSS_SOCKET result = accept(ListenSock, (struct sockaddr*)&their_addr, &addr_size);
+            if (result <= 0)
+            {
+                printf("server: accept error \n");
+                //TODO error check
+            }
+            else
+            {
+                printf("Client was connected \n");
+                //TODO check!!!!!
+                Clients.Add(new ServerClient(this, result));
+            }
+        }
+    }
 }
 
 void TCPServer::SendMessagee(ChatLib::BaseMessage* message, const CROSS_SOCKET& socket)
@@ -220,16 +234,16 @@ ChatLib::RawBytes TCPServer::RecieveMessage(const CROSS_SOCKET& socket)
 
 	if (recived == 0)
 	{
-		printf("Recieve message: connection softly closed");
-		throw Exceptions::ConnectionClosedException("connection softly closed");
+		printf(" Recieve message: connection softly closed \n");
+		throw Exceptions::ConnectionClosedException(" Connection softly closed \n");
 		//TODO error check Win and Timeout
 	}
 	else if (recived == -1)
 	{
 		PrintErrors;
 		closesocket(socket);
-		throw Exceptions::ConnectionLostException("connection lost closed");
-		//WSACleanup();
+        printf(" Recieve message: connection lost closed \n");
+		throw Exceptions::ConnectionLostException(" Connection lost closed \n");
 		//TODO check Unix error
 	}
 
