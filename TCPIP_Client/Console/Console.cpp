@@ -188,12 +188,26 @@ public:
 
 	void SetParams()
 	{
-		std::string name;
-		std::cin >> name;
+        std::cout << "Enter your Name: \n";
+        std::cin >> Name;
 
-		Name = name;
-		Adress = "127.0.0.1";
-		Port = "7700";
+        std::getline(std::cin, Adress);
+
+        std::cout << "Enter server Adress: ";
+        std::getline(std::cin, Adress);
+        if(Adress.empty())
+        {
+            Adress = "127.0.0.1";
+            std::cout << "Used localhost adress " + Adress << std::endl;
+        }
+
+        std::cout << "Enter server Port: ";
+        std::getline(std::cin, Port);
+        if (Port.empty())
+        {
+            Port = "7700";
+            std::cout << "Used localhost port " + Port << std::endl;
+        }
 
 		SetConnectionParams(Name.c_str(), Adress.c_str(), Port.c_str());
 	}
