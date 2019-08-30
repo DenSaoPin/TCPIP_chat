@@ -176,6 +176,7 @@ void TCPIP_Client::ClientMainLoop()
             m_ClientStatus = eInitializeSocket;
         else
         {
+            m_ClientStatus = eShutDown;
             throw new std::exception(" Start WSA failed \n");
         }
     }
@@ -186,6 +187,8 @@ void TCPIP_Client::ClientMainLoop()
             m_ClientStatus = eIntroduce;
         else
         {
+            WSACleanup();
+            m_ClientStatus = eShutDown;
             throw new std::exception(" Initialize socket failed \n");
         }
     }

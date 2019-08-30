@@ -22,15 +22,11 @@ enum E_UI_Command
 void OnRecieveMessage(const char *szName, const int* messageType, const char *szMessage);
 void OnExit();
 
-std::thread chatThread;
-std::thread statusThread;
-
-//std::thread m_clientDllMainThread;
 std::future<void> m_clientDllMainThread;
-//std::future<void> m_clientDllStatusThread;
 std::thread m_clientDllStatusThread;
 
 ThreadSafe<EClientStatus> m_clientStatus = eInvalid;
+ThreadSafe<bool> m_NeedKillStatusChecker = false;
 
 int UI_status = 0;
 
@@ -43,8 +39,12 @@ void DllStatusChecker();
 void OnExit()
 {
 	ClientTerminate();
-	chatThread.join();
-	statusThread.join();
+    m_NeedKillStatusChecker = true;
+
+    if(m_clientDllStatusThread.joinable())
+        m_clientDllStatusThread.join();
+
+    std::this_thread::sleep_for(int_sec{ 1 });
 }
 
 BOOL WINAPI ConsoleHandler(DWORD CEvent)
@@ -176,6 +176,8 @@ void DllStatusChecker()
             }
             lapStart = Timer::now();
         }
+        if(m_NeedKillStatusChecker)
+            return;
 	}
 }
 
@@ -215,6 +217,7 @@ public:
 int main()
 {
     m_clientDllStatusThread = std::thread(DllStatusChecker);
+    atexit(OnExit);
 
 	ClientSettings settings;
 	settings.SetParams();
@@ -227,6 +230,7 @@ int main()
 	m_clientDllMainThread = std::async(std::launch::async, ClientMainLoop);
 
     AwaitUserInput();
+    return 0;
 }
 
 	void OnRecieveMessage(const char *szName, const int* messageType, const char *szMessage)
