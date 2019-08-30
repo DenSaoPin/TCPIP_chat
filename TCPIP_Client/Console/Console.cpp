@@ -226,7 +226,6 @@ int main()
 
 	setCallbackMessageReceived(OnRecieveMessage);
 
-    //statusThread = std::thread(DllStatusChecker);
 	m_clientDllMainThread = std::async(std::launch::async, ClientMainLoop);
 
     AwaitUserInput();

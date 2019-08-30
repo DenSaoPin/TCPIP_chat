@@ -7,7 +7,6 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Media;
 using AttachedPropertyTest;
-using Properties;
 
 namespace WPF_UI
 {
@@ -51,14 +50,6 @@ namespace WPF_UI
             eDirectMessage = 0x05,
             eBroadcastMessage = 0x06,
             eResponse = 0x07,
-        };
-
-        public enum EResponseStatus
-        {
-            eResponseInvalid = 0x00,
-            eOk = 0x03,
-            eError = 0x04,
-            eNameConflict = 0x05,
         };
     }
     public static class ClientInfo
