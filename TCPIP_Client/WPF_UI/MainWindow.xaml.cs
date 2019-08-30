@@ -134,15 +134,10 @@ namespace WPF_UI
             if (string.IsNullOrEmpty(text))
                 return;
 
-            byte[] byteData = Encoding.Default.GetBytes(text);
-            var bytesLen = byteData.Length;
-
-            IntPtr unmanagedPointer = Marshal.AllocHGlobal(bytesLen);
-            Marshal.Copy(byteData, 0, unmanagedPointer, bytesLen);
-
-            Native.ClientSendMessage(ClientInfo.Name, (int)Native.EMessageType.eBroadcastMessage, unmanagedPointer, bytesLen);
-
-            Marshal.FreeHGlobal(unmanagedPointer);
+            byte[] byteData = Encoding.ASCII.GetBytes(text);
+            IntPtr ptr = Marshal.UnsafeAddrOfPinnedArrayElement(byteData, 0);
+           
+            Native.ClientSendMessage(ClientInfo.Name, (int)Native.EMessageType.eBroadcastMessage, ptr, byteData.Length);
 
             InputTextBox.Clear();
         }
