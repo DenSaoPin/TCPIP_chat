@@ -12,8 +12,6 @@
 
 #define MAX_PORT_DIGIT 5
 
-
-
 	class TCPIP_Client
 	{
 	private:

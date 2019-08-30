@@ -2,10 +2,12 @@
 using System.ComponentModel;
 using System.Media;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using System.Windows;
 using System.Windows.Media;
 using AttachedPropertyTest;
+using Properties;
 
 namespace WPF_UI
 {
@@ -20,16 +22,44 @@ namespace WPF_UI
         public static extern void setCallbackMessageReceived([MarshalAs(UnmanagedType.FunctionPtr)] MessageRecievedCallbackDelegate ptr);
 
         [DllImport("TCPIP_CLIENT_DLL.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        public static extern void ClientSendMessage([MarshalAs(UnmanagedType.LPStr)] string szStr);
+        public static extern void ClientSendMessage([MarshalAs(UnmanagedType.LPStr)] string szStrName, [MarshalAs(UnmanagedType.I4)] int status, IntPtr dataPtr, [MarshalAs(UnmanagedType.I4)] int dataLenBytes);
 
         [DllImport("TCPIP_CLIENT_DLL.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         public static extern void ClientTerminate();
 
         [DllImport("TCPIP_CLIENT_DLL.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        public static extern bool IsWorkingState();
+        public static extern EClientStatus GetClientDllStatus();
 
         [DllImport("TCPIP_CLIENT_DLL.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         public static extern void SetConnectionParams([MarshalAs(UnmanagedType.LPStr)] string name, [MarshalAs(UnmanagedType.LPStr)] string ip, [MarshalAs(UnmanagedType.LPStr)] string port);
+
+        public enum EClientStatus
+        {
+            eInvalid          = 0,
+            eStartWSA         = 1,
+            eInitializeSocket = 2,
+            eIntroduce        = 3,
+            eIdle             = 4,
+            eTerminating      = 5,
+            eShutDown         = 6,
+        };
+
+        public enum EMessageType
+        {
+            eInvalid = 0x00,
+            eNameRequest = 0x01,
+            eDirectMessage = 0x05,
+            eBroadcastMessage = 0x06,
+            eResponse = 0x07,
+        };
+
+        public enum EResponseStatus
+        {
+            eResponseInvalid = 0x00,
+            eOk = 0x03,
+            eError = 0x04,
+            eNameConflict = 0x05,
+        };
     }
     public static class ClientInfo
     {
@@ -38,11 +68,10 @@ namespace WPF_UI
         public static string Port;
     }
 
-
     public partial class MainWindow : Window
     {
         private static Thread _threadDllMain;
-        private static bool _clientExecuted = false;
+        private static Native.EClientStatus _clientStatus = Native.EClientStatus.eInvalid;
         private static FlashWindowHelper _flashHelper;
         private Timer _statusChecker;
 
@@ -75,13 +104,11 @@ namespace WPF_UI
             {
                 Dispatcher.Invoke(() =>
                 {
-                    _clientExecuted = Native.IsWorkingState();
-                    Status_Button.Background = _clientExecuted ? Brushes.Green : Brushes.Red;
+                    _clientStatus = Native.GetClientDllStatus();
+                    Status_Button.Background =
+                        _clientStatus != Native.EClientStatus.eShutDown ? Brushes.Green : Brushes.Red;
                 });
-
             },null, 0, sec);
-
-
         }
 
         private static void  ClientThreadFunc()
@@ -99,13 +126,23 @@ namespace WPF_UI
 
         private void button_SendMesage_OnClick(object sender, RoutedEventArgs e)
         {
-            ////TODO how to check which side used
-            /// 
             string text = InputTextBox.Text;
             if (!string.IsNullOrEmpty(text) && text != "...enter your message")
                 ShowText(text, ETextAligment.eLeft);
             //TODO send message to selected Client
-            Native.ClientSendMessage(InputTextBox.Text);
+
+            if (string.IsNullOrEmpty(text))
+                return;
+
+            byte[] byteData = Encoding.Default.GetBytes(text);
+            var bytesLen = byteData.Length;
+
+            IntPtr unmanagedPointer = Marshal.AllocHGlobal(bytesLen);
+            Marshal.Copy(byteData, 0, unmanagedPointer, bytesLen);
+
+            Native.ClientSendMessage(ClientInfo.Name, (int)Native.EMessageType.eBroadcastMessage, unmanagedPointer, bytesLen);
+
+            Marshal.FreeHGlobal(unmanagedPointer);
 
             InputTextBox.Clear();
         }
@@ -183,7 +220,7 @@ namespace WPF_UI
 
         private void MainWindow_OnClosing(object sender, CancelEventArgs e)
         {
-            if (_clientExecuted)
+            if (_clientStatus != Native.EClientStatus.eShutDown || _clientStatus != Native.EClientStatus.eTerminating)
             {
                 Native.ClientTerminate();
 
