@@ -91,7 +91,7 @@ namespace WPF_UI
 
             const int sec = 1000;
 
-            Timer timer = new Timer(x =>
+            _statusChecker = new Timer(x =>
             {
                 Dispatcher.Invoke(() =>
                 {
