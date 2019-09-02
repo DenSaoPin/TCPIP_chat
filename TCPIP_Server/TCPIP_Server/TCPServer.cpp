@@ -159,11 +159,6 @@ void TCPServer::ListenSockInitialization(std::string& IPv4_Adress,std::string& p
 
 void TCPServer::Accept()
 {
-    //WSADATA wsaData;
-    //WORD wVersion = MAKEWORD(2, 2);
-
-    //int wsaInitError = WSAStartup(wVersion, &wsaData);
-
     fd_set rfds;
 
 	FD_ZERO(&rfds);

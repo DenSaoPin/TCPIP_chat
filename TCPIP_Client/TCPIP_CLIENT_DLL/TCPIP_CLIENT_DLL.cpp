@@ -256,7 +256,18 @@ void TCPIP_Client::ClientMainLoop()
                 if (FD_ISSET(Socket, &rfds))
                 {
                     ChatLib::RawBytes rawData;
-                    rawData = RecieveMessage(Socket);
+                    try
+                    {
+                        rawData = RecieveMessage(Socket);
+                    }
+                    catch (Exceptions::ConnectionClosedException)
+                    {
+                        //TODO not implemented
+                    }
+                    catch (Exceptions::ConnectionLostException)
+                    {
+                        //TODO not implemented
+                    }
 
                     if (!rawData.empty())
                     {
