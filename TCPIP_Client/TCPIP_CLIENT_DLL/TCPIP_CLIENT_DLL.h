@@ -42,7 +42,9 @@
 
 		bool InitializeSocketRoutine();
 
-		bool InitWinSockDll();
+#ifdef _WIN32
+        bool InitWinSockDll();
+#endif
 
         void SocketCleanup();
 
