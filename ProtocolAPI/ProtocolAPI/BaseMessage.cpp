@@ -1,4 +1,3 @@
-#pragma once
 #include "BaseMessage.h"
 
 namespace ChatLib 
@@ -12,9 +11,9 @@ namespace ChatLib
 			if (messageType >= ChatLib::eInvalid && messageType <= ChatLib::eResponse)
 				return (ChatLib::MessageType)messageType;
 
-			throw std::exception(" Not filled package type or package is trash \n");
+            throw std::runtime_error(" Not filled package type or package is trash \n");
 		}
-		throw std::exception(" It isn`t message \n");
+        throw std::runtime_error(" It isn`t message \n");
 	}
 	MessageType BaseMessage::GetType(ChatLib::RawBytes& rawData)
 	{
@@ -59,10 +58,10 @@ namespace ChatLib
 		for (int i = 0; i < 4; ++i)
 		{
 			if (rawData[i] != 0xFF)
-				throw std::exception("BaseMesage constructor error: string argue don`t start with magic number");
+                throw std::runtime_error("BaseMesage constructor error: string argue don`t start with magic number");
 		}
 		if (rawData[MESSAGE_TYPE_INDEX] < ChatLib::eInvalid || rawData[MESSAGE_TYPE_INDEX] > ChatLib::eResponse)
-			throw std::exception("BaseMesage constructor error: message type not recognized");
+            throw std::runtime_error("BaseMesage constructor error: message type not recognized");
 
 		_id = *(unsigned short *)rawData[MESSAGE_ID_INDEX];
 		_messageType = rawData[MESSAGE_TYPE_INDEX];
@@ -71,7 +70,7 @@ namespace ChatLib
 	BaseMessage::BaseMessage(const ChatLib::MessageType& messageType, const unsigned short& id)
 	{
 		if (messageType < ChatLib::eInvalid || messageType > ChatLib::eResponse)
-			throw std::exception("BaseMesage constructor error: message type not recognized");
+            throw std::runtime_error("BaseMesage constructor error: message type not recognized");
 		_id = id;
 		_messageType = messageType;
 	}
@@ -88,7 +87,7 @@ namespace ChatLib
 
 
 			if (*pBuffer < ChatLib::eInvalid || *pBuffer > ChatLib::eResponse)
-				throw std::exception("BaseMesage constructor error: message type not recognized");
+                throw std::runtime_error("BaseMesage constructor error: message type not recognized");
 
 			_messageType = *(pBuffer++);
 		}

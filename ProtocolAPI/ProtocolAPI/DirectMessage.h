@@ -1,5 +1,6 @@
 #pragma once
 #include "BaseMessage.h"
+
 namespace ChatLib
 {
 	class DirectMessage :

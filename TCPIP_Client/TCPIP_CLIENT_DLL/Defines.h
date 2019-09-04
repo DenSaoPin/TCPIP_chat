@@ -1,13 +1,36 @@
 #pragma once
 
-#if defined _WIN32
+#ifdef _WIN32
+
 #include <WinSock2.h>
 #define PrintErrors printWsaError()
 #define CROSS_SOCKET SOCKET
+#define CROSS_SIZE int
+
 #else
+
+#ifdef __GNUC__
+
+#include <string.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <unistd.h>
+// types.h need for backward compatibility with BSD
+#include <sys/types.h>
 #define PrintErrors printLinuxError()
+#define CROSS_SOCKET int
+#define INVALID_SOCKET -1
+#define SOCKET_ERROR -1
+#define CROSS_SIZE socklen_t
+#define CROSS_SOCKCLOSE
+
+#endif
 #endif
 
+#if defined _WIN32
 inline void printWsaError()
 {
     switch (WSAGetLastError())
@@ -76,5 +99,42 @@ inline void printWsaError()
         //WSACleanup();
         break;
     }
+}
+#endif
 
+inline void printLinuxError()
+{
+    printf("%s", strerror(errno));
+    /*
+    switch (errno())
+    {
+
+    case EINTR: printf("The function specified was interrupted by a signal."); break;
+    case EBADF: printf("Bad socket. The socket might have been corrupted."); break;
+    case EAGAIN: printf("Resource temporarily unavailable."); break;
+    case EFAULT: printf("Bad address.On connect, bad address.On receive, the data was directed to be received into a nonexistent or protected art of the process address space. The buffer is not valid."); break;
+    case EBUSY: printf("Resource busy."); break;
+    case EINVAL: printf("Invalid argument that is passed to the specified function or the socket is closed. The EINVAL error can be returned if here was a memory overwrite, or buffer overflow problem."); break;
+    case ENFILE: printf("Too many open files in the system."); break;
+    case EMFILE: printf("The per-process file descriptor table is full. Number of file descriptors/sockets for the process is exceeded."); break;
+    case ENOSPC: printf("No space is left on a device or system table."); break;
+    case EPIPE: printf("Broken pipe."); break;
+    case EWOULDBLOCK: printf("On the connect function, the range that is allocated for TCP/UDP ephemeral ports is exhausted. (Some operating systems return the same error as EAGAIN.)"); break;
+    case ENOTSOCK: printf("Socket operation on a non-socket."); break;
+    case ENOPROTOOPT: printf("Option is unknown."); break;
+    case EADDRINUSE: printf("The specified address is already in use. Perhaps the previous process that established the connection was terminated abnormally or was not cleaned up properly."); break;
+    case EADDRNOTAVAIL: printf("The specified host name or IP address is not available from the local system."); break;
+    case ENETDOWN: printf("The network is down."); break;
+    case ENETUNREACH: printf("No route to the network or host is available."); break;
+    case ENETRESET: printf("The network dropped the connection on reset."); break;
+    case ECONNRESET: printf("Connection was reset by the partner."); break;
+    case ENOBUFS: printf("Insufficient memory or resources were available in the system to complete the call."); break;
+    case EISCONN: printf("The socket is already connected."); break;
+    case ENOTCONN: printf("The socket is not connected."); break;
+    case ETIMEDOUT: printf("The connection was timed out."); break;
+    case ECONNREFUSED: printf("The connection was refused. If you are trying to connect to the database, check that the database manager and TCP/IP protocol support at the server were started successfully.If you specified the SOCKS protocol support, you must also ensure that the TCP/IP protocol support at the SOCKS server was started successfully."); break;
+    case EHOSTDOWN: printf("The host is down."); break;
+    case EHOSTUNREACH: printf("No route to the host is available."); break;
+    }
+               */
 }

@@ -11,8 +11,10 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 add_subdirectory (../ProtocolAPI ProtocolAPI)
-add_subdirectory (TCPIP_CLIENT_DLL)          
-add_subdirectory (WPF_UI WPF_UI)
+add_subdirectory (TCPIP_CLIENT_DLL)
+if(WIN32)
+    add_subdirectory (WPF_UI WPF_UI)
+endif(WIN32)
 add_subdirectory (Console Console)
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT WPF_UI)

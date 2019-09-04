@@ -13,11 +13,14 @@ set(HEADER_FILES
 set(CPP_FILES
 	ChatClientAPI.cpp
  	UIInterface.cpp
- 	dllmain.cpp
- 	TCPIP_CLIENT_DLL.cpp
+	TCPIP_CLIENT_DLL.cpp
  	CallbacksHolder.cpp
 )
-                                                                
+
+if(WIN32)
+               set(CPP_FILES   ${CPP_FILES}  dllmain.cpp)
+endif(WIN32)                                          
+
 add_library (${PROJECT} SHARED  ${CPP_FILES} ${HEADER_FILES})
 target_include_directories (${PROJECT} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
                                                                 

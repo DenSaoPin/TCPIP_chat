@@ -1,6 +1,9 @@
 #include "BroadcastMessage.h"
 #include <ostream>
 
+//for Linux memcpy
+#include <string.h>
+
 namespace  ChatLib
 {
 
@@ -11,7 +14,7 @@ namespace  ChatLib
 
 		int strSize = SourceName.size();
 		pBuff[count++] = strSize;
-		memcpy((char *)pBuff + count, this->SourceName.c_str(), strSize);
+        memcpy((char *)pBuff + count, this->SourceName.c_str(), strSize);
 		count += strSize;
 
 		strSize = Text.size();

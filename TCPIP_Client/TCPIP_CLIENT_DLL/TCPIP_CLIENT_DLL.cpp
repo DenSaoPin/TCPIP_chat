@@ -1,19 +1,24 @@
-#pragma comment (lib, "Ws2_32.lib")
-#include <WinSock2.h>
-#include <WS2tcpip.h>
+#if defined _WIN32
+    #pragma comment (lib, "Ws2_32.lib")
+    #include <WinSock2.h>
+    #include <WS2tcpip.h>
+    #define CheckWOULDBLOCK CheckWSA_WOULDBLOCK()
+#endif
+
+#ifdef __GNUC__
+    #define CheckWOULDBLOCK CheckEINPROGRESS()
+#endif
+
 #include <mutex>
 #include <chrono>
-
 #include <ProtocolAPI/BroadcastMessage.h>
 #include <ProtocolAPI/DirectMessage.h>
 #include <ProtocolAPI/NameRequestMessage.h>
-
 #include "ProtocolAPI/Defines.h"
-
+#include "Exceptions.h"
 #include "TCPIP_CLIENT_DLL.h"
 #include "CallbacksHolder.h"
 #include "UIInterface.h"
-#include "Exceptions.h"
 #include "Defines.h"
 
 TCPIP_Client* TCPIP_Client::_instance = nullptr;
@@ -41,6 +46,7 @@ void TCPIP_Client::ShowError(const std::string& text)
 	CallbacksHolder::clbMessageReceive(name.c_str(), reinterpret_cast<int*>(ChatLib::eError), text.c_str());
 }
 
+#ifdef _WIN32
 bool TCPIP_Client::InitWinSockDll()
 {
 	WSADATA wsaData;
@@ -51,6 +57,40 @@ bool TCPIP_Client::InitWinSockDll()
 		return false;
 	}
 	return true;
+}
+
+bool CheckWSA_WOULDBLOCK()
+{
+    return (WSAGetLastError() == WSAEWOULDBLOCK);
+}
+#endif
+
+#ifdef __GNUC__
+bool CheckEINPROGRESS()
+{
+    return (errno == EINPROGRESS);
+}
+#endif
+
+int TCPIP_Client::GetSocket()
+{
+    return Socket;
+}
+
+void TCPIP_Client::SocketCleanup()
+{
+    if(GetSocket() != 0)
+    {
+#ifdef _WIN32
+        shutdown(GetSocket(), SD_BOTH);
+        WSACleanup();
+#endif
+
+#ifdef __GNUC__
+        shutdown(GetSocket(), SHUT_RDWR);
+        close(GetSocket());
+#endif
+    }
 }
 
 bool TCPIP_Client::InitializeSocketRoutine()
@@ -76,7 +116,7 @@ bool TCPIP_Client::InitializeSocketRoutine()
 		//TODO add handle WSAErroR and LINUX
 		ShowError("create socket error: \n");
 		return false;
-	};
+    }
 
 #ifdef _WIN32
 	unsigned long mode = 1; // set as nonblocking socket
@@ -87,29 +127,32 @@ bool TCPIP_Client::InitializeSocketRoutine()
 		closesocket(Socket);
 		return false;
 	}
-#else
-	if ( int flags = fcntl(Socket F_GETFL, 0)) == -1)
+#endif
+
+#ifdef __GNUC__
+    int flags = 0;
+    if (flags = (fcntl(Socket, F_GETFL, 0)) == -1)
 	{
 		//TODO add handle LINUX error
 		ShowError("set socket as nonblocking error: \n");
-		closesocket(Socket);
+        close(Socket);
 		return false;
 	}
 	flags = flags & ~O_NONBLOCK;
-	if (int flags = fcntl(Socket F_SETFL, 0)) != 0)
+    if (flags = (fcntl(Socket, F_SETFL, 0)) != 0)
 	{
 		//TODO add handle LINUX error
 		ShowError("set socket as nonblocking error: \n");
-		closesocket(Socket);
-		return false;
+        close(Socket);
+        return false;
 	}
 #endif
+
 	int status = 0;
 	status = connect(Socket, pServinfo->ai_addr, pServinfo->ai_addrlen);
-
 	//TODO check if
-	if ((status == SOCKET_ERROR) && (WSAGetLastError() == WSAEWOULDBLOCK))
-	{
+    if ((status == SOCKET_ERROR)  && (CheckWOULDBLOCK))
+    {
 		fd_set write, except;
 
 		FD_ZERO(&write);
@@ -119,14 +162,16 @@ bool TCPIP_Client::InitializeSocketRoutine()
 		FD_SET(Socket, &except);
 
 		struct timeval tv;
-		tv.tv_sec = 0;
-		tv.tv_usec = 500;
+        tv.tv_sec = 0;
+        tv.tv_usec = 500;
 
 		status = select(Socket + 1, NULL, &write, &except, &tv);
 		if (status == 0)
 		{
 			//TODO it is timeout
+#ifdef _WIN32
 			WSASetLastError(WSAETIMEDOUT);
+#endif
 			status = SOCKET_ERROR;
 		}
 		else if (status > 0)
@@ -134,9 +179,11 @@ bool TCPIP_Client::InitializeSocketRoutine()
 			if (FD_ISSET(Socket, &except))
 			{
 				int err = 0;
-				int size = sizeof(err);
+                CROSS_SIZE size = sizeof(err);
 				getsockopt(Socket, SOL_SOCKET, SO_ERROR, (char*)&err, &size);
+#ifdef _WIN32
 				WSASetLastError(err);
+#endif
 				status = SOCKET_ERROR;
 			}
 			else
@@ -145,21 +192,15 @@ bool TCPIP_Client::InitializeSocketRoutine()
 				status = 0;
 			}
 		}
-	}
+    }
 
 	if (status == SOCKET_ERROR)
 	{
 		//TODO handle error...
-		closesocket(Socket);
+        SocketCleanup();
 		return false;
 	}
-	//closesocket(Socket);
 	return true;
-}
-
-int TCPIP_Client::GetSocket()
-{
-	return Socket;
 }
 
 void TCPIP_Client::ClientMainLoop()
@@ -177,7 +218,7 @@ void TCPIP_Client::ClientMainLoop()
         else
         {
             m_ClientStatus = eShutDown;
-            throw new std::exception(" Start WSA failed \n");
+            throw new std::runtime_error(" Start WSA failed \n");
         }
     }
 
@@ -187,9 +228,9 @@ void TCPIP_Client::ClientMainLoop()
             m_ClientStatus = eIntroduce;
         else
         {
-            WSACleanup();
+            SocketCleanup();
             m_ClientStatus = eShutDown;
-            throw new std::exception(" Initialize socket failed \n");
+            throw new std::runtime_error(" Initialize socket failed \n");
         }
     }
 	Time::time_point lapStartTime;
@@ -232,18 +273,18 @@ void TCPIP_Client::ClientMainLoop()
 			{
 			case eStartWSA:
 			{
-				throw new std::exception(" Invalid client state ");
+                throw new std::runtime_error(" Invalid client state ");
 				break;
 			}
 			case eInitializeSocket:
 			{
-				throw new std::exception(" Invalid client state ");
+                throw new std::runtime_error(" Invalid client state ");
 				break;
 			}
 			case eIntroduce:
 			{
 				if (Name.length() == 0)
-					throw new std::exception("You must fill pClient->Name before call IntroduceToServer() \n");
+                    throw new std::runtime_error("You must fill pClient->Name before call IntroduceToServer() \n");
 
 				ChatLib::NameRequestMessagePtr NameReqMessagePtr(new ChatLib::NameRequestMessage(Name, GenerateId()));
                 m_NameRequest = NameReqMessagePtr;
@@ -382,8 +423,7 @@ void TCPIP_Client::ClientMainLoop()
             }
 			case eTerminating:
 			{
-				closesocket(GetSocket());
-				WSACleanup();
+                SocketCleanup();
 				m_ClientStatus = eShutDown;
 				break;
 			}
@@ -409,17 +449,20 @@ void TCPIP_Client::AddForSend(std::string& sz_target_name, const int messageType
 	switch (type)
 	{
 	case ChatLib::MessageType::eInvalid:
-		throw new std::exception("Invalid message type");
+        throw new std::runtime_error("Invalid message type");
 		break;
 	case ChatLib::MessageType::eBroadcastMessage:
 	{
-		const ChatLib::BroadcastMessagePtr broadPtr(new ChatLib::BroadcastMessage(Name, std::string((const char *)data, data_len * sizeof(char)), GenerateId()));
+        std::string str ((const char *)data, data_len * sizeof(char));
+        const ChatLib::BroadcastMessagePtr broadPtr(new ChatLib::BroadcastMessage(Name, str, GenerateId()));
 		m_outgoingMessages.push(broadPtr);
 		break;
 	}
 	case ChatLib::MessageType::eDirectMessage:
 	{
-		const ChatLib::DirectMessagePtr directPtr(new ChatLib::DirectMessage(Name, sz_target_name, std::string((const char *)data, data_len * sizeof(char)), GenerateId()));
+        std::string str((const char *)data, data_len * sizeof(char));
+
+        const ChatLib::DirectMessagePtr directPtr(new ChatLib::DirectMessage(Name, sz_target_name, str, GenerateId()));
 		m_outgoingMessages.push(directPtr);
 		break;
 	}
@@ -430,7 +473,7 @@ void TCPIP_Client::AddForSend(std::string& sz_target_name, const int messageType
 		break;
 	}
 	case ChatLib::MessageType::eResponse:
-		throw new std::exception(" Cathed Response from UI \n");
+        throw new std::runtime_error(" Cathed Response from UI \n");
 		break;
 	}
 }
@@ -452,7 +495,7 @@ ChatLib::RawBytes TCPIP_Client::RecieveMessage(const CROSS_SOCKET& socket)
 {
 		//TODO check recieved num
 		char buff[MAX_PACKAGE_LENGTH];
-		const int recived = recv(socket, buff, MAX_PACKAGE_LENGTH, NULL);
+        const int recived = recv(socket, buff, MAX_PACKAGE_LENGTH, 0);
 
 		if (recived == 0)
 		{
@@ -486,14 +529,14 @@ ChatLib::RawBytes TCPIP_Client::RecieveMessage(const CROSS_SOCKET& socket)
 
 bool TCPIP_Client::SendMessagee(ChatLib::BaseMessagePtr message, const CROSS_SOCKET& socket)
 {
-		byte pBuffer[255];
+        ChatLib::byte pBuffer[255];
 		int length = message->Construct(pBuffer);
 
 		//TODO should we use while
 		int sended = 0;
 		do
 		{
-			sended = send(socket, (char *)&pBuffer[sended], length, NULL);
+            sended = send(socket, (char *)&pBuffer[sended], length, 0);
 			length -= sended;
 		} while (length > 0);
 		return true;

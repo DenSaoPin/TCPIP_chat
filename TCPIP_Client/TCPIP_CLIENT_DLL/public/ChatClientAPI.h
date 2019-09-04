@@ -1,10 +1,29 @@
 #pragma once
 #include <mutex>
 
-#ifdef TCPIP_CLIENT_DLL_EXPORTS
-#define TCPIPCLIENTDLL_EXPORT __declspec(dllexport)
+#if defined _WIN32 || defined __CYGWIN__
+  #ifdef TCPIP_CLIENT_DLL_EXPORTS
+    #ifdef __GNUC__
+      #define TCPIPCLIENTDLL_PUBLIC __attribute__ ((dllexport))
+    #else
+      #define TCPIPCLIENTDLL_PUBLIC __declspec(dllexport) // Note: actually gcc seems to also supports this syntax.
+    #endif
+  #else
+    #ifdef __GNUC__
+      #define TCPIPCLIENTDLL_PUBLIC __attribute__ ((dllimport))
+    #else
+      #define TCPIPCLIENTDLL_PUBLIC __declspec(dllimport) // Note: actually gcc seems to also supports this syntax.
+    #endif
+  #endif
+  #define DLL_LOCAL
 #else
-#define TCPIPCLIENTDLL_EXPORT __declspec(dllimport)
+  #if __GNUC__ >= 4
+    #define TCPIPCLIENTDLL_PUBLIC __attribute__ ((visibility ("default")))
+    #define DLL_LOCAL  __attribute__ ((visibility ("hidden")))
+  #else
+    #define TCPIPCLIENTDLL_PUBLIC
+    #define DLL_LOCAL
+  #endif
 #endif
 
 typedef void (*callbackMessageReceivedFunc) (const char *, const int*, const char*);
@@ -22,12 +41,12 @@ enum EClientStatus
 
 extern "C"
 {
-	TCPIPCLIENTDLL_EXPORT void setCallbackMessageReceived(callbackMessageReceivedFunc);
-	TCPIPCLIENTDLL_EXPORT void ClientMainLoop();
-	TCPIPCLIENTDLL_EXPORT void ClientSendMessage(const char* szTargetName, const int status, const void * data, const int dataLen);
-	TCPIPCLIENTDLL_EXPORT void ClientTerminate();
-	TCPIPCLIENTDLL_EXPORT void SetConnectionParams(const char *, const char *, const char *);
-	TCPIPCLIENTDLL_EXPORT EClientStatus GetClientDllStatus();
+    TCPIPCLIENTDLL_PUBLIC void setCallbackMessageReceived(callbackMessageReceivedFunc);
+    TCPIPCLIENTDLL_PUBLIC void ClientMainLoop();
+    TCPIPCLIENTDLL_PUBLIC void ClientSendMessage(const char* szTargetName, const int status, const void * data, const int dataLen);
+    TCPIPCLIENTDLL_PUBLIC void ClientTerminate();
+    TCPIPCLIENTDLL_PUBLIC void SetConnectionParams(const char *, const char *, const char *);
+    TCPIPCLIENTDLL_PUBLIC EClientStatus GetClientDllStatus();
 }
 
 class MutexLocker
@@ -51,7 +70,9 @@ class ThreadSafe
     std::mutex _mutexRead;
     std::mutex _mutexWrite;
     T value;
+    ThreadSafe(){};
 public:
+
     ThreadSafe(const T& other)
     {
         MutexLocker ml1(&_mutexRead);

@@ -1,5 +1,5 @@
 #include "DirectMessage.h"
-
+#include <string.h>
 
 ChatLib::DirectMessage::DirectMessage(byteP &pBuff): BaseMessage(pBuff)
 {

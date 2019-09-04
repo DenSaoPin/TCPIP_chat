@@ -1,6 +1,10 @@
 #pragma once
 
-#include <Windows.h>
+
+#if defined(_WIN32)
+    #include <Windows.h>
+#endif
+
 #include <public/ChatClientAPI.h>
 #include <thread>
 #include <iostream>
