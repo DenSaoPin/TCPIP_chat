@@ -1,8 +1,10 @@
-#pragma once
-
-
 #if defined(_WIN32)
     #include <Windows.h>
+#endif
+
+#ifdef __GNUC__
+    #include <pthread.h>
+    #include <unistd.h>
 #endif
 
 #include <public/ChatClientAPI.h>
@@ -29,8 +31,8 @@ void OnExit();
 std::future<void> m_clientDllMainThread;
 std::thread m_clientDllStatusThread;
 
-ThreadSafe<EClientStatus> m_clientStatus = eInvalid;
-ThreadSafe<bool> m_NeedKillStatusChecker = false;
+ThreadSafe<EClientStatus> m_clientStatus{eInvalid};
+ThreadSafe<bool> m_NeedKillStatusChecker{false};
 
 int UI_status = 0;
 
@@ -51,20 +53,25 @@ void OnExit()
     std::this_thread::sleep_for(int_sec{ 1 });
 }
 
-BOOL WINAPI ConsoleHandler(DWORD CEvent)
-{
-	switch (CEvent)
-	{
-	case CTRL_C_EVENT:
-	case CTRL_BREAK_EVENT:
-	case CTRL_CLOSE_EVENT:
-	case CTRL_LOGOFF_EVENT:
-	case CTRL_SHUTDOWN_EVENT:
-		OnExit();
-		break;
-	}
-	return TRUE;
-}
+#ifdef _WIN32
+    BOOL WINAPI ConsoleHandler(DWORD CEvent)
+    {
+        switch (CEvent)
+        {
+        case CTRL_C_EVENT:
+        case CTRL_BREAK_EVENT:
+        case CTRL_CLOSE_EVENT:
+        case CTRL_LOGOFF_EVENT:
+        case CTRL_SHUTDOWN_EVENT:
+            OnExit();
+            break;
+        }
+        return TRUE;
+    }
+#endif
+
+
+
 
 E_UI_Command ParseCommand(const std::string& message, std::string& outTargetName)
 {
@@ -149,10 +156,10 @@ void AwaitUserInput()
             exit(0);
             break;
         case E_UI_Command::eDefault:
-            throw new std::exception(" Default command type in ConsoleUI \n");
+            throw new std::runtime_error(" Default command type in ConsoleUI \n");
             break;
         default:
-            throw new std::exception(" Unknown command type in ConsoleUI \n");
+            throw new std::runtime_error(" Unknown command type in ConsoleUI \n");
             break;
         }
     }
@@ -218,7 +225,7 @@ public:
 		SetConnectionParams(Name.c_str(), Adress.c_str(), Port.c_str());
 	}
 };
-int main()
+int main(int argc, char** argv)
 {
     m_clientDllStatusThread = std::thread(DllStatusChecker);
     atexit(OnExit);
@@ -226,9 +233,15 @@ int main()
 	ClientSettings settings;
 	settings.SetParams();
 
+#ifdef _WIN32
 	SetConsoleCtrlHandler(ConsoleHandler, TRUE);
+#endif
 
-	setCallbackMessageReceived(OnRecieveMessage);
+#ifdef __GNUC__
+    //No action
+#endif
+
+    setCallbackMessageReceived(OnRecieveMessage);
 
 	m_clientDllMainThread = std::async(std::launch::async, ClientMainLoop);
 

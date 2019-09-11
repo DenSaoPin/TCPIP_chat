@@ -1,21 +1,33 @@
-cmake_minimum_required (VERSION 3.8.2)
+	cmake_minimum_required (VERSION 3.8.2)
 
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
+	set(CMAKE_CXX_STANDARD 14)
+	set(CMAKE_CXX_STANDARD_REQUIRED ON)
+	set(CMAKE_CXX_EXTENSIONS OFF)
 
-project(TCP_Client)
+	project(TCP_Client)
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+	set(CMAKE_C_FLAGS "-pthread")
+	set(CMAKE_CXX_FLAGS "-pthread")
 
-add_subdirectory (../ProtocolAPI ProtocolAPI)
-add_subdirectory (TCPIP_CLIENT_DLL)
+
+	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+	add_subdirectory (../ProtocolAPI ProtocolAPI)
+	add_subdirectory (TCPIP_CLIENT_DLL)
+
 if(WIN32)
-    add_subdirectory (WPF_UI WPF_UI)
+    	add_subdirectory (WPF_UI WPF_UI)
 endif(WIN32)
-add_subdirectory (Console Console)
 
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT WPF_UI)
+	add_subdirectory (Console Console)
+
+if(WIN32)
+	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT WPF_UI)
+endif(WIN32)
+
+if (UNIX)
+ 	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Console)
+endif (UNIX)
 

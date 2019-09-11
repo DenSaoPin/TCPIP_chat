@@ -23,4 +23,5 @@ set(CPP_FILES
 
 
 add_library (${PROJECT} STATIC  ${CPP_FILES} ${HEADER_FILES})
+set_property(TARGET ${PROJECT} PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_include_directories (ProtocolAPI PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

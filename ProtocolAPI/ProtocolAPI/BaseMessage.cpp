@@ -63,7 +63,7 @@ namespace ChatLib
 		if (rawData[MESSAGE_TYPE_INDEX] < ChatLib::eInvalid || rawData[MESSAGE_TYPE_INDEX] > ChatLib::eResponse)
             throw std::runtime_error("BaseMesage constructor error: message type not recognized");
 
-		_id = *(unsigned short *)rawData[MESSAGE_ID_INDEX];
+        _id = *(unsigned short *)(&rawData[MESSAGE_ID_INDEX]);
 		_messageType = rawData[MESSAGE_TYPE_INDEX];
 	}
 

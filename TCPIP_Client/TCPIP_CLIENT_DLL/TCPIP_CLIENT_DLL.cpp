@@ -213,7 +213,11 @@ void TCPIP_Client::ClientMainLoop()
 
     if (m_ClientStatus == eStartWSA)
     {
-        if (InitWinSockDll())
+        int status = 1;
+#ifdef _WIN32
+        status = InitWinSockDll();
+#endif
+        if (status)
             m_ClientStatus = eInitializeSocket;
         else
         {
