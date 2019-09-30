@@ -1,0 +1,468 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="TCP_Client"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;CMake Files\..\;CMake Files\..\ProtocolAPI\;CMake Files\..\..\;CMake Files\..\..\..\;CMake Files\..\..\..\..\;CMake Files\..\..\..\..\..\;CMake Files\..\..\..\..\..\usr\;CMake Files\..\..\..\..\..\usr\lib\;CMake Files\..\..\..\..\..\usr\lib\x86_64-linux-gnu\;CMake Files\..\..\..\..\..\usr\lib\x86_64-linux-gnu\cmake\;CMake Files\..\..\..\..\..\usr\lib\x86_64-linux-gnu\cmake\Qt5\;CMake Files\..\..\..\..\..\usr\lib\x86_64-linux-gnu\cmake\Qt5Core\;CMake Files\..\..\..\..\..\usr\lib\x86_64-linux-gnu\cmake\Qt5Gui\;CMake Files\..\..\..\..\..\usr\lib\x86_64-linux-gnu\cmake\Qt5Widgets\;CMake Files\TCPIP_CLIENT_DLL\;CMake Files\Console\;CMake Files\QT_UI\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/denis/dev/tcpip_chat/TCPIP_Client"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/home/denis/dev/tcpip_chat/TCPIP_Client"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/home/denis/dev/tcpip_chat/TCPIP_Client"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="ProtocolAPI">
+				<Option output="/home/denis/dev/tcpip_chat/TCPIP_Client/lib/libProtocolAPI.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/denis/dev/tcpip_chat/TCPIP_Client/ProtocolAPI"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/denis/dev/tcpip_chat/ProtocolAPI"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/ProtocolAPI/Makefile&quot;  VERBOSE=1 ProtocolAPI"/>
+					<CompileFile command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/ProtocolAPI/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/ProtocolAPI/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/ProtocolAPI/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="ProtocolAPI/fast">
+				<Option output="/home/denis/dev/tcpip_chat/TCPIP_Client/lib/libProtocolAPI.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/denis/dev/tcpip_chat/TCPIP_Client/ProtocolAPI"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/denis/dev/tcpip_chat/ProtocolAPI"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/ProtocolAPI/Makefile&quot;  VERBOSE=1 ProtocolAPI/fast"/>
+					<CompileFile command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/ProtocolAPI/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/ProtocolAPI/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/ProtocolAPI/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="TCPIP_CLIENT_DLL">
+				<Option output="/home/denis/dev/tcpip_chat/TCPIP_Client/lib/libTCPIP_CLIENT_DLL.so" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/denis/dev/tcpip_chat/TCPIP_Client/TCPIP_CLIENT_DLL"/>
+				<Option object_output="./"/>
+				<Option type="3"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/denis/dev/tcpip_chat/TCPIP_Client/TCPIP_CLIENT_DLL"/>
+					<Add directory="/home/denis/dev/tcpip_chat/ProtocolAPI"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/TCPIP_CLIENT_DLL/Makefile&quot;  VERBOSE=1 TCPIP_CLIENT_DLL"/>
+					<CompileFile command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/TCPIP_CLIENT_DLL/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/TCPIP_CLIENT_DLL/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/TCPIP_CLIENT_DLL/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="TCPIP_CLIENT_DLL/fast">
+				<Option output="/home/denis/dev/tcpip_chat/TCPIP_Client/lib/libTCPIP_CLIENT_DLL.so" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/denis/dev/tcpip_chat/TCPIP_Client/TCPIP_CLIENT_DLL"/>
+				<Option object_output="./"/>
+				<Option type="3"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/denis/dev/tcpip_chat/TCPIP_Client/TCPIP_CLIENT_DLL"/>
+					<Add directory="/home/denis/dev/tcpip_chat/ProtocolAPI"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/TCPIP_CLIENT_DLL/Makefile&quot;  VERBOSE=1 TCPIP_CLIENT_DLL/fast"/>
+					<CompileFile command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/TCPIP_CLIENT_DLL/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/TCPIP_CLIENT_DLL/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/TCPIP_CLIENT_DLL/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Console">
+				<Option output="/home/denis/dev/tcpip_chat/TCPIP_Client/bin/Console" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/denis/dev/tcpip_chat/TCPIP_Client/bin"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/denis/dev/tcpip_chat/TCPIP_Client/TCPIP_CLIENT_DLL"/>
+					<Add directory="/home/denis/dev/tcpip_chat/ProtocolAPI"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/Console/Makefile&quot;  VERBOSE=1 Console"/>
+					<CompileFile command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/Console/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/Console/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/Console/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Console/fast">
+				<Option output="/home/denis/dev/tcpip_chat/TCPIP_Client/bin/Console" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/denis/dev/tcpip_chat/TCPIP_Client/bin"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/denis/dev/tcpip_chat/TCPIP_Client/TCPIP_CLIENT_DLL"/>
+					<Add directory="/home/denis/dev/tcpip_chat/ProtocolAPI"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/Console/Makefile&quot;  VERBOSE=1 Console/fast"/>
+					<CompileFile command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/Console/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/Console/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/Console/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="QT_DLL">
+				<Option output="/home/denis/dev/tcpip_chat/TCPIP_Client/lib/libQT_DLL.so" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/denis/dev/tcpip_chat/TCPIP_Client/QT_UI"/>
+				<Option object_output="./"/>
+				<Option type="3"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DQT_CORE_LIB"/>
+					<Add option="-DQT_NO_DEBUG"/>
+					<Add option="-DQT_GUI_LIB"/>
+					<Add option="-DQT_WIDGETS_LIB"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/qt5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/qt5/QtCore"/>
+					<Add directory="/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/qt5/QtGui"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/qt5/QtWidgets"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/QT_UI/Makefile&quot;  VERBOSE=1 QT_DLL"/>
+					<CompileFile command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/QT_UI/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/QT_UI/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/QT_UI/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="QT_DLL/fast">
+				<Option output="/home/denis/dev/tcpip_chat/TCPIP_Client/lib/libQT_DLL.so" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/denis/dev/tcpip_chat/TCPIP_Client/QT_UI"/>
+				<Option object_output="./"/>
+				<Option type="3"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DQT_CORE_LIB"/>
+					<Add option="-DQT_NO_DEBUG"/>
+					<Add option="-DQT_GUI_LIB"/>
+					<Add option="-DQT_WIDGETS_LIB"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/qt5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/qt5/QtCore"/>
+					<Add directory="/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/qt5/QtGui"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/qt5/QtWidgets"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/QT_UI/Makefile&quot;  VERBOSE=1 QT_DLL/fast"/>
+					<CompileFile command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/QT_UI/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/QT_UI/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/QT_UI/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="QT_UI">
+				<Option output="/home/denis/dev/tcpip_chat/TCPIP_Client/bin/QT_UI" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/denis/dev/tcpip_chat/TCPIP_Client/bin"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DQT_CORE_LIB"/>
+					<Add option="-DQT_NO_DEBUG"/>
+					<Add option="-DQT_GUI_LIB"/>
+					<Add option="-DQT_WIDGETS_LIB"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/qt5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/qt5/QtCore"/>
+					<Add directory="/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/qt5/QtGui"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/qt5/QtWidgets"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/QT_UI/Makefile&quot;  VERBOSE=1 QT_UI"/>
+					<CompileFile command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/QT_UI/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/QT_UI/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/QT_UI/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="QT_UI/fast">
+				<Option output="/home/denis/dev/tcpip_chat/TCPIP_Client/bin/QT_UI" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/denis/dev/tcpip_chat/TCPIP_Client/bin"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DQT_CORE_LIB"/>
+					<Add option="-DQT_NO_DEBUG"/>
+					<Add option="-DQT_GUI_LIB"/>
+					<Add option="-DQT_WIDGETS_LIB"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/qt5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/qt5/QtCore"/>
+					<Add directory="/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/qt5/QtGui"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/qt5/QtWidgets"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/QT_UI/Makefile&quot;  VERBOSE=1 QT_UI/fast"/>
+					<CompileFile command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/QT_UI/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/QT_UI/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j2 -f &quot;/home/denis/dev/tcpip_chat/TCPIP_Client/QT_UI/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/denis/dev/tcpip_chat/ProtocolAPI/ProtocolAPI/BaseMessage.cpp">
+			<Option target="ProtocolAPI"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/ProtocolAPI/ProtocolAPI/BaseMessage.h">
+			<Option target="ProtocolAPI"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/ProtocolAPI/ProtocolAPI/BroadcastMessage.cpp">
+			<Option target="ProtocolAPI"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/ProtocolAPI/ProtocolAPI/BroadcastMessage.h">
+			<Option target="ProtocolAPI"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/ProtocolAPI/ProtocolAPI/Defines.h">
+			<Option target="ProtocolAPI"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/ProtocolAPI/ProtocolAPI/DirectMessage.cpp">
+			<Option target="ProtocolAPI"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/ProtocolAPI/ProtocolAPI/DirectMessage.h">
+			<Option target="ProtocolAPI"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/ProtocolAPI/ProtocolAPI/Enums.h">
+			<Option target="ProtocolAPI"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/ProtocolAPI/ProtocolAPI/NameRequestMessage.cpp">
+			<Option target="ProtocolAPI"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/ProtocolAPI/ProtocolAPI/NameRequestMessage.h">
+			<Option target="ProtocolAPI"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/ProtocolAPI/ProtocolAPI/Response.cpp">
+			<Option target="ProtocolAPI"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/ProtocolAPI/ProtocolAPI/Response.h">
+			<Option target="ProtocolAPI"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/Console/Console.cpp">
+			<Option target="Console"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/QT_UI/main.cpp">
+			<Option target="QT_UI"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/QT_UI/mainwindow.cpp">
+			<Option target="QT_DLL"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/QT_UI/mainwindow.h">
+			<Option target="QT_DLL"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/QT_UI/mainwindow.ui">
+			<Option target="QT_DLL"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/QT_UI/moc_mainwindow.cpp">
+			<Option target="QT_DLL"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/QT_UI/moc_mainwindow.cpp.rule">
+			<Option target="QT_DLL"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/QT_UI/ui_mainwindow.h">
+			<Option target="QT_DLL"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/TCPIP_CLIENT_DLL/CallbacksHolder.cpp">
+			<Option target="TCPIP_CLIENT_DLL"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/TCPIP_CLIENT_DLL/CallbacksHolder.h">
+			<Option target="TCPIP_CLIENT_DLL"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/TCPIP_CLIENT_DLL/ChatClientAPI.cpp">
+			<Option target="TCPIP_CLIENT_DLL"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/TCPIP_CLIENT_DLL/Defines.h">
+			<Option target="TCPIP_CLIENT_DLL"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/TCPIP_CLIENT_DLL/Exceptions.h">
+			<Option target="TCPIP_CLIENT_DLL"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/TCPIP_CLIENT_DLL/TCPIP_CLIENT_DLL.cpp">
+			<Option target="TCPIP_CLIENT_DLL"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/TCPIP_CLIENT_DLL/TCPIP_CLIENT_DLL.h">
+			<Option target="TCPIP_CLIENT_DLL"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/TCPIP_CLIENT_DLL/UIInterface.cpp">
+			<Option target="TCPIP_CLIENT_DLL"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/TCPIP_CLIENT_DLL/UIInterface.h">
+			<Option target="TCPIP_CLIENT_DLL"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/TCPIP_CLIENT_DLL/public/ChatClientAPI.h">
+			<Option target="TCPIP_CLIENT_DLL"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/../ProtocolAPI/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\..\ProtocolAPI\"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/../../../../../usr/lib/x86_64-linux-gnu/cmake/Qt5/Qt5Config.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\lib\x86_64-linux-gnu\cmake\Qt5\"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/../../../../../usr/lib/x86_64-linux-gnu/cmake/Qt5/Qt5ConfigVersion.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\lib\x86_64-linux-gnu\cmake\Qt5\"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/../../../../../usr/lib/x86_64-linux-gnu/cmake/Qt5/Qt5ModuleLocation.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\lib\x86_64-linux-gnu\cmake\Qt5\"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/../../../../../usr/lib/x86_64-linux-gnu/cmake/Qt5Core/Qt5CoreConfig.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\lib\x86_64-linux-gnu\cmake\Qt5Core\"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/../../../../../usr/lib/x86_64-linux-gnu/cmake/Qt5Core/Qt5CoreConfigExtras.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\lib\x86_64-linux-gnu\cmake\Qt5Core\"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/../../../../../usr/lib/x86_64-linux-gnu/cmake/Qt5Core/Qt5CoreConfigExtrasMkspecDir.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\lib\x86_64-linux-gnu\cmake\Qt5Core\"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/../../../../../usr/lib/x86_64-linux-gnu/cmake/Qt5Core/Qt5CoreConfigVersion.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\lib\x86_64-linux-gnu\cmake\Qt5Core\"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/../../../../../usr/lib/x86_64-linux-gnu/cmake/Qt5Core/Qt5CoreMacros.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\lib\x86_64-linux-gnu\cmake\Qt5Core\"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/../../../../../usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5GuiConfig.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\lib\x86_64-linux-gnu\cmake\Qt5Gui\"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/../../../../../usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5GuiConfigExtras.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\lib\x86_64-linux-gnu\cmake\Qt5Gui\"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/../../../../../usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5GuiConfigVersion.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\lib\x86_64-linux-gnu\cmake\Qt5Gui\"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/../../../../../usr/lib/x86_64-linux-gnu/cmake/Qt5Widgets/Qt5WidgetsConfig.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\lib\x86_64-linux-gnu\cmake\Qt5Widgets\"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/../../../../../usr/lib/x86_64-linux-gnu/cmake/Qt5Widgets/Qt5WidgetsConfigExtras.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\lib\x86_64-linux-gnu\cmake\Qt5Widgets\"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/../../../../../usr/lib/x86_64-linux-gnu/cmake/Qt5Widgets/Qt5WidgetsConfigVersion.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\lib\x86_64-linux-gnu\cmake\Qt5Widgets\"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/../../../../../usr/lib/x86_64-linux-gnu/cmake/Qt5Widgets/Qt5WidgetsMacros.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\lib\x86_64-linux-gnu\cmake\Qt5Widgets\"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/TCPIP_CLIENT_DLL/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\TCPIP_CLIENT_DLL\"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/Console/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\Console\"/>
+		</Unit>
+		<Unit filename="/home/denis/dev/tcpip_chat/TCPIP_Client/QT_UI/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\QT_UI\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>
