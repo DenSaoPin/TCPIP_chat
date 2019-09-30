@@ -1,6 +1,6 @@
 set(PROJECT QT_UI)
 
-find_package (Qt5Widgets)
+find_package(Qt5 COMPONENTS Core Gui Widgets REQUIRED)
 
 set(LIB_HED
 	mainwindow.h 
@@ -27,7 +27,7 @@ add_library (QT_DLL SHARED
     ${LIB_UI_MOC}
 )
 
-target_link_libraries (QT_DLL Qt5::Widgets)
+target_link_libraries (QT_DLL Qt5::Core Qt5::Gui Qt5::Widgets)
 
 add_executable(${PROJECT} ${BIN})
 target_link_libraries (${PROJECT} QT_DLL)
