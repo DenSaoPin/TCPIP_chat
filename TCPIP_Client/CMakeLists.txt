@@ -16,14 +16,10 @@
 
 	add_subdirectory (../ProtocolAPI ProtocolAPI)
 	add_subdirectory (TCPIP_CLIENT_DLL)
-
+	add_subdirectory (Console Console)
+	add_subdirectory(QT_UI)
 if(WIN32)
     	add_subdirectory (WPF_UI WPF_UI)
-endif(WIN32)
-
-	add_subdirectory (Console Console)
-
-if(WIN32)
 	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT WPF_UI)
 endif(WIN32)
 
