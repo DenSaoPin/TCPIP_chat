@@ -1,8 +1,10 @@
+#pragma once
 #ifndef CLIENTSETTINGS_H
 #define CLIENTSETTINGS_H
 
-#include "QString"
-
+#include <QString>
+//#include "client.h"
+class Client;
 class ClientSettings
 {
 
@@ -16,6 +18,8 @@ public:
     void SetName(QString);
     void SetAdress(QString);
     void SetPort(QString);
+
+    void SetupToDll();
 
 private:
     QString m_name;

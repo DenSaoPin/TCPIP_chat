@@ -27,13 +27,30 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     settingsdialog.cpp \
-    clientsettings.cpp
+    clientsettings.cpp \
+    client.cpp \
+    worker.cpp \
+    threadcontroller.cpp \
+    mainloopworker.cpp \
+    statuscheckerworker.cpp
 
 HEADERS += \
         mainwindow.h \
     settingsdialog.h \
-    clientsettings.h
+    clientsettings.h \
+    client.h \
+    worker.h \
+    threadcontroller.h \
+    mainloopworker.h \
+    statuscheckerworker.h
 
 FORMS += \
         mainwindow.ui \
     settingsdialog.ui
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../lib/release/ -lTCPIP_CLIENT_DLL
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../lib/debug/ -lTCPIP_CLIENT_DLL
+else:unix: LIBS += -L$$PWD/../lib/ -lTCPIP_CLIENT_DLL
+
+INCLUDEPATH += $$PWD/../TCPIP_CLIENT_DLL/public
+DEPENDPATH += $$PWD/../TCPIP_CLIENT_DLL/public

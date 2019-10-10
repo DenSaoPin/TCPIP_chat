@@ -13,7 +13,10 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_button_Send_clicked()
+void MainWindow::OnRecieveMessage(const char *szName, const int* messageType, const char *szMessage)
 {
+    QString name (szName);
+    QString message (szMessage);
 
+    ui->textBox_Out->append(name + ": " + message + "\n");
 }

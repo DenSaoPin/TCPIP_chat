@@ -6,4 +6,3 @@ class CallbacksHolder
 public:
 	static callbackMessageReceivedFunc clbMessageReceive;
 };
-

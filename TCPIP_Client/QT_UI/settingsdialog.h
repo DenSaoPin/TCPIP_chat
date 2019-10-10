@@ -1,3 +1,4 @@
+#pragma once
 #ifndef SETTINGSDIALOG_H
 #define SETTINGSDIALOG_H
 
@@ -15,7 +16,7 @@ class SettingsDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit SettingsDialog(ClientSettings &settings,QWidget *parent = 0);
+    explicit SettingsDialog(ClientSettings *settings,QWidget *parent = 0);
     ~SettingsDialog();
 
 private slots:
@@ -27,7 +28,7 @@ private slots:
 private:
     Ui::SettingsDialog *ui;
 
-    ClientSettings m_settings;
+    ClientSettings * m_settings;
 
     QRegExpValidator m_nameValidator;
     QRegExpValidator m_adressValidator;

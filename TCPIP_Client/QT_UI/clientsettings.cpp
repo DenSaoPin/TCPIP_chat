@@ -1,4 +1,6 @@
 #include "clientsettings.h"
+#include <ChatClientAPI.h>
+#include "client.h"
 
 ClientSettings::ClientSettings()
 {
@@ -28,5 +30,19 @@ void ClientSettings::SetAdress(QString adress)
 void ClientSettings::SetPort(QString port)
 {
     m_port = port;
+}
+
+void ClientSettings::SetupToDll()
+{
+    QByteArray ba = m_name.toLocal8Bit();
+    const char *sz_name = ba.data();
+
+    ba = m_adress.toLocal8Bit();
+    const char *sz_adress = ba.data();
+
+    ba = m_port.toLocal8Bit();
+    const char *sz_port = ba.data();
+
+    SetConnectionParams(sz_name, sz_adress, sz_port);
 }
 
