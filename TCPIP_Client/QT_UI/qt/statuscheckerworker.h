@@ -6,6 +6,7 @@
 
 class StatusCheckerWorker : public Worker
 {
+    Q_OBJECT
 public:
     StatusCheckerWorker();
 public slots:

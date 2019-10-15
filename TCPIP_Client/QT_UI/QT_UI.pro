@@ -25,32 +25,27 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp \
-    settingsdialog.cpp \
-    clientsettings.cpp \
-    client.cpp \
-    worker.cpp \
-    threadcontroller.cpp \
-    mainloopworker.cpp \
-    statuscheckerworker.cpp
-
+    qt/client.cpp \
+    qt/clientsettings.cpp \
+    qt/mainloopworker.cpp \
+    qt/mainwindow.cpp \
+    qt/settingsdialog.cpp \
+    qt/statuscheckerworker.cpp \
+    qt/threadcontroller.cpp \
+    qt/worker.cpp
 HEADERS += \
-        mainwindow.h \
-    settingsdialog.h \
-    clientsettings.h \
-    client.h \
-    worker.h \
-    threadcontroller.h \
-    mainloopworker.h \
-    statuscheckerworker.h
+    qt/client.h \
+    qt/clientsettings.h \
+    qt/mainloopworker.h \
+    qt/mainwindow.h \
+    qt/settingsdialog.h \
+    qt/statuscheckerworker.h \
+    qt/threadcontroller.h \
+    qt/worker.h
 
 FORMS += \
-        mainwindow.ui \
-    settingsdialog.ui
+    qt/mainwindow.ui \
+    qt/settingsdialog.ui
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../lib/release/ -lTCPIP_CLIENT_DLL
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../lib/debug/ -lTCPIP_CLIENT_DLL
-else:unix: LIBS += -L$$PWD/../lib/ -lTCPIP_CLIENT_DLL
-
+INCLUDEPATH += $$PWD/qt
 INCLUDEPATH += $$PWD/../TCPIP_CLIENT_DLL/public
-DEPENDPATH += $$PWD/../TCPIP_CLIENT_DLL/public

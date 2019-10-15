@@ -9,7 +9,7 @@ ThreadController::ThreadController(Worker &worker, QObject *parent) : QObject(pa
 
         m_pWorkerThread->start();
 
-        //connect(this, &ThreadController::operate, m_pWorker, &Worker::doWork);
+        connect(this, &ThreadController::operate, m_pWorker, &Worker::doWork);
         //connect(m_pWorker, &Worker::resultReady, this, &ThreadController::handleResults);
 
         emit operate();

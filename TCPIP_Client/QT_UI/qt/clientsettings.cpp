@@ -1,5 +1,5 @@
 #include "clientsettings.h"
-#include <ChatClientAPI.h>
+#include "../../TCPIP_CLIENT_DLL/public/ChatClientAPI.h"
 #include "client.h"
 
 ClientSettings::ClientSettings()

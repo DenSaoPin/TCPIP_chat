@@ -1,6 +1,5 @@
 #include "mainloopworker.h"
-#include <ChatClientAPI.h>
-
+#include "../../TCPIP_CLIENT_DLL/public/ChatClientAPI.h"
 MainLoopWorker::MainLoopWorker()
 {
 

@@ -6,6 +6,7 @@
 
 class MainLoopWorker : public Worker
 {
+    Q_OBJECT
 public:
     MainLoopWorker();
 public slots:

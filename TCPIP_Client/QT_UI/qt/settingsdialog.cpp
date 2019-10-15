@@ -1,7 +1,7 @@
 #include "settingsdialog.h"
-#include "ui_settingsdialog.h"
 #include "QRegExp"
 #include "QMessageBox"
+#include "ui_settingsdialog.h"
 
 SettingsDialog::SettingsDialog(ClientSettings *settings ,QWidget *parent) :
     QDialog(parent),

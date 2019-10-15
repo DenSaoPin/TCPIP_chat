@@ -4,6 +4,7 @@
 
 #include <QMainWindow>
 #include "settingsdialog.h"
+#include "QString"
 
 namespace Ui {
 class MainWindow;
@@ -18,7 +19,10 @@ public:
     void OnRecieveMessage(const char *szName, const int* messageType, const char *szMessage);
     ~MainWindow();
 
-private slots:
+public slots:
+    void PrintMessage(QString& str);
+
+signals:
 
 private:
     Ui::MainWindow *ui;

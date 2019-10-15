@@ -6,6 +6,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
 }
 
 MainWindow::~MainWindow()
@@ -19,4 +20,9 @@ void MainWindow::OnRecieveMessage(const char *szName, const int* messageType, co
     QString message (szMessage);
 
     ui->textBox_Out->append(name + ": " + message + "\n");
+}
+
+void MainWindow::PrintMessage(QString& qstr)
+{
+    ui->textBox_Out->append(qstr + "\n");
 }

@@ -1,20 +1,21 @@
-#include "mainwindow.h"
-#include "settingsdialog.h"
-#include "clientsettings.h"
+#include "qt/mainwindow.h"
+#include "qt/settingsdialog.h"
+#include "qt/clientsettings.h"
 #include <QApplication>
 #include <ChatClientAPI.h>
 #include <QThread>
-#include "worker.h"
-#include "mainloopworker.h"
-#include "statuscheckerworker.h"
-#include "threadcontroller.h"
-#include "client.h"
+#include <QString>
+#include "qt/worker.h"
+#include "qt/mainloopworker.h"
+#include "qt/statuscheckerworker.h"
+#include "qt/threadcontroller.h"
+#include "qt/client.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    callbackMessageReceivedFunc(OnRecieveMessage);
+    //callbackMessageReceivedFunc(OnRecieveMessage);
 
     MainWindow w;
     Client *cl = new Client(&w);
@@ -30,15 +31,14 @@ int main(int argc, char *argv[])
 
     MainLoopWorker mainWorker;
     ThreadController MainController(mainWorker, &w);
-    QString str;
-    //MainController.operate(str);
 
     StatusCheckerWorker statusWorker;
     ThreadController StatusController(statusWorker, &w);
 
-    int i = 12;
-
     w.show();
+
+    QString str("Test message");
+    w.PrintMessage(str);
 
     return a.exec();
 }

@@ -1,5 +1,5 @@
 #include "statuscheckerworker.h"
-#include <ChatClientAPI.h>
+#include "../../TCPIP_CLIENT_DLL/public/ChatClientAPI.h"
 #include "mainwindow.h"
 #include <QThread>
 StatusCheckerWorker::StatusCheckerWorker()
@@ -9,7 +9,7 @@ StatusCheckerWorker::StatusCheckerWorker()
 
 void StatusCheckerWorker::doWork()
 {
-    EClientStatus status;
+    EClientStatus status = eInvalid;
     while(status != eShutDown)
     {
         status = GetClientDllStatus();

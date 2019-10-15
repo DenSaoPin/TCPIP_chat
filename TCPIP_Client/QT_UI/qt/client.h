@@ -3,9 +3,9 @@
 #define CLIENT_H
 
 #include <QObject>
-#include "ChatClientAPI.h"
 #include "mainwindow.h"
 #include "clientsettings.h"
+#include "../../TCPIP_CLIENT_DLL/public/ChatClientAPI.h"
 
 class Client : public QObject
 {
