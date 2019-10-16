@@ -2,7 +2,7 @@
 #include "qt/settingsdialog.h"
 #include "qt/clientsettings.h"
 #include <QApplication>
-#include <ChatClientAPI.h>
+#include <public/ChatClientAPI.h>
 #include <QThread>
 #include <QString>
 #include "qt/worker.h"
