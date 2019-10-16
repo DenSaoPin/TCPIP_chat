@@ -34,14 +34,14 @@ void ClientSettings::SetPort(QString port)
 
 void ClientSettings::SetupToDll()
 {
-    QByteArray ba = m_name.toLocal8Bit();
-    const char *sz_name = ba.data();
+    QByteArray bName = m_name.toLocal8Bit();
+    const char *sz_name = bName.data();
 
-    ba = m_adress.toLocal8Bit();
-    const char *sz_adress = ba.data();
+    QByteArray bAdress = m_adress.toLocal8Bit();
+    const char *sz_adress = bAdress.data();
 
-    ba = m_port.toLocal8Bit();
-    const char *sz_port = ba.data();
+    QByteArray bPort = m_port.toLocal8Bit();
+    const char *sz_port = bPort.data();
 
     SetConnectionParams(sz_name, sz_adress, sz_port);
 }
