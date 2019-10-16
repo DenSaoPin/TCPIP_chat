@@ -2,12 +2,6 @@
 #include <cstdarg>
 #include <cstdio>
 #include <cstring>
-//int ILogger::Print(ELogLevel eDebugLevel, const char* formatText, ...)
-//{
-//	va_list args;
-//	va_start(args, formatText);
-//	int recvd = vprintf(formatText, )
-//}
 
 BaseLogger::BaseLogger(const char* name)
 {
