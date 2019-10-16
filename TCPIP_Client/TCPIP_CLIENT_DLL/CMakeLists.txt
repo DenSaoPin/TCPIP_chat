@@ -22,8 +22,21 @@ if(WIN32)
 endif(WIN32)                                          
 
 add_library (${PROJECT} SHARED  ${CPP_FILES} ${HEADER_FILES})
+
 target_include_directories (${PROJECT} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
                                                                 
 target_link_libraries (${PROJECT} LINK_PUBLIC ProtocolAPI)
 
 add_dependencies(${PROJECT} ProtocolAPI)
+
+source_group("HEADERS" FILES ${HEADER_FILES})
+source_group("SOURCES" FILES ${CPP_FILES})
+
+include(GNUInstallDirs)
+
+INSTALL(TARGETS ${PROJECT} 
+	ARCHIVE  DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} 
+
+)
+install(FILES "public/ChatClientAPI.h" DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT}")
