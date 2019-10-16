@@ -1,10 +1,16 @@
-#pragma once
-
-#pragma comment(lib, "Ws2_32.lib")
-
 #define MAX_CLIENTS 10
 #define MAX_LENGTH 1024
 #define HEADER_START 0xFFFFFFFF
+
+#ifdef _WIN32
+    #define SLEEP Sleep
+#elseif __GNUC__
+    #include <unistd.h>
+    #define SLEEP usleep
+#else
+#define SLEEP usleep
+#endif
+
 #include <string>
 #include "ServerClient.h"
 int wsaError = 0;
@@ -18,7 +24,7 @@ int main()
 	
 	TCPServer server("0.0.0.0", "7700");
 
-	for (;; Sleep(75))
+    for (;; SLEEP(75))
 	{
 		server.Accept();
 
@@ -37,7 +43,8 @@ int main()
 	}
 }
 
-void TCPServer::printWsaError()
+#if defined _WIN32
+    void TCPServer::printWsaError()
 {
 	switch (WSAGetLastError())
 	{
@@ -105,4 +112,9 @@ void TCPServer::printWsaError()
 		//WSACleanup();
 		break;
 	}
+}
+#endif
+void TCPServer::printLinuxError()
+{
+    printf("%s", strerror(errno));
 }

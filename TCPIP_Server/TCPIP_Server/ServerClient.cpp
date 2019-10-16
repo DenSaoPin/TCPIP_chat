@@ -6,8 +6,9 @@
 #include "TCPServer.h"
 #include "Exceptions.h"
 #include <chrono>
+#include "Defines.h"
 
-ServerClient::ServerClient(TCPServer* pServer, SOCKET socket)
+ServerClient::ServerClient(TCPServer* pServer, CROSS_SOCKET socket)
 {
 	m_log = LoggerManager::GetLogger("ServerClient");
 	m_log->error("Test");
@@ -59,7 +60,14 @@ bool ServerClient::ProcessSocket()
                 //TODO need implement print exception text 
                 std::cout << " Exception ConnectionClosedException catched " << std::endl;
                 IInvalid = true;
-                closesocket(Socket);
+#ifdef _WIN32
+        shutdown(Socket, SD_BOTH);
+#endif
+
+#ifdef __GNUC__
+        shutdown(Socket, SHUT_RDWR);
+        close(Socket);
+#endif
                 return false;
             }
             catch (Exceptions::ConnectionLostException)

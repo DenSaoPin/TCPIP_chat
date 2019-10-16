@@ -1,5 +1,5 @@
 #pragma once
-#include <xstring>
+#include <string>
 #include "ClientSet.h"
 #include <unordered_set>
 #include "../../ProtocolAPI/ProtocolAPI/Protocol.h"
@@ -7,16 +7,7 @@
 #include "../../ProtocolAPI/ProtocolAPI/BroadcastMessage.h"
 #include <loggerAPI/ILogger.h>
 #include "ProtocolAPI/Response.h"
-
-
-#define CROSS_SOCKET SOCKET
-
-#if defined _WIN32
-#include <WinSock2.h>
-#define PrintErrors printWsaError()
-#else
-#define PrintErrors printLinuxError()
-#endif
+#include "Defines.h"
 
 class ServerClient;
  
@@ -59,4 +50,5 @@ public:
 	ChatLib::RawBytes RecieveMessage(const CROSS_SOCKET& socket);
 
 	void printWsaError();
+    void printLinuxError();
 };

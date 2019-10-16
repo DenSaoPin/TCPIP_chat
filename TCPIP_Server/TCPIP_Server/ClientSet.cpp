@@ -1,5 +1,6 @@
 #include "ClientSet.h"
 #include "ServerClient.h"
+#include "exception"
 
 ClientSet::ClientSet()
 {
@@ -51,7 +52,7 @@ bool ClientSet::Check(std::string inputName)
 	}
 	else
 	{
-		throw new std::exception("Server finding clients error: More than one Client has the same Name descriptor");
+        throw new std::runtime_error("Server finding clients error: More than one Client has the same Name descriptor");
 	}
 }
 

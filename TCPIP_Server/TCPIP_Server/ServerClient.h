@@ -13,7 +13,7 @@ public:
 	ServerClient(TCPServer* pServer, CROSS_SOCKET socket);
 
 	std::string Name = "";
-	CROSS_SOCKET Socket = NULL;
+    CROSS_SOCKET Socket = 0;
 	bool IInvalid = false;
 
 	std::queue<ChatLib::BaseMessagePtr> ForSend;

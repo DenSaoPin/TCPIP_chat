@@ -1,19 +1,24 @@
+#if defined _WIN32
+    #pragma comment (lib, "Ws2_32.lib")
+    #include <WinSock2.h>
+    #include <WS2tcpip.h>
+    #define CheckWOULDBLOCK CheckWSA_WOULDBLOCK()
+#endif
+
+#ifdef __GNUC__
+    #define CheckWOULDBLOCK CheckEINPROGRESS()
+    #include <sys/types.h>
+    #include <sys/socket.h>
+#endif
+
 #include "ServerClient.h"
 #include <iostream>
-#include <WS2tcpip.h>
 #include "LoggerManager.h"
 #include "ProtocolAPI/Defines.h"
 #include "Exceptions.h"
+#include "Defines.h"
+
 #define MAX_LENGTH 1024
-
-#if defined _WIN32
-#include <WinSock2.h>
-#define PrintErrors printWsaError()
-#define CROSS_SOCKET SOCKET
-#else
-#define PrintErrors printLinuxError()
-#endif
-
 const char * DefaultAddress = "0.0.0.0";
 
 TCPServer::TCPServer(std::string address, std::string port)
@@ -76,20 +81,22 @@ void TCPServer::InitialWSARoutine()
 
 	memset(buffer, ' ', MAX_LENGTH);
 
-	WSADATA wsaData;
-	WORD wVersion = MAKEWORD(2, 2);
+#ifdef _WIN32
+    WSADATA wsaData;
+    WORD wVersion = MAKEWORD(2, 2);
 
-	int wsaInitError = WSAStartup(wVersion, &wsaData);
+    int wsaInitError = WSAStartup(wVersion, &wsaData);
 
-	if (wsaInitError != 0)
-	{
-		std::cout << "Could not initialize winsock" << std::endl;
-	}
+    if (wsaInitError != 0)
+    {
+        std::cout << "Could not initialize winsock" << std::endl;
+    }
 
-	if (wsaData.wVersion != 514)
-	{
-		//CheckSockError(GetLastError());
-	}
+    if (wsaData.wVersion != 514)
+    {
+        //CheckSockError(GetLastError());
+    }
+#endif
 }
 
 void TCPServer::ListenSockInitialization(std::string& IPv4_Adress,std::string& port)
@@ -97,7 +104,7 @@ void TCPServer::ListenSockInitialization(std::string& IPv4_Adress,std::string& p
 	struct addrinfo hints, *p;
 	struct addrinfo* pResults;
 
-	ZeroMemory(&hints, sizeof(hints));
+    memset(&hints,0, sizeof(hints));
 
 	hints.ai_family = PF_INET;
 	hints.ai_flags = AI_PASSIVE;
@@ -112,7 +119,7 @@ void TCPServer::ListenSockInitialization(std::string& IPv4_Adress,std::string& p
 	}
 	if ((res = getaddrinfo(IPv4_Adress.c_str(), port.c_str(), &hints, &pResults)) != 0)
 	{
-		fprintf(stderr, "getaddrinfo: %ws\n", gai_strerror(res));
+        fprintf(stderr, "getaddrinfo: %ws\n", gai_strerror(res));
 	}
 
 	for (p = pResults; p != NULL; p = p->ai_next)
@@ -125,14 +132,25 @@ void TCPServer::ListenSockInitialization(std::string& IPv4_Adress,std::string& p
 		}
 		//TODO check
 		char yes = '1';
-		if (setsockopt(ListenSock, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof yes) == -1)
+        CROSS_SIZE size = sizeof(yes);
+#ifdef _WIN32
+        if (setsockopt(ListenSock, SOL_SOCKET, SO_REUSEADDR, &yes, size) == -1)
 		{
 			printf("server: setsockopt error \n");
-			exit(1);
+            printf("%s",strerror(errno));
+            exit(1);
 		}
+#endif
 		if (bind(ListenSock, p->ai_addr, (int)p->ai_addrlen) == -1)
 		{
-			closesocket(ListenSock);
+#ifdef _WIN32
+        shutdown(ListenSock, SD_BOTH);
+#endif
+
+#ifdef __GNUC__
+        shutdown(ListenSock, SHUT_RDWR);
+        close(ListenSock);
+#endif
 			printf("server: bind  error \n");
 			continue;
 		}
@@ -204,7 +222,7 @@ void TCPServer::Accept()
 
 void TCPServer::SendMessagee(ChatLib::BaseMessage* message, const CROSS_SOCKET& socket)
 {
-	byte pBuffer[255];
+    ChatLib::byte pBuffer[255];
 	int length = message->Construct(pBuffer);
 
 	int sended = 0;
@@ -235,8 +253,14 @@ ChatLib::RawBytes TCPServer::RecieveMessage(const CROSS_SOCKET& socket)
 	}
 	else if (recived == -1)
 	{
-		PrintErrors;
-		closesocket(socket);
+        PrintErrors;
+#ifdef _WIN32
+        shutdown(socket, SD_BOTH);
+#endif
+#ifdef __GNUC__
+        shutdown(socket, SHUT_RDWR);
+        close(socket);
+#endif
         printf(" Recieve message: connection lost closed \n");
 		throw Exceptions::ConnectionLostException(" Connection lost closed \n");
 		//TODO check Unix error

@@ -4,10 +4,14 @@ set (API_FOLDER	loggerAPI)
 set (CPP_SOURCES
 	BaseLogger.cpp
  	ConsoleLogger.cpp
- 	dllmain.cpp
  	ILogger.cpp
  	LoggerManager.cpp
 	)  
+
+if(WIN32)
+               set(CPP_SOURCES   ${CPP_SOURCES}  dllmain.cpp)
+endif(WIN32)
+
 
 set (H_SOURCES
 	BaseLogger.h
