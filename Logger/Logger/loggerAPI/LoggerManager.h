@@ -5,5 +5,5 @@
 class LoggerManager
 {
 public:
-	DLLEXPORT static ILogger *GetLogger(const char * name);
+	Logger_PUBLIC static ILogger *GetLogger(const char * name);
 };

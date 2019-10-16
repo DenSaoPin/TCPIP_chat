@@ -1,7 +1,7 @@
 #pragma once
 #include "loggerAPI/ILogger.h"
 
-class DLLEXPORT LoggerManager
+class Logger_PUBLIC LoggerManager
 {
 public:
 	static ILogger *GetLogger(const char * name);
