@@ -29,9 +29,6 @@ target_link_libraries (${PROJECT} LINK_PUBLIC ProtocolAPI)
 
 add_dependencies(${PROJECT} ProtocolAPI)
 
-source_group("HEADERS" FILES ${HEADER_FILES})
-source_group("SOURCES" FILES ${CPP_FILES})
-
 include(GNUInstallDirs)
 
 INSTALL(TARGETS ${PROJECT} 
