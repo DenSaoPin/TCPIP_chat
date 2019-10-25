@@ -4,7 +4,7 @@
 
 #ifdef _WIN32
     #define SLEEP Sleep
-#elseif __GNUC__
+#elif  __GNUC__
     #include <unistd.h>
     #define SLEEP usleep
 #else

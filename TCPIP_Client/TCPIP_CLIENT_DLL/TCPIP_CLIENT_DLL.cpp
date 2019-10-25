@@ -82,13 +82,21 @@ void TCPIP_Client::SocketCleanup()
     if(GetSocket() != 0)
     {
 #ifdef _WIN32
+
         shutdown(GetSocket(), SD_BOTH);
+
         WSACleanup();
+
 #endif
 
+
+
 #ifdef __GNUC__
+
         shutdown(GetSocket(), SHUT_RDWR);
+
         close(GetSocket());
+
 #endif
     }
 }
