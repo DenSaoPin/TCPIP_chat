@@ -18,27 +18,22 @@ int main(int argc, char *argv[])
     //callbackMessageReceivedFunc(OnRecieveMessage);
 
     MainWindow w;
-    Client *cl = new Client(&w);
-    SettingsDialog dialog(cl->pSettings);
+    ClientSettings settings;
+
+    SettingsDialog dialog(&settings);
+    settings.SetupToDll();
+
 
     int result = dialog.exec();
     if(result == QDialog::Rejected)
     {
           return 0;
     }
+    settings.SetupToDll();
 
-    cl->pSettings->SetupToDll();
-
-    MainLoopWorker mainWorker;
-    ThreadController MainController(mainWorker, &w);
-
-    StatusCheckerWorker statusWorker;
-    ThreadController StatusController(statusWorker, &w);
+    Client *cl = new Client(&w, &settings);
 
     w.show();
-
-    QString str("Test message");
-    w.PrintMessage(str);
 
     return a.exec();
 }
