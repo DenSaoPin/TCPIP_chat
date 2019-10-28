@@ -13,7 +13,7 @@ class ThreadController : public QObject
     Worker* m_pWorker;
 
 public:
-    explicit ThreadController(Worker &worker, QObject *parent = nullptr);
+    explicit ThreadController(Worker *pWorker, QObject *parent = nullptr);
 
     ~ThreadController()
     {
