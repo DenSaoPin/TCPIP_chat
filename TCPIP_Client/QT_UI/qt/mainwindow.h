@@ -24,6 +24,11 @@ public slots:
 
 signals:
 
+private slots:
+    void on_button_Send_clicked();
+
+    void on_actionReconnect_triggered();
+
 private:
     Ui::MainWindow *ui;
 };

@@ -1,12 +1,21 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "public/ChatClientAPI.h"
+
+enum EMessageType
+{
+    eInvalide = 0x00,
+    eNameRequest = 0x01,
+    eDirectMessage = 0x05,
+    eBroadcastMessage = 0x06,
+    eResponse = 0x07,
+};
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
 }
 
 MainWindow::~MainWindow()
