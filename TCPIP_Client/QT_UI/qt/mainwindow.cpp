@@ -1,5 +1,8 @@
+#include "threadcontroller.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "client.h"
+#include "QThread"
 #include "public/ChatClientAPI.h"
 
 enum EMessageType
@@ -11,11 +14,15 @@ enum EMessageType
     eResponse = 0x07,
 };
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow* MainWindow::m_pI = nullptr;
+
+MainWindow::MainWindow(Client *pClient, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    this->pClient = pClient;
+    MainWindow::m_pI = this;
 }
 
 MainWindow::~MainWindow()
@@ -28,7 +35,7 @@ void MainWindow::OnRecieveMessage(const char *szName, const int* messageType, co
     QString name (szName);
     QString message (szMessage);
 
-    ui->textBox_Out->append(name + ": " + message + "\n");
+    MainWindow::m_pI->ui->textBox_Out->append(name + ": " + message + "\n");
 }
 
 void MainWindow::PrintMessage(QString& qstr)
