@@ -39,14 +39,17 @@ void MainWindow::PrintMessage(QString& qstr)
 void MainWindow::on_button_Send_clicked()
 {
     QString text = ui->textBox_input->toPlainText();
-    PrintMessage(text);
+    if(!text.trimmed().isEmpty())
+    {
+        PrintMessage(text);
 
-    QByteArray ba = text.toLocal8Bit();
-    const char *szMessage = ba.data();
+        QByteArray ba = text.toLocal8Bit();
+        const char *szMessage = ba.data();
 
-    ClientSendMessage(nullptr, (const int)EMessageType::eBroadcastMessage, szMessage, ba.length());
+        ClientSendMessage(nullptr, static_cast<const int>(EMessageType::eBroadcastMessage), szMessage, ba.length());
 
-    ui->textBox_input->clear();
+        ui->textBox_input->clear();
+    }
 }
 
 void MainWindow::on_actionReconnect_triggered()
