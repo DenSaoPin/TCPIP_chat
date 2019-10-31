@@ -34,6 +34,10 @@ private slots:
 
     void on_actionReconnect_triggered();
 
+    void on_actionShutdown_triggered();
+
+    void on_actionExit_triggered();
+
 private:
     Ui::MainWindow *ui;
     Client *pClient;

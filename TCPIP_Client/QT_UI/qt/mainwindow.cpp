@@ -61,19 +61,41 @@ void MainWindow::on_button_Send_clicked()
 
 void MainWindow::on_actionReconnect_triggered()
 {
-    QString rec("@reconnect@");
-/*
-    if (m_clientStatus == EClientStatus::eTerminating)
+    //QString rec("@reconnect@");
+
+     if (pClient->DllStatus == EClientStatus::eTerminating)
+     {
+     }
+     else if (pClient->DllStatus == EClientStatus::eShutDown)
+     {
+     }
+     else
+     {
+         ClientTerminate();
+     }
+     QThread::usleep(500);
+     pClient->pMainLoopController->Operate();
+     pClient->pStatusCheckerController->Operate();
+}
+
+void MainWindow::on_actionShutdown_triggered()
+{
+    if (pClient->DllStatus == EClientStatus::eTerminating)
     {
     }
-    else if (m_clientStatus == EClientStatus::eShutDown)
+    else if (pClient->DllStatus == EClientStatus::eShutDown)
     {
     }
     else
     {
         ClientTerminate();
     }
-    QThread::usleep(500);
-*/
-    //m_clientDllMainThread = std::async(std::launch::async, ClientMainLoop);
+}
+
+void MainWindow::on_actionExit_triggered()
+{
+    pClient->pMainLoopController->Kill();
+    pClient->pStatusCheckerController->Kill();
+
+    QCoreApplication::quit();
 }
