@@ -6,6 +6,8 @@
 #include <QThread>
 #include "worker.h"
 
+class MyThread;
+
 class ThreadController : public QObject
 {
     Q_OBJECT
@@ -15,13 +17,19 @@ class ThreadController : public QObject
 public:
     explicit ThreadController(Worker *pWorker, QObject *parent = nullptr);
 
-    ~ThreadController()
-    {
-        m_pWorkerThread->quit();
-        m_pWorkerThread->wait();
-    }
+    void Operate();
+    void Kill();
+
+    ~ThreadController();
+    //{
+       // m_pWorkerThread->quit();
+        //m_pWorkerThread->wait();
+    //}
 public slots:
     void handleResults();
+    void PrintStart();
+    void PrintFinish();
+    void PrintDestroy();
 signals:
     void operate();
 };

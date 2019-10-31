@@ -14,15 +14,9 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-
-    //callbackMessageReceivedFunc(OnRecieveMessage);
-
-    MainWindow w;
     ClientSettings settings;
-
     SettingsDialog dialog(&settings);
     settings.SetupToDll();
-
 
     int result = dialog.exec();
     if(result == QDialog::Rejected)
@@ -31,9 +25,12 @@ int main(int argc, char *argv[])
     }
     settings.SetupToDll();
 
-    Client *cl = new Client(&w, &settings);
+    Client *cl = new Client(&settings);
+    setCallbackMessageReceived(MainWindow::OnRecieveMessage);
 
-    w.show();
+    cl->Window.show();
+    cl->pMainLoopController->Operate();
+    cl->pStatusCheckerController->Operate();
 
     return a.exec();
 }
