@@ -6,6 +6,7 @@
 #include "mainwindow.h"
 #include "clientsettings.h"
 #include "../../TCPIP_CLIENT_DLL/public/ChatClientAPI.h"
+#include <QMetaType>
 
 class ThreadController;
 class MainLoopWorker;
@@ -18,12 +19,12 @@ class Client : public QObject
     MainLoopWorker *m_pWorker;
     StatusCheckerWorker *m_pStWorker;
 public:
-    explicit Client(MainWindow *window, ClientSettings* pSettings, QObject *parent = nullptr);
+    explicit Client(ClientSettings* pSettings, QObject *parent = nullptr);
 
     virtual ~Client();
 
 public:
-    MainWindow* pWindow;
+    MainWindow Window{this};
     ThreadSafe<EClientStatus> DllStatus{eInvalid};
     ClientSettings* pSettings;
 
@@ -33,6 +34,7 @@ public:
 signals:
 
 public slots:
+    void ClientStatusUpdate(EClientStatus status);
 };
 
 #endif // CLIENT_H
